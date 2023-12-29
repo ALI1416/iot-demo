@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demo.mapper.GatewayMapper">
+
+  <sql id="col">
+    id,sn
+  </sql>
+
+  <!-- 插入 -->
+  <insert id="insert" parameterType="GatewayVo">
+    INSERT
+    gateway(
+    <include refid="col"/>
+    )VALUES(
+    #{id},#{sn}
+    )
+  </insert>
+
+  <!-- 查询所有 -->
+  <select id="findAll" resultType="GatewayVo">
+    SELECT
+    <include refid="col"/>
+    FROM
+    gateway
+  </select>
+
+  <resultMap id="findAllAndDeviceMap" type="GatewayVo">
+    <id column="id" property="id"/>
+    <result column="sn" property="sn"/>
+    <collection property="deviceList" ofType="DeviceVo">
+      <id column="deviceId" property="id"/>
+      <result column="deviceSn" property="sn"/>
+      <result column="deviceType" property="type"/>
+    </collection>
+  </resultMap>
+
+  <!-- 查询所有(含设备) -->
+  <select id="findAllAndDevice" resultMap="findAllAndDeviceMap">
+    SELECT
+    g.id,
+    g.sn,
+    d.id AS deviceId,
+    d.sn AS deviceSn,
+    d.type AS deviceType
+    FROM
+    gateway g,
+    device d
+    WHERE
+    d.gateway_id = g.id
+  </select>
+
+</mapper>

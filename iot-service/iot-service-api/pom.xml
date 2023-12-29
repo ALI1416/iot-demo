@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>iot-service-api</artifactId>
+  <version>1.0.0</version>
+
+  <name>iot-service-api</name>
+  <description>物联网服务API</description>
+  <url>https://github.com/ALI1416/springboot-demo/tree/master/iot-demo/iot-service/iot-service-api</url>
+
+  <parent>
+    <groupId>com.demo</groupId>
+    <artifactId>iot-service</artifactId>
+    <version>1.0.0</version>
+  </parent>
+
+  <dependencies>
+    <!--SpringBoot Web-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <!--SpringBoot WebSocket-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-websocket</artifactId>
+    </dependency>
+    <!--FastJson-->
+    <dependency>
+      <groupId>com.alibaba.fastjson2</groupId>
+      <artifactId>fastjson2</artifactId>
+    </dependency>
+    <!--Redis-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+    <!--轻量级权限认证SpringBoot启动器-->
+    <dependency>
+      <groupId>cn.404z</groupId>
+      <artifactId>tiny-token-spring-boot-starter</artifactId>
+    </dependency>
+    <!--MyBatis-->
+    <dependency>
+      <groupId>org.mybatis.spring.boot</groupId>
+      <artifactId>mybatis-spring-boot-starter</artifactId>
+    </dependency>
+    <!--PageHelper分页排序查询-->
+    <dependency>
+      <groupId>com.github.pagehelper</groupId>
+      <artifactId>pagehelper-spring-boot-starter</artifactId>
+    </dependency>
+    <!--雪花ID生成器-->
+    <dependency>
+      <groupId>cn.404z</groupId>
+      <artifactId>id-spring-boot-autoconfigure</artifactId>
+    </dependency>
+    <!--Knife4j-->
+    <dependency>
+      <groupId>com.github.xiaoymin</groupId>
+      <artifactId>knife4j-openapi3-spring-boot-starter</artifactId>
+    </dependency>
+    <!--RabbitMQ-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-amqp</artifactId>
+    </dependency>
+    <!--MongoDB-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-mongodb</artifactId>
+    </dependency>
+    <!--MQTT-->
+    <dependency>
+      <groupId>org.eclipse.paho</groupId>
+      <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+    </dependency>
+    <!--MySQL-->
+    <dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <!--WebSocket SpringBoot模板-->
+    <dependency>
+      <groupId>cn.404z</groupId>
+      <artifactId>websocket-spring-boot-temp</artifactId>
+    </dependency>
+    <!--Redis SpringBoot模板-->
+    <dependency>
+      <groupId>cn.404z</groupId>
+      <artifactId>redis-spring-boot-temp</artifactId>
+    </dependency>
+    <!--RabbitMQ SpringBoot模板-->
+    <dependency>
+      <groupId>cn.404z</groupId>
+      <artifactId>rabbitmq-spring-boot-temp</artifactId>
+    </dependency>
+    <!--MongoDB SpringBoot模板-->
+    <dependency>
+      <groupId>cn.404z</groupId>
+      <artifactId>mongo-spring-boot-temp</artifactId>
+    </dependency>
+    <!--MQTT SpringBoot启动器-->
+    <dependency>
+      <groupId>cn.404z</groupId>
+      <artifactId>mqtt-spring-boot-starter</artifactId>
+    </dependency>
+    <!--工具-->
+    <dependency>
+      <groupId>cn.404z</groupId>
+      <artifactId>util</artifactId>
+    </dependency>
+    <!--SpringBoot工具-->
+    <dependency>
+      <groupId>cn.404z</groupId>
+      <artifactId>util-spring-boot</artifactId>
+    </dependency>
+  </dependencies>
+
+  <profiles>
+    <profile>
+      <!-- mvn install -P prd -->
+      <id>prd</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>
+                  <groupId>org.projectlombok</groupId>
+                  <artifactId>lombok</artifactId>
+                </exclude>
+                <exclude>
+                  <groupId>com.github.xiaoymin</groupId>
+                  <artifactId>knife4j-openapi3-spring-boot-starter</artifactId>
+                </exclude>
+                <exclude>
+                  <groupId>com.github.xiaoymin</groupId>
+                  <artifactId>knife4j-core</artifactId>
+                </exclude>
+                <exclude>
+                  <groupId>com.github.xiaoymin</groupId>
+                  <artifactId>knife4j-openapi3-ui</artifactId>
+                </exclude>
+                <exclude>
+                  <groupId>org.springdoc</groupId>
+                  <artifactId>springdoc-openapi-ui</artifactId>
+                </exclude>
+                <exclude>
+                  <groupId>org.springdoc</groupId>
+                  <artifactId>springdoc-openapi-webmvc-core</artifactId>
+                </exclude>
+                <exclude>
+                  <groupId>org.springdoc</groupId>
+                  <artifactId>springdoc-openapi-common</artifactId>
+                </exclude>
+                <exclude>
+                  <groupId>io.swagger.core.v3</groupId>
+                  <artifactId>swagger-annotations</artifactId>
+                </exclude>
+                <exclude>
+                  <groupId>io.swagger.core.v3</groupId>
+                  <artifactId>swagger-core</artifactId>
+                </exclude>
+                <exclude>
+                  <groupId>io.swagger.core.v3</groupId>
+                  <artifactId>swagger-models</artifactId>
+                </exclude>
+                <exclude>
+                  <groupId>org.webjars</groupId>
+                  <artifactId>swagger-ui</artifactId>
+                </exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>

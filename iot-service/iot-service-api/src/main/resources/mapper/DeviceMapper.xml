@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demo.mapper.DeviceMapper">
+
+  <sql id="col">
+    id,gateway_id,sn,type
+  </sql>
+
+  <!-- 插入 -->
+  <insert id="insert" parameterType="DeviceVo">
+    INSERT
+    device(
+    <include refid="col"/>
+    )VALUES(
+    #{id},#{gatewayId},#{sn},#{type}
+    )
+  </insert>
+
+  <!-- 查询，通过gatewayId -->
+  <select id="findByGatewayId" parameterType="Long" resultType="DeviceVo">
+    SELECT
+    <include refid="col"/>
+    FROM
+    device
+    WHERE
+    gateway_id = #{gatewayId}
+  </select>
+
+</mapper>

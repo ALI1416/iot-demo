@@ -1,0 +1,5 @@
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+cn.z.mqtt.annotation.MqttAnnotationProcessor,\
+cn.z.mqtt.autoconfigure.MqttAutoConfiguration,\
+cn.z.mqtt.MqttTemp

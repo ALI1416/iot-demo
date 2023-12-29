@@ -1,0 +1,52 @@
+spring:
+  profiles:
+    active: dev
+  devtools:
+    restart:
+      enabled: false
+  servlet:
+    multipart:
+      max-file-size: 4GB
+      max-request-size: 4GB
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      max-lifetime: 60000
+  data:
+    mongodb:
+      auto-index-creation: true
+  redis:
+    database: 0
+    timeout: 10s
+  rabbitmq:
+    listener:
+      type: simple
+      simple:
+        default-requeue-rejected: false
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.demo.entity.po,com.demo.entity.vo
+  configuration:
+    map-underscore-to-camel-case: true
+
+id:
+  machine-id: 0
+  machine-bits: 8
+  sequence-bits: 12
+
+tiny-token:
+  header: Authorization
+  username: root
+  password: admin
+  # cm9vdDphZG1pbg==
+
+mqtt:
+  connection-timeout: 30
+  keep-alive-interval: 60
+  clean-session: false
+  automatic-reconnect: true
+
+logging:
+  file:
+    name: /log/iot-service-api.log

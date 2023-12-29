@@ -1,0 +1,32 @@
+spring:
+  devtools:
+    restart:
+      enabled: true
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/iot?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+  data:
+    mongodb:
+      host: 127.0.0.1
+      port: 27017
+      database: iot
+      # username:
+      # password:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password:
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+
+mqtt:
+  uri: tcp://127.0.0.1:1883
+
+logging:
+  level:
+    root: info
+    com.demo.mapper: trace

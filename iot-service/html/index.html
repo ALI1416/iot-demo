@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Title</title>
+  <script src="js/stomp-1.7.1.js"></script>
+</head>
+
+<body>
+<div>
+  <h3>配置</h3>
+  <label for="urlText">URL：</label><input id="urlText" type="text" value="http://127.0.0.1:8080/">
+  <br>
+  <label for="wsUrlText">WebSocket URL：</label><input id="wsUrlText" type="text" value="ws://127.0.0.1:8080/ws">
+  <br>
+  <label for="usernameText">用户名：</label><input id="usernameText" type="text" value="root">
+  <br>
+  <label for="passwordText">密码：</label><input id="passwordText" type="text" value="admin">
+  <br>
+  <label for="gatewaySnText">网关序号：</label><input id="gatewaySnText" type="text" value="123">
+  <br>
+  <label for="deviceSnText">设备序号：</label><input id="deviceSnText" type="text" value="1">
+  <br>
+  <input id="connectBtn" type="button" value="连接WebSocket">
+  <h4>消息</h4>
+  <div id="msg">暂无</div>
+</div>
+<div>
+  <h3>事件</h3>
+  <h4>心跳</h4>
+  <textarea id="heartbeatMsg" readonly cols="50" rows="5"></textarea>
+  <h4>网关</h4>
+  <textarea id="gatewayMsg" readonly cols="50" rows="5"></textarea>
+  <h4>温湿度</h4>
+  <textarea id="thermoHygroMeterMsg" readonly cols="50" rows="5"></textarea>
+</div>
+<div>
+  <h3>故障详情</h3>
+  <textarea id="faultMsg" readonly cols="50" rows="5"></textarea>
+</div>
+<div>
+  <h3>互动</h3>
+  <h4>设置通信地址</h4>
+  <textarea id="setCommunicationAddressSendText" cols="50" rows="5">{
+  "uri": "mqtt://127.0.0.1:1883",
+  "username": "",
+  "password": ""
+}</textarea>
+  <input id="setCommunicationAddressSendBtn" type="button" value="发送">
+  <br>
+  <textarea id="setCommunicationAddressMsg" readonly cols="50" rows="5"></textarea>
+  <h4>设置温湿度报警</h4>
+  <textarea id="setThermoHygroMeterSendText" cols="50" rows="5">{
+  "temperatureMax": 3000,
+  "temperatureMin": 1000,
+  "humidityMax": 9000,
+  "humidityMin": 5000
+}</textarea>
+  <input id="setThermoHygroMeterSendBtn" type="button" value="发送">
+  <br>
+  <textarea id="setThermoHygroMeterMsg" readonly cols="50" rows="5"></textarea>
+  <h4>获取通信地址</h4>
+  <input id="getCommunicationAddressSendBtn" type="button" value="发送">
+  <br>
+  <textarea id="getCommunicationAddressMsg" readonly cols="50" rows="5"></textarea>
+  <h4>获取温湿度报警</h4>
+  <input id="getThermoHygroMeterSendBtn" type="button" value="发送">
+  <br>
+  <textarea id="getThermoHygroMeterMsg" readonly cols="50" rows="5"></textarea>
+</div>
+</body>
+<script>
+  const urlText = document.getElementById('urlText')
+  const wsUrlText = document.getElementById('wsUrlText')
+  const usernameText = document.getElementById('usernameText')
+  const passwordText = document.getElementById('passwordText')
+  const gatewaySnText = document.getElementById('gatewaySnText')
+  const deviceSnText = document.getElementById('deviceSnText')
+  const connectBtn = document.getElementById('connectBtn')
+  const msg = document.getElementById('msg')
+  const heartbeatMsg = document.getElementById('heartbeatMsg')
+  const gatewayMsg = document.getElementById('gatewayMsg')
+  const thermoHygroMeterMsg = document.getElementById('thermoHygroMeterMsg')
+  const faultMsg = document.getElementById('faultMsg')
+  const setCommunicationAddressSendText = document.getElementById('setCommunicationAddressSendText')
+  const setCommunicationAddressSendBtn = document.getElementById('setCommunicationAddressSendBtn')
+  const setCommunicationAddressMsg = document.getElementById('setCommunicationAddressMsg')
+  const setThermoHygroMeterSendText = document.getElementById('setThermoHygroMeterSendText')
+  const setThermoHygroMeterSendBtn = document.getElementById('setThermoHygroMeterSendBtn')
+  const setThermoHygroMeterMsg = document.getElementById('setThermoHygroMeterMsg')
+  const getCommunicationAddressSendBtn = document.getElementById('getCommunicationAddressSendBtn')
+  const getCommunicationAddressMsg = document.getElementById('getCommunicationAddressMsg')
+  const getThermoHygroMeterSendBtn = document.getElementById('getThermoHygroMeterSendBtn')
+  const getThermoHygroMeterMsg = document.getElementById('getThermoHygroMeterMsg')
+
+  let stomp
+
+  /**
+   * 点击连接按钮
+   */
+  connectBtn.addEventListener('click', () => {
+    const headers = {
+      Authorization: getAuthorization()
+    }
+    stomp = Stomp.client(wsUrlText.value)
+    stomp.connect(headers, connectCallback, errorCallback)
+  })
+
+  /**
+   * 获取Authorization
+   */
+  function getAuthorization() {
+    return btoa(usernameText.value + ':' + passwordText.value)
+  }
+
+  /**
+   * 设置通信地址
+   */
+  setCommunicationAddressSendBtn.addEventListener('click', () => {
+    const data = {
+      gatewaySn: gatewaySnText.value,
+      deviceSn: 0,
+      commandCode: 3001,
+      requestJson: JSON.parse(setCommunicationAddressSendText.value)
+    }
+    interact(data).then(res => {
+      alert(JSON.stringify(res))
+    })
+  })
+
+  /**
+   * 设置温湿度报警
+   */
+  setThermoHygroMeterSendBtn.addEventListener('click', () => {
+    const data = {
+      gatewaySn: gatewaySnText.value,
+      deviceSn: deviceSnText.value,
+      commandCode: 3002,
+      requestJson: JSON.parse(setThermoHygroMeterSendText.value)
+    }
+    interact(data).then(res => {
+      alert(JSON.stringify(res))
+    })
+  })
+
+  /**
+   * 获取通信地址
+   */
+  getCommunicationAddressSendBtn.addEventListener('click', () => {
+    const data = {
+      gatewaySn: gatewaySnText.value,
+      deviceSn: 0,
+      commandCode: 4001
+    }
+    interact(data).then(res => {
+      alert(JSON.stringify(res))
+    })
+  })
+
+  /**
+   * 获取温湿度报警
+   */
+  getThermoHygroMeterSendBtn.addEventListener('click', () => {
+    const data = {
+      gatewaySn: gatewaySnText.value,
+      deviceSn: deviceSnText.value,
+      commandCode: 4002
+    }
+    interact(data).then(res => {
+      alert(JSON.stringify(res))
+    })
+  })
+
+  /**
+   * 互动
+   */
+  function interact(data) {
+    return myFetch('interact/send', 'post', data)
+  }
+
+  function myFetch(path, method, body) {
+    let options = {
+      headers: {
+        mode: 'no-cors',
+        Authorization: getAuthorization(),
+        'Content-Type': 'application/json;charset=UTF-8'
+      }
+    }
+    if (method !== undefined) {
+      options.method = method
+    }
+    if (body !== undefined) {
+      options.body = JSON.stringify(body)
+    }
+    return fetch(urlText.value + path, options)
+      .then(res => res.json())
+      .catch(e => {
+        msg.innerText = '接口[' + path + ']调用失败\n' + e
+        throw e
+      })
+  }
+
+  /**
+   * 连接成功回调
+   */
+  function connectCallback() {
+    msg.innerText = 'WebSocket连接成功'
+    /* 事件 */
+    // 心跳
+    stomp.subscribe('/topic/iot/event/' + gatewaySnText.value + '/0/1000', function (res) {
+      heartbeatMsg.value = res.body + '\n' + heartbeatMsg.value
+    })
+    // 网关
+    stomp.subscribe('/topic/iot/event/' + gatewaySnText.value + '/0/1001', function (res) {
+      gatewayMsg.value = res.body + '\n' + gatewayMsg.value
+    })
+    // 温湿度
+    stomp.subscribe('/topic/iot/event/' + gatewaySnText.value + '/' + deviceSnText.value + '/1002', function (res) {
+      thermoHygroMeterMsg.value = res.body + '\n' + thermoHygroMeterMsg.value
+    })
+    /* 故障详情 */
+    stomp.subscribe('/topic/iot/fault/' + gatewaySnText.value, function (res) {
+      faultMsg.value = res.body + '\n' + faultMsg.value
+    })
+    /* 互动 */
+    // 设置通信地址
+    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/0/3001', function (res) {
+      setCommunicationAddressMsg.value = res.body + '\n' + setCommunicationAddressMsg.value
+    })
+    // 设置温湿度报警
+    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/' + deviceSnText.value + '/3002', function (res) {
+      setThermoHygroMeterMsg.value = res.body + '\n' + setThermoHygroMeterMsg.value
+    })
+    // 获取通信地址
+    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/0/4001', function (res) {
+      getCommunicationAddressMsg.value = res.body + '\n' + getCommunicationAddressMsg.value
+    })
+    // 获取温湿度报警
+    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/' + deviceSnText.value + '/4002', function (res) {
+      getThermoHygroMeterMsg.value = res.body + '\n' + getThermoHygroMeterMsg.value
+    })
+  }
+
+  /**
+   * 连接错误回调
+   */
+  function errorCallback(e) {
+    stomp = undefined
+    msg.innerText = e
+  }
+
+</script>
+
+</html>
