@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * <h1>设置温度配置</h1>
+ * <h1>设置温度计配置</h1>
  *
  * <p>
  * createDate 2023/11/15 10:07:57
@@ -18,8 +18,8 @@ import lombok.Setter;
  * @author ALI[ali-k@foxmail.com]
  * @since 1.0.0
  **/
-@Schema(description = "设置温度配置")
-@ProtocolClass(code = 3002, name = "设置温度配置", type = ProtocolType.INTERACT, deviceType = DeviceType.THERMOMETER, requestClass = Interact3002.Request.class)
+@Schema(description = "设置温度计配置")
+@ProtocolClass(code = 3002, name = "设置温度计配置", type = ProtocolType.INTERACT, deviceType = DeviceType.THERMOMETER, requestClass = Interact3002.Request.class)
 public class Interact3002 {
 
     private Interact3002() {
@@ -34,17 +34,17 @@ public class Interact3002 {
     public static class Request extends ToStringBase implements Protocol.Data {
 
         /**
-         * 读取间隔(s 秒)
+         * 刷新间隔(s 秒)
          */
-        @Schema(description = "读取间隔(s 秒)")
-        @ProtocolField(name = "读取间隔", unit = FieldUnit.SECOND)
-        private Integer intervalRead;
+        @Schema(description = "刷新间隔(s 秒)")
+        @ProtocolField(name = "刷新间隔", unit = FieldUnit.SECOND)
+        private Integer intervalRefresh;
         /**
-         * 发送间隔(s 秒)
+         * 推送间隔(s 秒)
          */
-        @Schema(description = "发送间隔(s 秒)")
-        @ProtocolField(name = "发送间隔", unit = FieldUnit.SECOND)
-        private Integer intervalSend;
+        @Schema(description = "推送间隔(s 秒)")
+        @ProtocolField(name = "推送间隔", unit = FieldUnit.SECOND)
+        private Integer intervalPush;
         /**
          * 温度上限(m℃ 毫摄氏度)
          */
@@ -65,7 +65,7 @@ public class Interact3002 {
          */
         @Override
         public boolean dataCheckNotPass() {
-            return ControllerBase.existNull(intervalRead, intervalSend, temperatureMax, temperatureMin);
+            return ControllerBase.existNull(intervalRefresh, intervalPush, temperatureMax, temperatureMin);
         }
 
     }

@@ -8,7 +8,7 @@ import com.demo.entity.protocol.ProtocolInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
- * <h1>温度</h1>
+ * <h1>温度计故障</h1>
  *
  * <p>
  * createDate 2023/12/11 11:02:38
@@ -17,8 +17,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @author ALI[ali-k@foxmail.com]
  * @since 1.0.0
  **/
-@Schema(description = "温度")
-@ProtocolClass(code = 2002, name = "温度", type = ProtocolType.FAULT, deviceType = DeviceType.THERMOMETER, faultClass = Fault2002.Fault.class)
+@Schema(description = "温度计故障")
+@ProtocolClass(code = 2002, name = "温度计故障", type = ProtocolType.FAULT, deviceType = DeviceType.THERMOMETER, faultClass = Fault2002.Fault.class)
 public class Fault2002 {
 
     private Fault2002() {

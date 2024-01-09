@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * <h1>温度</h1>
+ * <h1>温度计事件</h1>
  *
  * <p>
  * createDate 2023/11/10 17:12:31
@@ -18,8 +18,8 @@ import lombok.Setter;
  * @author ALI[ali-k@foxmail.com]
  * @since 1.0.0
  **/
-@Schema(description = "温度")
-@ProtocolClass(code = 1002, name = "温度", type = ProtocolType.EVENT, deviceType = DeviceType.THERMOMETER, eventClass = Event1002.Event.class)
+@Schema(description = "温度计事件")
+@ProtocolClass(code = 1002, name = "温度计事件", type = ProtocolType.EVENT, deviceType = DeviceType.THERMOMETER, eventClass = Event1002.Event.class)
 public class Event1002 {
 
     private Event1002() {

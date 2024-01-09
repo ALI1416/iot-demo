@@ -77,11 +77,6 @@
     <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis -->
     <!--<jedis.version></jedis.version>-->
 
-    <!--RabbitMQ(与服务器版本号不对应，不需一致)-->
-    <!--org.springframework.boot:spring-boot-starter-amqp-->
-    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-amqp -->
-    <!--<rabbit-amqp-client.version></rabbit-amqp-client.version>-->
-
     <!--实体层注解(与IDE安装的版本号对应，不需一致)-->
     <!--org.projectlombok:lombok-->
     <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->

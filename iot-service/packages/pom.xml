@@ -14,7 +14,6 @@
   <url>https://github.com/ALI1416/springboot-demo/tree/master/packages</url>
 
   <modules>
-    <module>rabbitmq-spring-boot-temp</module>
     <module>redis-spring-boot-temp</module>
     <module>websocket-spring-boot-temp</module>
     <module>mongo-spring-boot-temp</module>
@@ -54,9 +53,6 @@
     <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk18on -->
     <bcpkix.version>1.77</bcpkix.version>
 
-    <!--RabbitMQ SpringBoot模板-->
-    <!--cn.404z:rabbitmq-spring-boot-temp-->
-    <rabbitmq-spring-boot-temp.version>1.0.0</rabbitmq-spring-boot-temp.version>
     <!--Redis SpringBoot模板-->
     <!--cn.404z:redis-spring-boot-temp-->
     <redis-spring-boot-temp.version>1.0.0</redis-spring-boot-temp.version>
@@ -112,12 +108,6 @@
         <artifactId>spring-boot-configuration-processor</artifactId>
         <version>${springboot.version}</version>
       </dependency>
-      <!--RabbitMQ-->
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-amqp</artifactId>
-        <version>${springboot.version}</version>
-      </dependency>
       <!--Redis-->
       <dependency>
         <groupId>org.springframework.boot</groupId>
@@ -149,12 +139,6 @@
         <version>${bcpkix.version}</version>
       </dependency>
 
-      <!--RabbitMQ SpringBoot模板-->
-      <dependency>
-        <groupId>cn.404z</groupId>
-        <artifactId>rabbitmq-spring-boot-temp</artifactId>
-        <version>${rabbitmq-spring-boot-temp.version}</version>
-      </dependency>
       <!--Redis SpringBoot模板-->
       <dependency>
         <groupId>cn.404z</groupId>

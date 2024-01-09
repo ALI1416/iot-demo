@@ -1,4 +1,4 @@
-package com.demo.entity.protocol.event;
+package com.demo.entity.protocol.interact;
 
 import com.demo.announce.DeviceType;
 import com.demo.announce.ProtocolClass;
@@ -14,7 +14,7 @@ import lombok.Setter;
 import java.util.List;
 
 /**
- * <h1>网关</h1>
+ * <h1>获取网关信息</h1>
  *
  * <p>
  * createDate 2023/11/17 11:17:17
@@ -23,20 +23,20 @@ import java.util.List;
  * @author ALI[ali-k@foxmail.com]
  * @since 1.0.0
  **/
-@Schema(description = "网关")
-@ProtocolClass(code = 1001, name = "网关", type = ProtocolType.EVENT, deviceType = DeviceType.GATEWAY, eventClass = Event1001.Event.class)
-public class Event1001 {
+@Schema(description = "获取网关信息")
+@ProtocolClass(code = 4000, name = "获取网关信息", type = ProtocolType.INTERACT, deviceType = DeviceType.GATEWAY, responseClass = Interact4000.Response.class)
+public class Interact4000 {
 
-    private Event1001() {
+    private Interact4000() {
     }
 
     /**
-     * 事件
+     * 响应
      */
     @Getter
     @Setter
-    @Schema(description = "事件")
-    public static class Event extends ToStringBase implements Protocol.Data {
+    @Schema(description = "响应")
+    public static class Response extends ToStringBase implements Protocol.Data {
 
         /**
          * 设备列表
