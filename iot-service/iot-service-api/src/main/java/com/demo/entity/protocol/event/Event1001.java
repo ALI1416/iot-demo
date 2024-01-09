@@ -72,12 +72,12 @@ public class Event1001 {
         @ProtocolField(name = "设备序号")
         private Integer sn;
         /**
-         * 设备类型 0网关 1温湿度计
+         * 设备类型 0网关 1温度计
          *
          * @see com.demo.announce.DeviceType
          */
-        @Schema(description = "设备类型 0网关 1温湿度计")
-        @ProtocolField(name = "设备类型 0网关 1温湿度计")
+        @Schema(description = "设备类型 0网关 1温度计")
+        @ProtocolField(name = "设备类型 0网关 1温度计")
         private Integer type;
 
     }

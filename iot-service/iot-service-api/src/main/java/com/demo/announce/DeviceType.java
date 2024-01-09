@@ -20,9 +20,9 @@ public enum DeviceType {
      */
     GATEWAY(0),
     /**
-     * 温湿度计
+     * 温度计
      */
-    THERMO_HYGRO_METER(1);
+    THERMOMETER(1);
 
     /**
      * 设备类型编码

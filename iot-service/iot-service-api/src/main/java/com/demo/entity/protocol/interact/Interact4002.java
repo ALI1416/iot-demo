@@ -7,7 +7,7 @@ import com.demo.entity.protocol.Protocol;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
- * <h1>获取温湿度报警</h1>
+ * <h1>获取温度配置</h1>
  *
  * <p>
  * createDate 2023/11/15 10:07:57
@@ -16,8 +16,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @author ALI[ali-k@foxmail.com]
  * @since 1.0.0
  **/
-@Schema(description = "获取温湿度报警")
-@ProtocolClass(code = 4002, name = "获取温湿度报警", type = ProtocolType.INTERACT, deviceType = DeviceType.THERMO_HYGRO_METER, responseClass = Interact4002.Response.class)
+@Schema(description = "获取温度配置")
+@ProtocolClass(code = 4002, name = "获取温度配置", type = ProtocolType.INTERACT, deviceType = DeviceType.THERMOMETER, responseClass = Interact4002.Response.class)
 public class Interact4002 {
 
     private Interact4002() {

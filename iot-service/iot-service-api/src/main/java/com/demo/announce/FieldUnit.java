@@ -16,6 +16,34 @@ import lombok.Getter;
 public enum FieldUnit {
 
     /**
+     * 时间(year 年)
+     */
+    YEAR("year", "年"),
+    /**
+     * 时间(month 月)
+     */
+    MONTH("month", "月"),
+    /**
+     * 时间(day 日)
+     */
+    DAY("day", "日"),
+    /**
+     * 时间(h 时)
+     */
+    HOUR("h", "时"),
+    /**
+     * 时间(min 分)
+     */
+    MINUTE("min", "分"),
+    /**
+     * 时间(s 秒)
+     */
+    SECOND("s", "秒"),
+    /**
+     * 时间(ms 毫秒)
+     */
+    MILLISECOND("ms", "毫秒"),
+    /**
      * 温度(m℃ 毫摄氏度)
      */
     CENTIGRADE_N3("m℃", "毫摄氏度"),

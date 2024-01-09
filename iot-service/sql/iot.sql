@@ -25,7 +25,7 @@ CREATE TABLE `device`  (
   `id` bigint NOT NULL COMMENT 'id',
   `gateway_id` bigint UNSIGNED NOT NULL DEFAULT 0 COMMENT '网关id：外键gateway.id，唯一gateway_id和sn',
   `sn` int UNSIGNED NOT NULL DEFAULT 0 COMMENT '设备序号，唯一gateway_id和sn',
-  `type` int UNSIGNED NOT NULL DEFAULT 0 COMMENT '设备类型：0网关 1温湿度计',
+  `type` int UNSIGNED NOT NULL DEFAULT 0 COMMENT '设备类型：0网关 1温度计',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `gateway_id__sn`(`gateway_id` ASC, `sn` ASC) USING BTREE,
   INDEX `sn`(`sn` ASC) USING BTREE,

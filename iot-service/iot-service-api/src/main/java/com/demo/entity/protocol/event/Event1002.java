@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * <h1>温湿度</h1>
+ * <h1>温度</h1>
  *
  * <p>
  * createDate 2023/11/10 17:12:31
@@ -18,8 +18,8 @@ import lombok.Setter;
  * @author ALI[ali-k@foxmail.com]
  * @since 1.0.0
  **/
-@Schema(description = "温湿度")
-@ProtocolClass(code = 1002, name = "温湿度", type = ProtocolType.EVENT, deviceType = DeviceType.THERMO_HYGRO_METER, eventClass = Event1002.Event.class)
+@Schema(description = "温度")
+@ProtocolClass(code = 1002, name = "温度", type = ProtocolType.EVENT, deviceType = DeviceType.THERMOMETER, eventClass = Event1002.Event.class)
 public class Event1002 {
 
     private Event1002() {
@@ -39,12 +39,6 @@ public class Event1002 {
         @Schema(description = "温度(m℃ 毫摄氏度)")
         @ProtocolField(name = "温度", unit = FieldUnit.CENTIGRADE_N3)
         private Integer temperature;
-        /**
-         * 湿度(%% 万分之)
-         */
-        @Schema(description = "湿度(%% 万分之)")
-        @ProtocolField(name = "湿度", unit = FieldUnit.PERCENTAGE_N2)
-        private Integer humidity;
 
         /**
          * 数据检查未通过
@@ -53,7 +47,7 @@ public class Event1002 {
          */
         @Override
         public boolean dataCheckNotPass() {
-            return ControllerBase.existNull(temperature, humidity);
+            return ControllerBase.existNull(temperature);
         }
 
     }
