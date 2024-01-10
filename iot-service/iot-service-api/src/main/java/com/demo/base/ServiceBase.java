@@ -1,9 +1,7 @@
 package com.demo.base;
 
 import cn.z.mongo.entity.Pageable;
-import cn.z.redis.RedisTemp;
 import com.demo.constant.Constant;
-import com.demo.constant.RedisConstant;
 import com.demo.entity.pojo.PageInfo;
 import com.demo.entity.pojo.PageRequestFix;
 import com.github.pagehelper.Page;

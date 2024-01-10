@@ -41,7 +41,7 @@ public class InteractController extends ControllerBase {
      * 发送
      */
     @PostMapping("send")
-    @Operation(summary = "发送", description = "需要登录/commandCode/gatewaySn<br>响应：成功ProtocolVo/失败null")
+    @Operation(summary = "发送", description = "需要gatewaySn/deviceSn/commandCode<br>响应：成功ProtocolVo/失败null")
     public Result<ProtocolVo> send(@RequestBody ProtocolVo base) {
         Integer gatewaySn = base.getGatewaySn();
         Integer deviceSn = base.getDeviceSn();

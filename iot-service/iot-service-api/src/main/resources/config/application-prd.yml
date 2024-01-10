@@ -10,10 +10,6 @@ spring:
       database: iot
       # username:
       # password:
-  redis:
-    host: 127.0.0.1
-    port: 6379
-    password:
 
 mqtt:
   uri: tcp://127.0.0.1:1883

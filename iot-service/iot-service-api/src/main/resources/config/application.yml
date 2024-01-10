@@ -15,9 +15,6 @@ spring:
   data:
     mongodb:
       auto-index-creation: true
-  redis:
-    database: 0
-    timeout: 10s
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml

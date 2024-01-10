@@ -1,6 +1,5 @@
 package com.demo.service;
 
-import cn.z.redis.RedisTemp;
 import com.demo.announce.DeviceType;
 import com.demo.base.ServiceBase;
 import com.demo.constant.Constant;
@@ -32,7 +31,6 @@ import java.util.Set;
 @AllArgsConstructor
 public class GatewayService extends ServiceBase {
 
-    private final RedisTemp redisTemp;
     private final GatewayDao gatewayDao;
 
     /**
