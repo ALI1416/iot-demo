@@ -19,10 +19,10 @@ import lombok.Setter;
  * @since 1.0.0
  **/
 @Schema(description = "设置温度计配置")
-@ProtocolClass(code = 3002, name = "设置温度计配置", type = ProtocolType.INTERACT, deviceType = DeviceType.THERMOMETER, requestClass = Interact3002.Request.class)
-public class Interact3002 {
+@ProtocolClass(code = 30100, name = "设置温度计配置", type = ProtocolType.INTERACT, deviceType = DeviceType.THERMOMETER, requestClass = Interact30100.Request.class)
+public class Interact30100 {
 
-    private Interact3002() {
+    private Interact30100() {
     }
 
     /**

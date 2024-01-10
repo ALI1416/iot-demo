@@ -19,10 +19,10 @@ import lombok.Setter;
  * @since 1.0.0
  **/
 @Schema(description = "温度计事件")
-@ProtocolClass(code = 1002, name = "温度计事件", type = ProtocolType.EVENT, deviceType = DeviceType.THERMOMETER, eventClass = Event1002.Event.class)
-public class Event1002 {
+@ProtocolClass(code = 10100, name = "温度计事件", type = ProtocolType.EVENT, deviceType = DeviceType.THERMOMETER, eventClass = Event10100.Event.class)
+public class Event10100 {
 
-    private Event1002() {
+    private Event10100() {
     }
 
     /**

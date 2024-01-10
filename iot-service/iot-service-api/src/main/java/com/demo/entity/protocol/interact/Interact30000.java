@@ -12,7 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * <h1>设置通信地址</h1>
+ * <h1>设置网关通信地址</h1>
  *
  * <p>
  * createDate 2023/11/10 17:49:15
@@ -21,11 +21,11 @@ import lombok.Setter;
  * @author ALI[ali-k@foxmail.com]
  * @since 1.0.0
  **/
-@Schema(description = "设置通信地址")
-@ProtocolClass(code = 3001, name = "设置通信地址", type = ProtocolType.INTERACT, deviceType = DeviceType.GATEWAY, requestClass = Interact3001.Request.class)
-public class Interact3001 {
+@Schema(description = "设置网关通信地址")
+@ProtocolClass(code = 30000, name = "设置网关通信地址", type = ProtocolType.INTERACT, deviceType = DeviceType.GATEWAY, requestClass = Interact30000.Request.class)
+public class Interact30000 {
 
-    private Interact3001() {
+    private Interact30000() {
     }
 
     /**

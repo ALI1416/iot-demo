@@ -17,17 +17,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @since 1.0.0
  **/
 @Schema(description = "获取温度计配置")
-@ProtocolClass(code = 4002, name = "获取温度计配置", type = ProtocolType.INTERACT, deviceType = DeviceType.THERMOMETER, responseClass = Interact4002.Response.class)
-public class Interact4002 {
+@ProtocolClass(code = 40100, name = "获取温度计配置", type = ProtocolType.INTERACT, deviceType = DeviceType.THERMOMETER, responseClass = Interact40100.Response.class)
+public class Interact40100 {
 
-    private Interact4002() {
+    private Interact40100() {
     }
 
     /**
      * 响应
      */
     @Schema(description = "响应")
-    public static class Response extends Interact3002.Request implements Protocol.Data {
+    public static class Response extends Interact30100.Request implements Protocol.Data {
     }
 
 }

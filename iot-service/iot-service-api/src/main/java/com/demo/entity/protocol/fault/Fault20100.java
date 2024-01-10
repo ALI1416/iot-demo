@@ -18,10 +18,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @since 1.0.0
  **/
 @Schema(description = "温度计故障")
-@ProtocolClass(code = 2002, name = "温度计故障", type = ProtocolType.FAULT, deviceType = DeviceType.THERMOMETER, faultClass = Fault2002.Fault.class)
-public class Fault2002 {
+@ProtocolClass(code = 20100, name = "温度计故障", type = ProtocolType.FAULT, deviceType = DeviceType.THERMOMETER, faultClass = Fault20100.Fault.class)
+public class Fault20100 {
 
-    private Fault2002() {
+    private Fault20100() {
     }
 
     public static class Fault implements Protocol.Fault {

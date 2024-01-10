@@ -24,10 +24,10 @@ import java.util.List;
  * @since 1.0.0
  **/
 @Schema(description = "获取网关信息")
-@ProtocolClass(code = 4000, name = "获取网关信息", type = ProtocolType.INTERACT, deviceType = DeviceType.GATEWAY, responseClass = Interact4000.Response.class)
-public class Interact4000 {
+@ProtocolClass(code = 40001, name = "获取网关信息", type = ProtocolType.INTERACT, deviceType = DeviceType.GATEWAY, responseClass = Interact40001.Response.class)
+public class Interact40001 {
 
-    private Interact4000() {
+    private Interact40001() {
     }
 
     /**
