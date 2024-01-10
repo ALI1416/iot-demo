@@ -115,7 +115,7 @@ public class InteractService extends ServiceBase {
             base.setCommandCode(commandCode);
             base.setErrorCode(errorCode);
             base.setResponse(responseMap.getValue());
-            ProtocolVo result = interactDao.insert(base);
+            ProtocolVo result = interactDao.insert2(base);
             if (result != null) {
                 log.info("单向互动响应接收成功:[{}]", result);
             } else {
@@ -124,7 +124,7 @@ public class InteractService extends ServiceBase {
             return;
         }
         // 双向互动
-        ProtocolVo base = interactDao.findById(id, gatewaySn + MongoConstant.INTERACT + "_" + DateUtils.getYyyy(Id.parse(id)[0]));
+        ProtocolVo base = interactDao.findById(id, gatewaySn + MongoConstant.INTERACT + "_" + DateUtils.getYyyy(Id.timestamp(id)));
         if (base == null) {
             log.warn("网关序号:[{}]不存在id:[{}] ,设备序号:[{}] ,命令代码:[{}] ,错误代码:[{}] ,消息:[{}]", gatewaySn, id, deviceSn, commandCode, errorCode, responseJson);
             return;

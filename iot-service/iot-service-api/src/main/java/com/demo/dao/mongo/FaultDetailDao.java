@@ -28,6 +28,10 @@ public class FaultDetailDao extends DaoBase {
     private static final Class<ProtocolVo> CLAZZ = ProtocolVo.class;
     private final MongoTemp mongoTemp;
 
+    private String getCollectionName(ProtocolVo base) {
+        return base.getGatewaySn() + MongoConstant.FAULT_DETAIL + "_" + DateUtils.getYyyy(base.getCreateTime().getTime());
+    }
+
     /**
      * 插入
      *
@@ -39,7 +43,7 @@ public class FaultDetailDao extends DaoBase {
         base.setCreateTime(Clock.timestamp());
         base.setUpdateTime(base.getCreateTime());
         // [网关序号]_fault_detail_[yyyy]
-        return tryAnyNoTransactionReturnT(() -> mongoTemp.insert(base, base.getGatewaySn() + MongoConstant.FAULT_DETAIL + "_" + DateUtils.getYyyy(base.getCreateTime().getTime())));
+        return tryAnyNoTransactionReturnT(() -> mongoTemp.insert(base, getCollectionName(base)));
     }
 
     /**
@@ -51,7 +55,7 @@ public class FaultDetailDao extends DaoBase {
     public ProtocolVo save(ProtocolVo base) {
         base.setUpdateTime(Clock.timestamp());
         // [网关序号]_fault_detail_[yyyy]
-        return tryAnyNoTransactionReturnT(() -> mongoTemp.save(base, base.getGatewaySn() + MongoConstant.FAULT_DETAIL + "_" + DateUtils.getYyyy(base.getCreateTime().getTime())));
+        return tryAnyNoTransactionReturnT(() -> mongoTemp.save(base, getCollectionName(base)));
     }
 
     /**

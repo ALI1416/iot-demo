@@ -27,6 +27,14 @@ public class InteractDao extends DaoBase {
     private static final Class<ProtocolVo> CLAZZ = ProtocolVo.class;
     private final MongoTemp mongoTemp;
 
+    private String getCollectionName(ProtocolVo base) {
+        return base.getGatewaySn() + MongoConstant.INTERACT + "_" + DateUtils.getYyyy(base.getCreateTime().getTime());
+    }
+
+    private String getCollectionName2(ProtocolVo base) {
+        return base.getGatewaySn() + MongoConstant.INTERACT + "_" + DateUtils.getYyyy(base.getUpdateTime().getTime());
+    }
+
     /**
      * 插入
      *
@@ -37,7 +45,20 @@ public class InteractDao extends DaoBase {
         base.setId(Id.next());
         base.setCreateTime(Clock.timestamp());
         // [网关序号]_interact_[yyyy]
-        return tryAnyNoTransactionReturnT(() -> mongoTemp.insert(base, base.getGatewaySn() + MongoConstant.INTERACT + "_" + DateUtils.getYyyy(base.getCreateTime().getTime())));
+        return tryAnyNoTransactionReturnT(() -> mongoTemp.insert(base, getCollectionName(base)));
+    }
+
+    /**
+     * 插入2
+     *
+     * @param base ProtocolVo(自动填充id/updateTime 必须gatewaySn)
+     * @return ok:T,e:null
+     */
+    public ProtocolVo insert2(ProtocolVo base) {
+        base.setId(Id.next());
+        base.setUpdateTime(Clock.timestamp());
+        // [网关序号]_interact_[yyyy]
+        return tryAnyNoTransactionReturnT(() -> mongoTemp.insert(base, getCollectionName2(base)));
     }
 
     /**
@@ -60,7 +81,7 @@ public class InteractDao extends DaoBase {
     public ProtocolVo save(ProtocolVo base) {
         base.setUpdateTime(Clock.timestamp());
         // [网关序号]_interact_[yyyy]
-        return tryAnyNoTransactionReturnT(() -> mongoTemp.save(base, base.getGatewaySn() + MongoConstant.INTERACT + "_" + DateUtils.getYyyy(base.getCreateTime().getTime())));
+        return tryAnyNoTransactionReturnT(() -> mongoTemp.save(base, getCollectionName(base)));
     }
 
 }

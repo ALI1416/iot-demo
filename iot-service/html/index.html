@@ -11,7 +11,7 @@
 
 <body>
 <div>
-  <h3>配置</h3>
+  <h3>设置</h3>
   <label for="urlText">URL：</label><input id="urlText" type="text" value="http://127.0.0.1:8080/">
   <br>
   <label for="wsUrlText">WebSocket URL：</label><input id="wsUrlText" type="text" value="ws://127.0.0.1:8080/ws">
@@ -39,7 +39,7 @@
 </div>
 <div>
   <h3>互动</h3>
-  <h4>设置通信地址</h4>
+  <h4>设置网关通信地址</h4>
   <textarea id="setCommunicationAddressSendText" cols="50" rows="5">{
   "uri": "mqtt://127.0.0.1:1883",
   "username": "",
@@ -48,7 +48,7 @@
   <input id="setCommunicationAddressSendBtn" type="button" value="发送">
   <br>
   <textarea id="setCommunicationAddressMsg" readonly cols="50" rows="5"></textarea>
-  <h4>设置温度计配置</h4>
+  <h4>设置温度计参数</h4>
   <textarea id="setThermometerSendText" cols="50" rows="5">{
   "intervalRefresh": 1,
   "intervalPush": 2,
@@ -58,15 +58,15 @@
   <input id="setThermometerSendBtn" type="button" value="发送">
   <br>
   <textarea id="setThermometerMsg" readonly cols="50" rows="5"></textarea>
+  <h4>获取网关通信地址</h4>
+  <input id="getCommunicationAddressSendBtn" type="button" value="发送">
+  <br>
+  <textarea id="getCommunicationAddressMsg" readonly cols="50" rows="5"></textarea>
   <h4>获取网关信息</h4>
   <input id="getGatewayInfoSendBtn" type="button" value="发送">
   <br>
   <textarea id="getGatewayInfoMsg" readonly cols="50" rows="5"></textarea>
-  <h4>获取通信地址</h4>
-  <input id="getCommunicationAddressSendBtn" type="button" value="发送">
-  <br>
-  <textarea id="getCommunicationAddressMsg" readonly cols="50" rows="5"></textarea>
-  <h4>获取温度计配置</h4>
+  <h4>获取温度计参数</h4>
   <input id="getThermometerSendBtn" type="button" value="发送">
   <br>
   <textarea id="getThermometerMsg" readonly cols="50" rows="5"></textarea>
@@ -89,10 +89,10 @@
   const setThermometerSendText = document.getElementById('setThermometerSendText')
   const setThermometerSendBtn = document.getElementById('setThermometerSendBtn')
   const setThermometerMsg = document.getElementById('setThermometerMsg')
-  const getGatewayInfoSendBtn = document.getElementById('getGatewayInfoSendBtn')
-  const getGatewayInfoMsg = document.getElementById('getGatewayInfoMsg')
   const getCommunicationAddressSendBtn = document.getElementById('getCommunicationAddressSendBtn')
   const getCommunicationAddressMsg = document.getElementById('getCommunicationAddressMsg')
+  const getGatewayInfoSendBtn = document.getElementById('getGatewayInfoSendBtn')
+  const getGatewayInfoMsg = document.getElementById('getGatewayInfoMsg')
   const getThermometerSendBtn = document.getElementById('getThermometerSendBtn')
   const getThermometerMsg = document.getElementById('getThermometerMsg')
 
@@ -117,13 +117,13 @@
   }
 
   /**
-   * 设置通信地址
+   * 设置网关通信地址
    */
   setCommunicationAddressSendBtn.addEventListener('click', () => {
     const data = {
       gatewaySn: gatewaySnText.value,
       deviceSn: 0,
-      commandCode: 3001,
+      commandCode: 30000,
       requestJson: JSON.parse(setCommunicationAddressSendText.value)
     }
     interact(data).then(res => {
@@ -132,14 +132,28 @@
   })
 
   /**
-   * 设置温度计配置
+   * 设置温度计参数
    */
   setThermometerSendBtn.addEventListener('click', () => {
     const data = {
       gatewaySn: gatewaySnText.value,
       deviceSn: deviceSnText.value,
-      commandCode: 3002,
+      commandCode: 30100,
       requestJson: JSON.parse(setThermometerSendText.value)
+    }
+    interact(data).then(res => {
+      alert(JSON.stringify(res))
+    })
+  })
+
+  /**
+   * 获取网关通信地址
+   */
+  getCommunicationAddressSendBtn.addEventListener('click', () => {
+    const data = {
+      gatewaySn: gatewaySnText.value,
+      deviceSn: 0,
+      commandCode: 40000
     }
     interact(data).then(res => {
       alert(JSON.stringify(res))
@@ -153,7 +167,7 @@
     const data = {
       gatewaySn: gatewaySnText.value,
       deviceSn: 0,
-      commandCode: 4000
+      commandCode: 40001
     }
     interact(data).then(res => {
       alert(JSON.stringify(res))
@@ -161,27 +175,13 @@
   })
 
   /**
-   * 获取通信地址
-   */
-  getCommunicationAddressSendBtn.addEventListener('click', () => {
-    const data = {
-      gatewaySn: gatewaySnText.value,
-      deviceSn: 0,
-      commandCode: 4001
-    }
-    interact(data).then(res => {
-      alert(JSON.stringify(res))
-    })
-  })
-
-  /**
-   * 获取温度计配置
+   * 获取温度计参数
    */
   getThermometerSendBtn.addEventListener('click', () => {
     const data = {
       gatewaySn: gatewaySnText.value,
       deviceSn: deviceSnText.value,
-      commandCode: 4002
+      commandCode: 40100
     }
     interact(data).then(res => {
       alert(JSON.stringify(res))
@@ -223,8 +223,8 @@
   function connectCallback() {
     msg.innerText = 'WebSocket连接成功'
     /* 事件 */
-    // 温度事件
-    stomp.subscribe('/topic/iot/event/' + gatewaySnText.value + '/' + deviceSnText.value + '/1002', function (res) {
+    // 温度计事件
+    stomp.subscribe('/topic/iot/event/' + gatewaySnText.value + '/' + deviceSnText.value + '/10100', function (res) {
       thermometerMsg.value = res.body + '\n' + thermometerMsg.value
     })
     /* 故障详情 */
@@ -232,24 +232,24 @@
       faultMsg.value = res.body + '\n' + faultMsg.value
     })
     /* 互动 */
-    // 设置通信地址
-    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/0/3001', function (res) {
+    // 设置网关通信地址
+    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/0/30000', function (res) {
       setCommunicationAddressMsg.value = res.body + '\n' + setCommunicationAddressMsg.value
     })
-    // 设置温度计配置
-    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/' + deviceSnText.value + '/3002', function (res) {
+    // 设置温度计参数
+    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/' + deviceSnText.value + '/30100', function (res) {
       setThermometerMsg.value = res.body + '\n' + setThermometerMsg.value
     })
-    // 获取网关信息
-    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/0/4000', function (res) {
-      getGatewayInfoMsg.value = res.body + '\n' + getGatewayInfoMsg.value
-    })
-    // 获取通信地址
-    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/0/4001', function (res) {
+    // 获取网关通信地址
+    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/0/40000', function (res) {
       getCommunicationAddressMsg.value = res.body + '\n' + getCommunicationAddressMsg.value
     })
-    // 获取温度计配置
-    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/' + deviceSnText.value + '/4002', function (res) {
+    // 获取网关信息
+    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/0/40001', function (res) {
+      getGatewayInfoMsg.value = res.body + '\n' + getGatewayInfoMsg.value
+    })
+    // 获取温度计参数
+    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/' + deviceSnText.value + '/40100', function (res) {
       getThermometerMsg.value = res.body + '\n' + getThermometerMsg.value
     })
   }

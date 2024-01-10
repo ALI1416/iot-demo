@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * <h1>设置温度计配置</h1>
+ * <h1>设置温度计参数</h1>
  *
  * <p>
  * createDate 2023/11/15 10:07:57
@@ -18,8 +18,8 @@ import lombok.Setter;
  * @author ALI[ali-k@foxmail.com]
  * @since 1.0.0
  **/
-@Schema(description = "设置温度计配置")
-@ProtocolClass(code = 30100, name = "设置温度计配置", type = ProtocolType.INTERACT, deviceType = DeviceType.THERMOMETER, requestClass = Interact30100.Request.class)
+@Schema(description = "设置温度计参数")
+@ProtocolClass(code = 30100, name = "设置温度计参数", type = ProtocolType.INTERACT, deviceType = DeviceType.THERMOMETER, requestClass = Interact30100.Request.class)
 public class Interact30100 {
 
     private Interact30100() {

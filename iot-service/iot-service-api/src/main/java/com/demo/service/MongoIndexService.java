@@ -30,7 +30,6 @@ public class MongoIndexService extends ServiceBase {
 
     private final MongoTemp mongoTemp;
 
-    private static final IndexDefinition CREATE_ID = new Index("createId", Sort.Direction.ASC);
     private static final IndexDefinition COMMAND_CODE = new Index("commandCode", Sort.Direction.ASC);
     private static final IndexDefinition DEVICE_SN = new Index("deviceSn", Sort.Direction.ASC);
     private static final IndexDefinition MONTH = new Index("month", Sort.Direction.ASC);
@@ -52,7 +51,6 @@ public class MongoIndexService extends ServiceBase {
         for (String collectionName : collectionNameSet) {
             if (collectionName.contains(MongoConstant.INTERACT)) {
                 // 互动
-                mongoTemp.addCollectionIndex(collectionName, CREATE_ID);
                 mongoTemp.addCollectionIndex(collectionName, COMMAND_CODE);
                 mongoTemp.addCollectionIndex(collectionName, DEVICE_SN);
             } else if (collectionName.contains(MongoConstant.FAULT)) {
@@ -90,8 +88,6 @@ public class MongoIndexService extends ServiceBase {
                 }
             }
         }
-        // 登录日志
-        mongoTemp.addCollectionIndex("login_log", CREATE_ID);
     }
 
 }

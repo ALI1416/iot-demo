@@ -31,6 +31,10 @@ public class EventDao extends DaoBase {
     private static final Class<ProtocolVo> CLAZZ = ProtocolVo.class;
     private final MongoTemp mongoTemp;
 
+    private String getCollectionName(ProtocolVo base) {
+        return base.getGatewaySn() + MongoConstant.EVENT + "_" + DateUtils.getYyyyMm(base.getCreateTime().getTime());
+    }
+
     /**
      * 插入
      *
@@ -41,7 +45,7 @@ public class EventDao extends DaoBase {
         base.setId(Id.next());
         base.setCreateTime(Clock.timestamp());
         // [网关序号]_event_[yyyyMM]
-        return tryAnyNoTransactionReturnT(() -> mongoTemp.insert(base, base.getGatewaySn() + MongoConstant.EVENT + "_" + DateUtils.getYyyyMm(base.getCreateTime().getTime())));
+        return tryAnyNoTransactionReturnT(() -> mongoTemp.insert(base, getCollectionName(base)));
     }
 
     /**
