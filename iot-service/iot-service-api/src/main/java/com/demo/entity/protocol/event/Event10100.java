@@ -37,7 +37,7 @@ public class Event10100 {
          * 温度(m℃ 毫摄氏度)
          */
         @Schema(description = "温度(m℃ 毫摄氏度)")
-        @ProtocolField(name = "温度", unit = FieldUnit.CENTIGRADE_N3)
+        @ProtocolField(name = "温度", unit = FieldUnit.TEMPERATURE_N3)
         private Integer temperature;
 
         /**

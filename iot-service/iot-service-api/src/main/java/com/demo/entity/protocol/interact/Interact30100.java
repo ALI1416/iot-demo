@@ -49,13 +49,13 @@ public class Interact30100 {
          * 温度上限(m℃ 毫摄氏度)
          */
         @Schema(description = "温度上限(m℃ 毫摄氏度)")
-        @ProtocolField(name = "温度上限", unit = FieldUnit.CENTIGRADE_N3)
+        @ProtocolField(name = "温度上限", unit = FieldUnit.TEMPERATURE_N3)
         private Integer temperatureMax;
         /**
          * 温度下限(m℃ 毫摄氏度)
          */
         @Schema(description = "温度下限(m℃ 毫摄氏度)")
-        @ProtocolField(name = "温度下限", unit = FieldUnit.CENTIGRADE_N3)
+        @ProtocolField(name = "温度下限", unit = FieldUnit.TEMPERATURE_N3)
         private Integer temperatureMin;
 
         /**

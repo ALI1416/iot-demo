@@ -45,13 +45,13 @@ public enum FieldUnit {
     MILLISECOND("ms", "毫秒"),
 
     /**
-     * 摄氏度(m℃ 毫摄氏度)
+     * 温度(m℃ 毫摄氏度)
      */
-    CENTIGRADE_N3("m℃", "毫摄氏度"),
+    TEMPERATURE_N3("m℃", "毫摄氏度"),
     /**
-     * 摄氏度(℃ 摄氏度)
+     * 温度(℃ 摄氏度)
      */
-    CENTIGRADE("℃", "摄氏度"),
+    TEMPERATURE("℃", "摄氏度"),
 
     /**
      * 万分比(%% 万分之)
