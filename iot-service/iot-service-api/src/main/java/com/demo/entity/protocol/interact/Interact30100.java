@@ -46,16 +46,16 @@ public class Interact30100 {
         @ProtocolField(name = "推送间隔", unit = FieldUnit.SECOND)
         private Integer intervalPush;
         /**
-         * 温度上限(m℃ 毫摄氏度)
+         * 温度上限(℃ 摄氏度)
          */
-        @Schema(description = "温度上限(m℃ 毫摄氏度)")
-        @ProtocolField(name = "温度上限", unit = FieldUnit.TEMPERATURE_N3)
+        @Schema(description = "温度上限(℃ 摄氏度)")
+        @ProtocolField(name = "温度上限", unit = FieldUnit.TEMPERATURE)
         private Integer temperatureMax;
         /**
-         * 温度下限(m℃ 毫摄氏度)
+         * 温度下限(℃ 摄氏度)
          */
-        @Schema(description = "温度下限(m℃ 毫摄氏度)")
-        @ProtocolField(name = "温度下限", unit = FieldUnit.TEMPERATURE_N3)
+        @Schema(description = "温度下限(℃ 摄氏度)")
+        @ProtocolField(name = "温度下限", unit = FieldUnit.TEMPERATURE)
         private Integer temperatureMin;
 
         /**
