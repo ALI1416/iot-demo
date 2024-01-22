@@ -2,6 +2,9 @@ package com.demo.announce;
 
 import lombok.Getter;
 
+import java.util.AbstractMap;
+import java.util.Map;
+
 /**
  * <h1>字段单位</h1>
  *
@@ -72,17 +75,12 @@ public enum FieldUnit {
     NONE("", "");
 
     /**
-     * 符号
+     * 实体
      */
-    private final String symbol;
-    /**
-     * 名称
-     */
-    private final String name;
+    private final Map.Entry<String, String> entry;
 
     FieldUnit(String symbol, String name) {
-        this.symbol = symbol;
-        this.name = name;
+        this.entry = new AbstractMap.SimpleEntry<>(symbol, name);
     }
 
 }

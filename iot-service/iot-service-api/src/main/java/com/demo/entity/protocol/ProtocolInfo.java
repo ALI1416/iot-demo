@@ -2,9 +2,7 @@ package com.demo.entity.protocol;
 
 import cn.z.tool.ClassScanner;
 import com.alibaba.fastjson2.annotation.JSONField;
-import com.demo.announce.FieldUnit;
-import com.demo.announce.ProtocolClass;
-import com.demo.announce.ProtocolField;
+import com.demo.announce.*;
 import com.demo.base.ToStringBase;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -13,10 +11,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.lang.reflect.Field;
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.*;
 
 /**
  * <h1>协议信息</h1>
@@ -101,41 +98,50 @@ public class ProtocolInfo extends ToStringBase {
         @Schema(description = "字段类型")
         private String type;
         /**
-         * 字段单位 符号,名称
+         * 字段特殊类型
          */
-        @Schema(description = "字段单位 符号,名称")
+        @Schema(description = "字段特殊类型")
+        private Integer specialType;
+        /**
+         * 嵌套
+         */
+        @Schema(description = "嵌套")
+        private Data nest;
+        /**
+         * 字段单位
+         */
+        @Schema(description = "字段单位")
         private Map.Entry<String, String> unit;
-
         /**
-         * 设置字段单位
-         *
-         * @param unit 符号,名称
+         * 字段Map
          */
-        public void setUnit(Map.Entry<String, String> unit) {
-            this.unit = unit;
-        }
-
+        @Schema(description = "字段Map")
+        private Map<String, String> map;
         /**
-         * 设置字段单位
-         *
-         * @param fieldUnit FieldUnit
+         * 最大值
          */
-        public void setUnit(FieldUnit fieldUnit) {
-            this.unit = new AbstractMap.SimpleEntry<>(fieldUnit.getSymbol(), fieldUnit.getName());
-        }
-
+        @Schema(description = "最大值")
+        private String max;
         /**
-         * 构造函数
-         *
-         * @param name      字段名
-         * @param type      字段类型
-         * @param fieldUnit FieldUnit
+         * 最小值
          */
-        public Data(String name, String type, FieldUnit fieldUnit) {
-            this.name = name;
-            this.type = type;
-            setUnit(fieldUnit);
-        }
+        @Schema(description = "最小值")
+        private String min;
+        /**
+         * 最大字符长度
+         */
+        @Schema(description = "最大字符长度")
+        private Integer maxLength;
+        /**
+         * 最小字符长度
+         */
+        @Schema(description = "最小字符长度")
+        private Integer minLength;
+        /**
+         * 特殊处理
+         */
+        @Schema(description = "特殊处理")
+        private Boolean special;
 
     }
 
@@ -186,6 +192,55 @@ public class ProtocolInfo extends ToStringBase {
         return INFO.get(commandCode);
     }
 
+    List list1;
+    List<Integer>[] list2;
+    List<Set<Integer>>[][] list3;
+
+    public static void main(String[] args) {
+        System.out.println(INFO);
+        Field[] fields = ProtocolInfo.class.getDeclaredFields();
+        Field field1 = fields[10];
+        Field field2 = fields[11];
+        Field field3 = fields[12];
+        Type type1 = field1.getType();
+        Type type2 = field2.getType();
+        Type type3 = field3.getType();
+        // Type type2 = field2.getGenericType();
+        // Type type3 = field3.getGenericType();
+        Class class1 = (Class) type1;
+        Class class2 = (Class) type2;
+        Class class3 = (Class) type3;
+        // ParameterizedType class2 = (ParameterizedType) type2;
+        // ParameterizedType class3 = (ParameterizedType) type3;
+        // String name1 = class1.getTypeName();
+        // String name2 = class2.getTypeName();
+        // String name3 = class3.getTypeName();
+        Class componentType = class3.getComponentType();
+    }
+
+    /**
+     * 是数组或集合
+     *
+     * @param clazz Class
+     * @return 是数组或集合
+     */
+    private static boolean isArrayOrCollection(Class clazz) {
+        return clazz.isArray() || Collection.class.isAssignableFrom(clazz);
+    }
+
+    /**
+     * 获取泛型
+     *
+     * @param type Type
+     * @return 泛型(没有返回null)
+     */
+    private static Type getGenericType(Type type) {
+        if (type instanceof ParameterizedType) {
+            return ((ParameterizedType) type).getActualTypeArguments()[0];
+        }
+        return null;
+    }
+
     /**
      * 获取协议信息Map
      *
@@ -219,10 +274,9 @@ public class ProtocolInfo extends ToStringBase {
                 protocolInfo.setEventMap(getDataMap(eventClass));
                 protocolInfo.setDataClass(eventClass);
             }
-            // 故障类
-            Class<? extends Protocol.Fault> faultClass = protocolClass.faultClass();
-            if (faultClass != Protocol.NoFault.class) {
-                protocolInfo.setFaultMap(getFaultMap(faultClass));
+            // 故障Map
+            if (protocolClass.faultMap() != FaultMap.NULL) {
+                protocolInfo.setFaultMap(protocolClass.faultMap().getMap());
             }
             // 请求类
             Class<? extends Protocol.Data> requestClass = protocolClass.requestClass();
@@ -274,14 +328,71 @@ public class ProtocolInfo extends ToStringBase {
                 continue;
             }
             ProtocolInfo.Data data = new ProtocolInfo.Data();
+            // 字段类型
+            Class fieldType = field.getType();
+            // 数组类型
+            // if (fieldType.isArray()) {
+            //
+            // }
+            //
+            data.setType(getTypeName(fieldType));
+            // 字段名
             data.setName(protocolField.name());
-            data.setType(getTypeName(field.getType()));
+            // 字段特殊类型
+            if (protocolField.specialType() != FieldSpecialType.DEFAULT) {
+                data.setSpecialType(protocolField.specialType().getCode());
+            }
+            // 字段单位
             if (protocolField.unit() != FieldUnit.NONE) {
-                data.setUnit(protocolField.unit());
+                data.setUnit(protocolField.unit().getEntry());
+            }
+            // 字段Map
+            if (protocolField.map() != FieldMap.NULL) {
+                data.setMap(protocolField.map().getMap());
+            }
+            // 最大值
+            if (!protocolField.max().isEmpty()) {
+                data.setMax(protocolField.max());
+            }
+            // 最小值
+            if (!protocolField.min().isEmpty()) {
+                data.setMin(protocolField.min());
+            }
+            // 最大字符长度
+            if (protocolField.maxLength() != Integer.MAX_VALUE) {
+                data.setMaxLength(protocolField.maxLength());
+            }
+            // 最小字符长度
+            if (protocolField.minLength() != 0) {
+                data.setMinLength(protocolField.minLength());
+            }
+            // 特殊处理
+            if (protocolField.special()) {
+                data.setSpecial(true);
             }
             map.put(field.getName(), data);
         }
         return map;
+    }
+
+    private static void fieldHandle(Map<String, ProtocolInfo.Data> map, Field field, ProtocolField protocolField) {
+
+    }
+
+    private static void arrayFieldHandle(Map<String, ProtocolInfo.Data> map, Field field, ProtocolField protocolField) {
+
+    }
+
+    private static void listFieldHandle(Map<String, ProtocolInfo.Data> map, Field field, ProtocolField protocolField) {
+
+    }
+
+    private static void objectFieldHandle(Map<String, ProtocolInfo.Data> map, Field field, ProtocolField protocolField) {
+
+    }
+
+    private static void normalFieldHandle(Map<String, ProtocolInfo.Data> map, Field field, ProtocolField protocolField) {
+
     }
 
     /**
@@ -291,7 +402,6 @@ public class ProtocolInfo extends ToStringBase {
      * @return 字段类型
      */
     private static String getTypeName(Class<?> clazz) {
-        // TODO 支持其他类型 数组 对象
         switch (clazz.getName()) {
             case "boolean":
             case "java.lang.Boolean": {
@@ -325,34 +435,12 @@ public class ProtocolInfo extends ToStringBase {
             case "java.lang.Double": {
                 return "double";
             }
+            case "java.lang.String": {
+                return "string";
+            }
             default: {
                 return "object";
             }
-        }
-    }
-
-    /**
-     * 获取故障Map
-     *
-     * @param faultClass Protocol.Fault
-     * @return 分组名, 故障名数组
-     */
-    private static Map<String, String[]> getFaultMap(Class<? extends Protocol.Fault> faultClass) {
-        try {
-            /**
-             * 调用方法
-             * {@link Protocol.Fault#getFaultInfoList()}
-             */
-            Fault[] faultInfoList = (Fault[])
-                    faultClass.getMethod("getFaultInfoList")
-                            .invoke(faultClass.getConstructor().newInstance());
-            Map<String, String[]> map = new HashMap<>();
-            for (Fault fault : faultInfoList) {
-                map.put(fault.getGroupName(), fault.getFaultNameArray());
-            }
-            return map;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 

@@ -50,9 +50,9 @@ public @interface ProtocolClass {
     Class<? extends Protocol.Data> eventClass() default Protocol.NoData.class;
 
     /**
-     * 故障类
+     * 故障Map
      */
-    Class<? extends Protocol.Fault> faultClass() default Protocol.NoFault.class;
+    FaultMap faultMap() default FaultMap.NULL;
 
     /**
      * 请求类

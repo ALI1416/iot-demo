@@ -10,6 +10,7 @@ using IotGateway.Model;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using IotGateway.Model.Interact;
+using Newtonsoft.Json.Serialization;
 
 namespace IotGateway
 {
@@ -21,14 +22,6 @@ namespace IotGateway
     {
 
         /// <summary>
-        /// JSON序列化设置
-        /// </summary>
-        private static readonly JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings
-        {
-            ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver()
-        };
-
-        /// <summary>
         /// 网关序号
         /// </summary>
         private static readonly int gatewaySn = 123;
@@ -36,11 +29,15 @@ namespace IotGateway
         /// 设备序号
         /// </summary>
         private static readonly int deviceSn = 1;
+        /// <summary>
+        /// 请求超时时间
+        /// </summary>
+        private static readonly int timeoutSecond = 60;
 
         /// <summary>
-        /// 请求序号Map<命令代码,请求序号队列>
+        /// 请求序号Map 命令代码,队列 请求序号,请求时间
         /// </summary>
-        private static readonly Dictionary<int, Queue<long>> map = new Dictionary<int, Queue<long>>();
+        private static readonly Dictionary<int, Queue<Tuple<long, DateTime>>> map = new Dictionary<int, Queue<Tuple<long, DateTime>>>();
 
         /// <summary>
         /// 串口配置
@@ -57,7 +54,7 @@ namespace IotGateway
         /// <summary>
         /// MQTT订阅主题
         /// </summary>
-        private static readonly string subscribeTopic = "$iot/request/" + gatewaySn + "/#";
+        private static readonly string subscribeTopic = "$iot/request/" + gatewaySn + "/+/+/+";
         /// <summary>
         /// MQTT连接选项
         /// </summary>
@@ -69,23 +66,6 @@ namespace IotGateway
         /// MQTT客户端
         /// </summary>
         private static IMqttClient client;
-
-        // 数据交互格式：
-        // 事件(单片机 --> 网关)：0x00 - 0x3F
-        //   温度事件：0x00
-        //     温度x10000(32bit)
-        // 故障(单片机 --> 网关)：0x40 - 0x7F
-        //   温度报警：0x40
-        //     温度报警状态(8bit)
-        // 互动请求(网关 --> 单片机)：0x80 - 0xBF
-        //   设置温度参数：0x80
-        //     F温度读取时间间隔 C串口发送时间间隔 H高温报警 L低温报警(32bit)
-        //   读取温度参数：0x81
-        // 互动响应(单片机 --> 网关)：0xC0 - 0xFF
-        //   设置温度参数：0xC0
-        //     设置状态(8bit) 0x00成功 0x01失败
-        //   读取温度参数：0xC1
-        //     F温度读取时间间隔 C串口发送时间间隔 H高温报警 L低温报警(32bit)
 
         /// <summary>
         /// 串口初始化
@@ -222,15 +202,25 @@ namespace IotGateway
         /// <returns>请求序号(不存在返回0)</returns>
         private static long GetRequestSn(int commandCode)
         {
-            map.TryGetValue(commandCode, out Queue<long> queue);
-            if (queue == null || queue.Count == 0)
+            Queue<Tuple<long, DateTime>> queue = map[commandCode];
+            if (queue.Count == 0)
             {
                 return 0;
             }
             else
             {
-                return queue.Dequeue();
+                return queue.Dequeue().Item1;
             }
+        }
+
+        /// <summary>
+        /// 添加请求序号
+        /// </summary>
+        /// <param name="commandCode">命令代码</param>
+        /// <param name="requestSn">请求序号</param>
+        private static void AddRequestSn(int commandCode, long requestSn)
+        {
+            map[commandCode].Enqueue(new Tuple<long, DateTime>(requestSn, DateTime.Now));
         }
 
         /// <summary>
@@ -240,7 +230,7 @@ namespace IotGateway
         /// <returns>错误代码</returns>
         private static int GetErrorCode(byte b)
         {
-            return (int)(b == 0 ? ErrorCode.NoError : ErrorCode.DeviceReturnError);
+            return (int)(b == 0 ? ErrorCode.NoError : ErrorCode.DeviceResponseError);
         }
 
         /// <summary>
@@ -263,16 +253,12 @@ namespace IotGateway
                         {
                             Temperature = Bytes2Int(msg.Skip(1).Take(4).ToArray()) / 10
                         };
-                        return JsonConvert.SerializeObject(e, jsonSerializerSettings);
+                        return JsonConvert.SerializeObject(e);
                     }
                 // 温度报警
                 case 0x40:
                     {
-                        List<int> list = new List<int>
-                        {
-                            msg[1]
-                        };
-                        return JsonConvert.SerializeObject(list);
+                        return JsonConvert.SerializeObject(GetFaultList(msg));
                     }
                 // 读取温度参数
                 case 0xC1:
@@ -284,9 +270,24 @@ namespace IotGateway
                             TemperatureMax = msg[3],
                             TemperatureMin = msg[4]
                         };
-                        return JsonConvert.SerializeObject(i, jsonSerializerSettings);
+                        return JsonConvert.SerializeObject(i);
                     }
             }
+        }
+
+        /// <summary>
+        /// 获取故障列表
+        /// </summary>
+        /// <param name="msg">byte[]</param>
+        /// <returns>List int</returns>
+        private static List<int> GetFaultList(byte[] msg)
+        {
+            List<int> list = new List<int>(msg.Length - 1);
+            for (int i = 1; i < msg.Length; i++)
+            {
+                list.Add(msg[i]);
+            }
+            return list;
         }
 
         /// <summary>
@@ -373,14 +374,16 @@ namespace IotGateway
         private static Task MqttReceive(MqttApplicationMessageReceivedEventArgs msg)
         {
             string topic = msg.ApplicationMessage.Topic;
-            byte[] message = msg.ApplicationMessage.PayloadSegment.Array;
+            byte[] messageArray = msg.ApplicationMessage.PayloadSegment.Array;
+            string message = null;
             string log = "MQTT接收到主题：" + topic + " ，消息：";
-            if (message == null)
+            if (messageArray == null)
             {
                 Log(log);
             }
             else
             {
+                message = Encoding.UTF8.GetString(messageArray);
                 Log(log + message);
             }
             MqttMsgHandle(topic, message);
@@ -392,14 +395,9 @@ namespace IotGateway
         /// </summary>
         /// <param name="topic">主题</param>
         /// <param name="message">消息</param>
-        private static void MqttMsgHandle(string topic, byte[] message)
+        private static void MqttMsgHandle(string topic, string message)
         {
             string[] topicPart = topic.Split('/');
-            if (topicPart.Length != 6)
-            {
-                // 格式错误
-                return;
-            }
             string deviceSnString = topicPart[3];
             string commandCodeString = topicPart[4];
             string requestSnString = topicPart[5];
@@ -442,32 +440,92 @@ namespace IotGateway
                 // 设置网关通信地址
                 case 30000:
                     {
-                        MqttSend(topicPrefix + (int)ErrorCode.NoError, null);
+                        Interact30000.Request r = JsonConvert.DeserializeObject<Interact30000.Request>(message);
+                        if (r != null && r.Uri != null && r.Username != null && r.Password != null)
+                        {
+                            MqttSend(topicPrefix + (int)ErrorCode.NoError, null);
+                        }
+                        else
+                        {
+                            MqttSend(topicPrefix + (int)ErrorCode.MqttMsgError, null);
+                        }
                         return;
                     }
                 // 设置温度计参数
                 case 30100:
                     {
+                        if (DeviceOfflineHandle(topicPrefix))
+                        {
+                            return;
+                        }
+                        Interact30100.Request r = JsonConvert.DeserializeObject<Interact30100.Request>(message);
+                        if (r != null
+                            && r.IntervalRefresh != null && r.IntervalPush != null && r.TemperatureMax != null && r.TemperatureMin != null
+                            && r.IntervalRefresh > 0 && r.IntervalRefresh < 61
+                            && r.IntervalPush > 0 && r.IntervalPush < 61
+                            && r.IntervalPush >= r.IntervalRefresh
+                            && r.TemperatureMax >= -55 && r.TemperatureMax <= 99
+                            && r.TemperatureMin >= -55 && r.TemperatureMin <= 99
+                            && r.TemperatureMax > r.TemperatureMin
+                            )
+                        {
+                            AddRequestSn(30100, requestSn);
+                            byte[] msg = new byte[] {
+                                0x80,
+                                (byte) r.IntervalRefresh,
+                                (byte) r.IntervalPush,
+                                (byte) r.TemperatureMax,
+                                (byte) r.TemperatureMin
+                            };
+                            SerialPortSend(msg);
+                        }
+                        else
+                        {
+                            MqttSend(topicPrefix + (int)ErrorCode.MqttMsgError, null);
+                        }
                         return;
                     }
                 // 获取网关通信地址
                 case 40000:
                     {
-                        MqttSend(topicPrefix + (int)ErrorCode.NoError, JsonConvert.SerializeObject(interact40000Response, jsonSerializerSettings));
+                        MqttSend(topicPrefix + (int)ErrorCode.NoError, JsonConvert.SerializeObject(interact40000Response));
                         return;
                     }
                 // 获取网关信息
                 case 40001:
                     {
-                        MqttSend(topicPrefix + (int)ErrorCode.NoError, JsonConvert.SerializeObject(interact40001Response, jsonSerializerSettings));
+                        MqttSend(topicPrefix + (int)ErrorCode.NoError, JsonConvert.SerializeObject(interact40001Response));
                         return;
                     }
                 // 获取温度计参数
                 case 40100:
                     {
+                        if (DeviceOfflineHandle(topicPrefix))
+                        {
+                            return;
+                        }
+                        AddRequestSn(40100, requestSn);
+                        byte[] msg = new byte[] {
+                                0x81
+                            };
+                        SerialPortSend(msg);
                         return;
                     }
             }
+        }
+
+        /// <summary>
+        /// 设备离线处理
+        /// </summary>
+        /// <returns>设备离线</returns>
+        private static bool DeviceOfflineHandle(string topicPrefix)
+        {
+            if (serialPort.IsOpen)
+            {
+                return false;
+            }
+            MqttSend(topicPrefix + (int)ErrorCode.DeviceOffline, null);
+            return true;
         }
 
         /// <summary>
@@ -481,7 +539,7 @@ namespace IotGateway
         };
 
         /// <summary>
-        /// 获取网关信息
+        /// 获取网关信息 响应
         /// </summary>
         private static readonly Interact40001.Response interact40001Response = new Interact40001.Response()
         {
@@ -489,13 +547,13 @@ namespace IotGateway
             {
                 new Interact40001.Device()
                 {
-                    Type=0,
-                    Sn=0
+                    Type = 0,
+                    Sn = 0
                 },
                 new Interact40001.Device()
                 {
-                    Type=1,
-                    Sn=1
+                    Type = 1,
+                    Sn = 1
                 }
             }
         };
@@ -556,30 +614,68 @@ namespace IotGateway
         /// 打印日志
         /// </summary>
         /// <param name="text">文本</param>
-        private static void Log(String text)
+        private static void Log(string text)
         {
             Console.WriteLine(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss.fff]: ") + text);
         }
 
+        /// <summary>
+        /// 请求超时处理
+        /// </summary>
+        private static void RequestTimeoutHandle()
+        {
+            // 10秒轮询一次
+            while (true)
+            {
+                DateTime now = DateTime.Now;
+                Queue<Tuple<long, DateTime>> map30100 = map[30100];
+                Queue<Tuple<long, DateTime>> map40100 = map[40100];
+                for (int i = 0; i < map30100.Count; i++)
+                {
+                    Tuple<long, DateTime> tuple = map30100.Peek();
+                    if (now.Subtract(tuple.Item2).TotalSeconds < timeoutSecond)
+                    {
+                        break;
+                    }
+                    map30100.Dequeue();
+                    MqttSend("$iot/response/" + gatewaySn + "/1/30100/" + tuple.Item1 + "/" + (int)ErrorCode.DeviceRequestTimeout, null);
+                }
+                for (int i = 0; i < map40100.Count; i++)
+                {
+                    Tuple<long, DateTime> tuple = map40100.Peek();
+                    if (now.Subtract(tuple.Item2).TotalSeconds < timeoutSecond)
+                    {
+                        break;
+                    }
+                    map40100.Dequeue();
+                    MqttSend("$iot/response/" + gatewaySn + "/1/40100/" + tuple.Item1 + "/" + (int)ErrorCode.DeviceRequestTimeout, null);
+                }
+                Thread.Sleep(10000);
+            }
+        }
+
         public static void Main(string[] args)
         {
+            // 请求序号Map初始化
+            map.Add(30100, new Queue<Tuple<long, DateTime>>());
+            map.Add(40100, new Queue<Tuple<long, DateTime>>());
+            // JSON默认序列化设置
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
             // 串口初始化
-            new Thread(t =>
-            {
-                SerialPortInit();
-            })
-            {
-                IsBackground = true
-            }.Start();
+            Task serialPortInit = new Task(() => SerialPortInit());
+            serialPortInit.Start();
             // MQTT初始化
-            new Thread(t =>
-            {
-                MqttInit();
-            })
-            {
-                IsBackground = true
-            }.Start();
-            Console.ReadLine();
+            Task mqttInit = new Task(() => MqttInit());
+            mqttInit.Start();
+            // 请求超时处理
+            Task requestTimeoutHandle = new Task(() => RequestTimeoutHandle());
+            requestTimeoutHandle.Start();
+            Task.WaitAll(serialPortInit);
+            Task.WaitAll(mqttInit);
+            Task.WaitAll(requestTimeoutHandle);
         }
 
     }

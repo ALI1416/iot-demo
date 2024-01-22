@@ -100,12 +100,22 @@ public class InteractService extends ServiceBase {
         if (responseJson.isEmpty()) {
             responseJson = null;
         }
-        // 响应转换
-        Map.Entry<Integer, Protocol.Data> responseMap = Protocol.responseConvert(commandCode, responseJson);
-        // 协议格式错误或转换失败或数据检查未通过
-        if (responseMap == null || (responseMap.getValue() != null && responseMap.getValue().dataCheckNotPass())) {
-            log.warn("协议格式错误或转换失败或数据检查未通过 网关序号:[{}] ,设备序号:[{}] ,命令代码:[{}] ,消息:[{}]", gatewaySn, deviceSn, commandCode, responseJson);
-            return;
+        Protocol.Data responseData = null;
+        // 没有错误
+        if (errorCode == 0) {
+            // 响应转换
+            Map.Entry<Integer, Protocol.Data> responseMap = Protocol.responseConvert(commandCode, responseJson);
+            // 协议格式错误或转换失败
+            if (responseMap == null) {
+                log.warn("协议格式错误或转换失败 网关序号:[{}] ,设备序号:[{}] ,命令代码:[{}] ,消息:[{}]", gatewaySn, deviceSn, commandCode, responseJson);
+                return;
+            }
+            // 数据检查未通过
+            responseData = responseMap.getValue();
+            if (responseData != null && responseData.dataCheckNotPass()) {
+                log.warn("数据检查未通过 网关序号:[{}] ,设备序号:[{}] ,命令代码:[{}] ,消息:[{}]", gatewaySn, deviceSn, commandCode, responseJson);
+                return;
+            }
         }
         // 单向互动
         if (id == 0) {
@@ -114,7 +124,7 @@ public class InteractService extends ServiceBase {
             base.setDeviceSn(deviceSn);
             base.setCommandCode(commandCode);
             base.setErrorCode(errorCode);
-            base.setResponse(responseMap.getValue());
+            base.setResponse(responseData);
             ProtocolVo result = interactDao.insert2(base);
             if (result != null) {
                 log.info("单向互动响应接收成功:[{}]", result);
@@ -143,7 +153,7 @@ public class InteractService extends ServiceBase {
         }
         base.setGatewaySn(gatewaySn);
         base.setErrorCode(errorCode);
-        base.setResponse(responseMap.getValue());
+        base.setResponse(responseData);
         // 更新
         ProtocolVo result = interactDao.save(base);
         if (result != null) {

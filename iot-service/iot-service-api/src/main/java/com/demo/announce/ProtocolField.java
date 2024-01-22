@@ -23,8 +23,53 @@ public @interface ProtocolField {
     String name();
 
     /**
+     * 字段特殊类型
+     */
+    FieldSpecialType specialType() default FieldSpecialType.DEFAULT;
+
+    /**
      * 字段单位
      */
     FieldUnit unit() default FieldUnit.NONE;
+
+    /**
+     * 字段Map
+     */
+    FieldMap map() default FieldMap.NULL;
+
+    /**
+     * 最大值
+     */
+    String max() default "";
+
+    /**
+     * 最小值
+     */
+    String min() default "";
+
+    /**
+     * 最大数组长度
+     */
+    int[] maxArrayLength() default {};
+
+    /**
+     * 最小数组长度
+     */
+    int[] minArrayLength() default {};
+
+    /**
+     * 最大字符长度
+     */
+    int maxLength() default Integer.MAX_VALUE;
+
+    /**
+     * 最小字符长度
+     */
+    int minLength() default 0;
+
+    /**
+     * 特殊处理
+     */
+    boolean special() default false;
 
 }

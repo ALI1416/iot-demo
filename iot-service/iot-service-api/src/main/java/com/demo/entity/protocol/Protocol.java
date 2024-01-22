@@ -36,6 +36,11 @@ import java.util.Map;
 public class Protocol extends MongoEntityBase {
 
     /**
+     * token
+     */
+    @Schema(description = "token")
+    private String token;
+    /**
      * 网关序号
      */
     @Transient
@@ -152,35 +157,6 @@ public class Protocol extends MongoEntityBase {
         @Override
         public boolean dataCheckNotPass() {
             return false;
-        }
-
-    }
-
-    /**
-     * 故障
-     */
-    @Schema(description = "故障")
-    public interface Fault {
-
-        /**
-         * 获取故障信息列表
-         */
-        ProtocolInfo.Fault[] getFaultInfoList();
-
-    }
-
-    /**
-     * 没有故障
-     */
-    @Schema(description = "没有故障")
-    public static class NoFault implements Fault {
-
-        /**
-         * 获取故障信息列表
-         */
-        @Override
-        public ProtocolInfo.Fault[] getFaultInfoList() {
-            return new ProtocolInfo.Fault[0];
         }
 
     }

@@ -16,19 +16,19 @@
             /// <summary>
             /// 刷新间隔(s 秒)
             /// </summary>
-            public int IntervalRefresh { get; set; }
+            public int? IntervalRefresh { get; set; }
             /// <summary>
             /// 推送间隔(s 秒)
             /// </summary>
-            public int IntervalPush { get; set; }
+            public int? IntervalPush { get; set; }
             /// <summary>
             /// 温度上限(℃ 摄氏度)
             /// </summary>
-            public int TemperatureMax { get; set; }
+            public int? TemperatureMax { get; set; }
             /// <summary>
             /// 温度下限(℃ 摄氏度)
             /// </summary>
-            public int TemperatureMin { get; set; }
+            public int? TemperatureMin { get; set; }
 
         }
 

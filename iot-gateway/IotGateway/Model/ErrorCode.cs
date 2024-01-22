@@ -15,13 +15,13 @@
         /// </summary>
         GatewayNotFound = 1,
         /// <summary>
-        /// 网关离线
-        /// </summary>
-        GatewayOffline = 2,
-        /// <summary>
         /// 设备不存在
         /// </summary>
-        DeviceNotFound = 3,
+        DeviceNotFound = 2,
+        /// <summary>
+        /// 网关离线
+        /// </summary>
+        GatewayOffline = 3,
         /// <summary>
         /// 设备离线
         /// </summary>
@@ -45,11 +45,19 @@
         /// <summary>
         /// 网关执行失败
         /// </summary>
-        GatewayReturnError = 9,
+        GatewayResponseError = 9,
         /// <summary>
         /// 设备执行失败
         /// </summary>
-        DeviceReturnError = 10,
+        DeviceResponseError = 10,
+        /// <summary>
+        /// 网关执行超时
+        /// </summary>
+        GatewayRequestTimeout = 9,
+        /// <summary>
+        /// 设备执行超时
+        /// </summary>
+        DeviceRequestTimeout = 10,
 
     }
 }
