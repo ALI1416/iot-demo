@@ -11,9 +11,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <h1>协议信息</h1>
@@ -108,6 +112,11 @@ public class ProtocolInfo extends ToStringBase {
         @Schema(description = "嵌套")
         private Data nest;
         /**
+         * 嵌套Map
+         */
+        @Schema(description = "嵌套Map")
+        private Map<String, Data> nestMap;
+        /**
          * 字段单位
          */
         @Schema(description = "字段单位")
@@ -192,53 +201,8 @@ public class ProtocolInfo extends ToStringBase {
         return INFO.get(commandCode);
     }
 
-    List list1;
-    List<Integer>[] list2;
-    List<Set<Integer>>[][] list3;
-
     public static void main(String[] args) {
         System.out.println(INFO);
-        Field[] fields = ProtocolInfo.class.getDeclaredFields();
-        Field field1 = fields[10];
-        Field field2 = fields[11];
-        Field field3 = fields[12];
-        Type type1 = field1.getType();
-        Type type2 = field2.getType();
-        Type type3 = field3.getType();
-        // Type type2 = field2.getGenericType();
-        // Type type3 = field3.getGenericType();
-        Class class1 = (Class) type1;
-        Class class2 = (Class) type2;
-        Class class3 = (Class) type3;
-        // ParameterizedType class2 = (ParameterizedType) type2;
-        // ParameterizedType class3 = (ParameterizedType) type3;
-        // String name1 = class1.getTypeName();
-        // String name2 = class2.getTypeName();
-        // String name3 = class3.getTypeName();
-        Class componentType = class3.getComponentType();
-    }
-
-    /**
-     * 是数组或集合
-     *
-     * @param clazz Class
-     * @return 是数组或集合
-     */
-    private static boolean isArrayOrCollection(Class clazz) {
-        return clazz.isArray() || Collection.class.isAssignableFrom(clazz);
-    }
-
-    /**
-     * 获取泛型
-     *
-     * @param type Type
-     * @return 泛型(没有返回null)
-     */
-    private static Type getGenericType(Type type) {
-        if (type instanceof ParameterizedType) {
-            return ((ParameterizedType) type).getActualTypeArguments()[0];
-        }
-        return null;
     }
 
     /**
@@ -299,110 +263,139 @@ public class ProtocolInfo extends ToStringBase {
     /**
      * 获取数据Map
      *
-     * @param dataClass Protocol.Data
+     * @param clazz Protocol.Data
      * @return 字段名, ProtocolInfo.Data
      */
-    private static Map<String, ProtocolInfo.Data> getDataMap(Class<? extends Protocol.Data> dataClass) {
-        Map<String, ProtocolInfo.Data> map = new HashMap<>(getFieldsDataMap(dataClass.getDeclaredFields()));
+    private static Map<String, ProtocolInfo.Data> getDataMap(Class<?> clazz) {
+        Map<String, ProtocolInfo.Data> map = new HashMap<>(getFieldArrayDataMap(clazz.getDeclaredFields()));
         // 父类
-        Class<?> superClass = dataClass.getSuperclass();
+        Class<?> superClass = clazz.getSuperclass();
         while (!(superClass == null || superClass == ToStringBase.class || superClass == Object.class)) {
-            map.putAll(getFieldsDataMap(superClass.getDeclaredFields()));
+            map.putAll(getFieldArrayDataMap(superClass.getDeclaredFields()));
             superClass = superClass.getSuperclass();
         }
         return map;
     }
 
     /**
-     * 获取字段数据Map
+     * 获取字段数组数据Map
      *
-     * @param fields 字段数组
+     * @param fieldArray 字段数组
      * @return 字段名, ProtocolInfo.Data
      */
-    private static Map<String, ProtocolInfo.Data> getFieldsDataMap(Field[] fields) {
+    private static Map<String, ProtocolInfo.Data> getFieldArrayDataMap(Field[] fieldArray) {
         Map<String, ProtocolInfo.Data> map = new HashMap<>();
-        for (Field field : fields) {
+        for (Field field : fieldArray) {
             // 含注解的字段
             ProtocolField protocolField = field.getAnnotation(ProtocolField.class);
             if (protocolField == null) {
                 continue;
             }
-            ProtocolInfo.Data data = new ProtocolInfo.Data();
-            // 字段类型
-            Class fieldType = field.getType();
-            // 数组类型
-            // if (fieldType.isArray()) {
-            //
-            // }
-            //
-            data.setType(getTypeName(fieldType));
-            // 字段名
-            data.setName(protocolField.name());
-            // 字段特殊类型
-            if (protocolField.specialType() != FieldSpecialType.DEFAULT) {
-                data.setSpecialType(protocolField.specialType().getCode());
-            }
-            // 字段单位
-            if (protocolField.unit() != FieldUnit.NONE) {
-                data.setUnit(protocolField.unit().getEntry());
-            }
-            // 字段Map
-            if (protocolField.map() != FieldMap.NULL) {
-                data.setMap(protocolField.map().getMap());
-            }
-            // 最大值
-            if (!protocolField.max().isEmpty()) {
-                data.setMax(protocolField.max());
-            }
-            // 最小值
-            if (!protocolField.min().isEmpty()) {
-                data.setMin(protocolField.min());
-            }
-            // 最大字符长度
-            if (protocolField.maxLength() != Integer.MAX_VALUE) {
-                data.setMaxLength(protocolField.maxLength());
-            }
-            // 最小字符长度
-            if (protocolField.minLength() != 0) {
-                data.setMinLength(protocolField.minLength());
-            }
-            // 特殊处理
-            if (protocolField.special()) {
-                data.setSpecial(true);
-            }
-            map.put(field.getName(), data);
+            map.put(field.getName(), getFieldData(field.getGenericType(), protocolField));
         }
         return map;
     }
 
-    private static void fieldHandle(Map<String, ProtocolInfo.Data> map, Field field, ProtocolField protocolField) {
-
-    }
-
-    private static void arrayFieldHandle(Map<String, ProtocolInfo.Data> map, Field field, ProtocolField protocolField) {
-
-    }
-
-    private static void listFieldHandle(Map<String, ProtocolInfo.Data> map, Field field, ProtocolField protocolField) {
-
-    }
-
-    private static void objectFieldHandle(Map<String, ProtocolInfo.Data> map, Field field, ProtocolField protocolField) {
-
-    }
-
-    private static void normalFieldHandle(Map<String, ProtocolInfo.Data> map, Field field, ProtocolField protocolField) {
-
+    /**
+     * 获取字段数据
+     *
+     * @param protocolField ProtocolField
+     * @param type          Type
+     * @return ProtocolInfo.Data
+     */
+    private static ProtocolInfo.Data getFieldData(Type type, ProtocolField protocolField) {
+        ProtocolInfo.Data data = new ProtocolInfo.Data();
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            // 泛型对象 例如List<Integer>
+            if (Collection.class.isAssignableFrom((Class<?>) (parameterizedType.getRawType()))) {
+                // 集合类型
+                data.setType("collection");
+                data.setNest(getFieldData(parameterizedType.getActualTypeArguments()[0], protocolField));
+            } else {
+                // 非集合类型
+                data.setType("NotCollectionType");
+            }
+        } else if (type instanceof GenericArrayType) {
+            // 泛型对象数组 例如List<Integer>[]
+            data.setType("array");
+            data.setNest(getFieldData(((GenericArrayType) type).getGenericComponentType(), protocolField));
+        } else if (type instanceof Class) {
+            // 普通数组类型、非数组类型 例如int[]、int
+            Class<?> clazz = (Class<?>) type;
+            if (clazz.isArray()) {
+                // 数组类型
+                data.setType("array");
+                data.setNest(getFieldData(clazz.getComponentType(), protocolField));
+            } else {
+                // 非数组类型
+                data.setType(getTypeName(clazz));
+                if ("object".equals(data.getType())) {
+                    // 对象类型
+                    data.setNestMap(getDataMap(clazz));
+                } else {
+                    // 普通类型
+                    setNormalTypeData(data, protocolField);
+                }
+            }
+        } else {
+            // 未知类型
+            data.setType("UnknownType");
+        }
+        return data;
     }
 
     /**
-     * 获取字段类型
+     * 设置普通类型数据
      *
-     * @param clazz Class
-     * @return 字段类型
+     * @param data          ProtocolInfo.Data
+     * @param protocolField ProtocolField
      */
-    private static String getTypeName(Class<?> clazz) {
-        switch (clazz.getName()) {
+    private static void setNormalTypeData(ProtocolInfo.Data data, ProtocolField protocolField) {
+        // 字段名
+        data.setName(protocolField.name());
+        // 字段特殊类型
+        if (protocolField.specialType() != FieldSpecialType.DEFAULT) {
+            data.setSpecialType(protocolField.specialType().getCode());
+        }
+        // 字段单位
+        if (protocolField.unit() != FieldUnit.NONE) {
+            data.setUnit(protocolField.unit().getEntry());
+        }
+        // 字段Map
+        if (protocolField.map() != FieldMap.NULL) {
+            data.setMap(protocolField.map().getMap());
+        }
+        // 最大值
+        if (!protocolField.max().isEmpty()) {
+            data.setMax(protocolField.max());
+        }
+        // 最小值
+        if (!protocolField.min().isEmpty()) {
+            data.setMin(protocolField.min());
+        }
+        // 最大字符长度
+        if (protocolField.maxLength() != Integer.MAX_VALUE) {
+            data.setMaxLength(protocolField.maxLength());
+        }
+        // 最小字符长度
+        if (protocolField.minLength() != 0) {
+            data.setMinLength(protocolField.minLength());
+        }
+        // 特殊处理
+        if (protocolField.special()) {
+            data.setSpecial(true);
+        }
+    }
+
+    /**
+     * 获取字段类型名(基本类型、字符串类型、对象类型)
+     *
+     * @param fieldType 字段类型
+     * @return 字段类型名
+     */
+    private static String getTypeName(Class<?> fieldType) {
+        switch (fieldType.getName()) {
             case "boolean":
             case "java.lang.Boolean": {
                 return "boolean";

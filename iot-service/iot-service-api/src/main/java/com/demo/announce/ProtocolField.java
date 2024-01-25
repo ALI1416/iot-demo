@@ -48,16 +48,6 @@ public @interface ProtocolField {
     String min() default "";
 
     /**
-     * 最大数组长度
-     */
-    int[] maxArrayLength() default {};
-
-    /**
-     * 最小数组长度
-     */
-    int[] minArrayLength() default {};
-
-    /**
      * 最大字符长度
      */
     int maxLength() default Integer.MAX_VALUE;
