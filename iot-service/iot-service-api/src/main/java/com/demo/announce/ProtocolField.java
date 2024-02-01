@@ -62,4 +62,9 @@ public @interface ProtocolField {
      */
     boolean special() default false;
 
+    /**
+     * 备注
+     */
+    String comment() default "";
+
 }

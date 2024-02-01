@@ -75,11 +75,23 @@ public class ProtocolInfo extends ToStringBase {
     @Schema(description = "响应Map")
     private Map<String, Data> responseMap;
     /**
-     * 数据类
+     * 事件类
      */
-    @Schema(description = "数据类")
+    @Schema(description = "事件类")
     @JSONField(serialize = false, deserialize = false)
-    private Class<? extends Protocol.Data> dataClass;
+    private Class<? extends Protocol.Data> eventClass;
+    /**
+     * 请求类
+     */
+    @Schema(description = "请求类")
+    @JSONField(serialize = false, deserialize = false)
+    private Class<? extends Protocol.Data> requestClass;
+    /**
+     * 响应类
+     */
+    @Schema(description = "响应类")
+    @JSONField(serialize = false, deserialize = false)
+    private Class<? extends Protocol.Data> responseClass;
 
     /**
      * 数据
@@ -151,6 +163,11 @@ public class ProtocolInfo extends ToStringBase {
          */
         @Schema(description = "特殊处理")
         private Boolean special;
+        /**
+         * 备注
+         */
+        @Schema(description = "备注")
+        private String comment;
 
     }
 
@@ -201,10 +218,6 @@ public class ProtocolInfo extends ToStringBase {
         return INFO.get(commandCode);
     }
 
-    public static void main(String[] args) {
-        System.out.println(INFO);
-    }
-
     /**
      * 获取协议信息Map
      *
@@ -236,7 +249,7 @@ public class ProtocolInfo extends ToStringBase {
             Class<? extends Protocol.Data> eventClass = protocolClass.eventClass();
             if (eventClass != Protocol.NoData.class) {
                 protocolInfo.setEventMap(getDataMap(eventClass));
-                protocolInfo.setDataClass(eventClass);
+                protocolInfo.setEventClass(eventClass);
             }
             // 故障Map
             if (protocolClass.faultMap() != FaultMap.NULL) {
@@ -246,13 +259,13 @@ public class ProtocolInfo extends ToStringBase {
             Class<? extends Protocol.Data> requestClass = protocolClass.requestClass();
             if (requestClass != Protocol.NoData.class) {
                 protocolInfo.setRequestMap(getDataMap(requestClass));
-                protocolInfo.setDataClass(requestClass);
+                protocolInfo.setRequestClass(requestClass);
             }
             // 响应类
             Class<? extends Protocol.Data> responseClass = protocolClass.responseClass();
             if (responseClass != Protocol.NoData.class) {
                 protocolInfo.setResponseMap(getDataMap(responseClass));
-                protocolInfo.setDataClass(responseClass);
+                protocolInfo.setResponseClass(responseClass);
             }
             // 命令代码,协议信息
             map.put(protocolClass.code(), protocolInfo);
@@ -314,7 +327,7 @@ public class ProtocolInfo extends ToStringBase {
                 data.setNest(getFieldData(parameterizedType.getActualTypeArguments()[0], protocolField));
             } else {
                 // 非集合类型
-                data.setType("NotCollectionType");
+                data.setType("uncollection");
             }
         } else if (type instanceof GenericArrayType) {
             // 泛型对象数组 例如List<Integer>[]
@@ -340,7 +353,7 @@ public class ProtocolInfo extends ToStringBase {
             }
         } else {
             // 未知类型
-            data.setType("UnknownType");
+            data.setType("unknown");
         }
         return data;
     }
@@ -385,6 +398,10 @@ public class ProtocolInfo extends ToStringBase {
         // 特殊处理
         if (protocolField.special()) {
             data.setSpecial(true);
+        }
+        // 备注
+        if(!protocolField.comment().isEmpty()){
+            data.setComment(protocolField.comment());
         }
     }
 

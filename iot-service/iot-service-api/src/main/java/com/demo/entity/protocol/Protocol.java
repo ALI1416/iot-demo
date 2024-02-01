@@ -205,7 +205,7 @@ public class Protocol extends MongoEntityBase {
         Data data = null;
         if (eventJson != null) {
             try {
-                data = JSON.parseObject(eventJson, info.getDataClass());
+                data = JSON.parseObject(eventJson, info.getEventClass());
             } catch (Exception ignored) {
                 return null;
             }
@@ -232,7 +232,7 @@ public class Protocol extends MongoEntityBase {
         Data data = null;
         if (requestJson != null) {
             try {
-                data = requestJson.to(info.getDataClass());
+                data = requestJson.to(info.getRequestClass());
             } catch (Exception ignored) {
                 return null;
             }
@@ -259,7 +259,7 @@ public class Protocol extends MongoEntityBase {
         Data data = null;
         if (responseJson != null) {
             try {
-                data = JSON.parseObject(responseJson, info.getDataClass());
+                data = JSON.parseObject(responseJson, info.getResponseClass());
             } catch (Exception ignored) {
                 return null;
             }

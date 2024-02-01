@@ -20,15 +20,6 @@ import java.util.Map;
 public enum FieldMap {
 
     /**
-     * 光伏遥控
-     */
-    PV_REMOTE(
-            new AbstractMap.SimpleEntry<>("0", "加载优先"),
-            new AbstractMap.SimpleEntry<>("1", "电池优先"),
-            new AbstractMap.SimpleEntry<>("2", "电网优先")
-    ),
-
-    /**
      * 空
      */
     NULL(new AbstractMap.SimpleEntry<>(null, null));
