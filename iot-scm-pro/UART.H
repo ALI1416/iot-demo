@@ -3,6 +3,5 @@
 
 void UartInit();
 void UartSendByte(unsigned char byte);
-void UartSendString(unsigned char *str);
 
 #endif

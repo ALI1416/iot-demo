@@ -399,7 +399,7 @@ void main()
           delayMs(5);
           AT24C02_WriteByte(2, TempAlertHigh);
           delayMs(5);
-          AT24C02_WriteByte(4, TempAlertLow);
+          AT24C02_WriteByte(3, TempAlertLow);
           delayMs(5);
           // 读取温度参数响应：0xC1
           UartSendByte(0xC1);

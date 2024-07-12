@@ -40,34 +40,6 @@ void UartSendByte(unsigned char byte)
   TI = 0;
 }
 
-/**
-* 发送1个字符串(字符串结尾会自动加\0)
-* 0x00(即\0)作为字符串结束符，如果需要发送0x00，那么发送2个0x00
-*/
-void UartSendString(unsigned char *str)
-{
-  unsigned char i = 0;
-  while (1)
-  {
-    if (str[i] == 0)
-    {
-      if (str[++i] == 0)
-      {
-        i++;
-        UartSendByte(0);
-      }
-      else
-      {
-        break;
-      }
-    }
-    else
-    {
-      UartSendByte(str[i++]);
-    }
-  }
-}
-
 // /**
 // 串口中断
 // */
