@@ -2,7 +2,7 @@
 {
 
     /// <summary>
-    /// 获取温度计参数
+    /// 获取温度计配置
     /// </summary>
     public class Interact40100
     {

@@ -30,7 +30,7 @@ public class Fault20100 {
 
     // 1组
     static {
-        MAP.put("报警", new String[]{
+        MAP.put("警报", new String[]{
                 "温度过高",
                 "温度过低",
         });

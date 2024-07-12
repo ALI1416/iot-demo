@@ -2,7 +2,7 @@
 {
 
     /// <summary>
-    /// 设置网关通信地址
+    /// 设置温度计配置
     /// </summary>
     public class Interact30100
     {

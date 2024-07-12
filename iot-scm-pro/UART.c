@@ -68,38 +68,6 @@ void UartSendString(unsigned char *str)
   }
 }
 
-/**
-* 发送字符数组，并指定只发送前几位
-*/
-void UartSendByteArray(unsigned char bytes[], unsigned char len)
-{
-  unsigned char i;
-  for (i = 0; i < len; i++)
-  {
-    UartSendByte(bytes[i]);
-  }
-}
-
-/**
- * 发送int，高位在前
- */
-void UartSendInt(unsigned int i)
-{
-  UartSendByte(i >> 8);
-  UartSendByte(i & 0x00FF);
-}
-
-/**
- * 发送long，高位在前
- */
-void UartSendLong(unsigned long i)
-{
-  UartSendByte(i >> 24);
-  UartSendByte((i & 0x00FF0000) >> 16);
-  UartSendByte((i & 0x0000FF00) >> 8);
-  UartSendByte(i & 0x000000FF);
-}
-
 // /**
 // 串口中断
 // */

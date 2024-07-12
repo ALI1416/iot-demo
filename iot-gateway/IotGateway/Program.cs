@@ -30,12 +30,12 @@ namespace IotGateway
         /// </summary>
         private static readonly int deviceSn = 1;
         /// <summary>
-        /// 请求超时时间
+        /// 请求超时时间(秒)[2分钟]
         /// </summary>
-        private static readonly int timeoutSecond = 60;
+        private static readonly int timeout = 120;
 
         /// <summary>
-        /// 请求序号Map 命令代码,队列 请求序号,请求时间
+        /// 请求序号Map 命令代码,请求序号,请求时间
         /// </summary>
         private static readonly Dictionary<int, Queue<Tuple<long, DateTime>>> map = new Dictionary<int, Queue<Tuple<long, DateTime>>>();
 
@@ -54,7 +54,7 @@ namespace IotGateway
         /// <summary>
         /// MQTT订阅主题
         /// </summary>
-        private static readonly string subscribeTopic = "$iot/request/" + gatewaySn + "/+/+/+";
+        private static readonly string subscribeTopic = "$iot/request/" + gatewaySn + "/+/+";
         /// <summary>
         /// MQTT连接选项
         /// </summary>
@@ -108,52 +108,17 @@ namespace IotGateway
                 byte[] buffer = new byte[length];
                 serialPort.Read(buffer, 0, length);
                 string log = "串口收到消息：" + Bytes2Hex(buffer);
-                if (SerialPortReceiveMsgCheck(buffer))
+                string topic = GetMqttTopic(buffer);
+                if (topic != null)
                 {
                     Log(log);
                     // MQTT发送消息
-                    MqttSend(GetMqttTopic(buffer), GetMqttMsg(buffer));
+                    MqttSend(topic, GetMqttMsg(buffer));
                 }
                 else
                 {
                     Log(log + " 错误！");
                 }
-            }
-        }
-
-        /// <summary>
-        /// 串口接收消息检查
-        /// </summary>
-        /// <param name="msg">消息</param>
-        /// <returns>是否正确</returns>
-        private static bool SerialPortReceiveMsgCheck(byte[] msg)
-        {
-            switch (msg[0])
-            {
-                default:
-                    {
-                        return false;
-                    }
-                // 温度事件
-                case 0x00:
-                    {
-                        return msg.Length == 5;
-                    }
-                // 温度报警
-                case 0x40:
-                    {
-                        return msg.Length == 2;
-                    }
-                // 设置温度参数
-                case 0xC0:
-                    {
-                        return msg.Length == 2;
-                    }
-                // 读取温度参数
-                case 0xC1:
-                    {
-                        return msg.Length == 5;
-                    }
             }
         }
 
@@ -168,29 +133,27 @@ namespace IotGateway
             {
                 default:
                     {
-                        return "";
+                        return null;
                     }
-                // 温度事件
+                // 温度计事件
                 case 0x00:
                     {
-                        return "$iot/event/" + gatewaySn + "/" + deviceSn + "/10100";
+                        return msg.Length == 5 ? "$iot/event/" + gatewaySn + "/" + deviceSn + "/10100" : null;
                     }
-                // 温度报警
+                // 温度计故障
                 case 0x40:
                     {
-                        return "$iot/fault/" + gatewaySn + "/" + deviceSn + "/20100";
+                        return msg.Length == 2 ? "$iot/fault/" + gatewaySn + "/" + deviceSn + "/20100" : null;
                     }
-                // 设置温度参数
+                // 设置温度计配置
                 case 0xC0:
                     {
-                        return "$iot/response/" + gatewaySn + "/" + deviceSn + "/30100/" +
-                            GetRequestSn(30100) + "/" + GetErrorCode(msg[0]);
+                        return msg.Length == 2 ? "$iot/response/" + gatewaySn + "/" + deviceSn + "/30100" : null;
                     }
-                // 读取温度参数
+                // 获取温度计配置
                 case 0xC1:
                     {
-                        return "$iot/response/" + gatewaySn + "/" + deviceSn + "/40100/" +
-                            GetRequestSn(40100) + "/0";
+                        return msg.Length == 5 ? "$iot/response/" + gatewaySn + "/" + deviceSn + "/40100" : null;
                     }
             }
         }
@@ -255,7 +218,7 @@ namespace IotGateway
                         };
                         return JsonConvert.SerializeObject(e);
                     }
-                // 温度报警
+                // 温度警报
                 case 0x40:
                     {
                         return JsonConvert.SerializeObject(GetFaultList(msg));
@@ -437,7 +400,7 @@ namespace IotGateway
                         MqttSend(topicPrefix + (int)ErrorCode.CommandCodeError, null);
                         return;
                     }
-                // 设置网关通信地址
+                // 设置通信地址
                 case 30000:
                     {
                         Interact30000.Request r = JsonConvert.DeserializeObject<Interact30000.Request>(message);
@@ -451,7 +414,19 @@ namespace IotGateway
                         }
                         return;
                     }
-                // 设置温度计参数
+                // 获取通信地址
+                case 40000:
+                    {
+                        MqttSend(topicPrefix + (int)ErrorCode.NoError, JsonConvert.SerializeObject(interact40000Response));
+                        return;
+                    }
+                // 获取网关配置
+                case 40001:
+                    {
+                        MqttSend(topicPrefix + (int)ErrorCode.NoError, JsonConvert.SerializeObject(interact40001Response));
+                        return;
+                    }
+                // 设置温度计配置
                 case 30100:
                     {
                         if (DeviceOfflineHandle(topicPrefix))
@@ -461,8 +436,8 @@ namespace IotGateway
                         Interact30100.Request r = JsonConvert.DeserializeObject<Interact30100.Request>(message);
                         if (r != null
                             && r.IntervalRefresh != null && r.IntervalPush != null && r.TemperatureMax != null && r.TemperatureMin != null
-                            && r.IntervalRefresh > 0 && r.IntervalRefresh < 61
-                            && r.IntervalPush > 0 && r.IntervalPush < 61
+                            && r.IntervalRefresh >= 1 && r.IntervalRefresh <= 60
+                            && r.IntervalPush >= 1 && r.IntervalPush <= 60
                             && r.IntervalPush >= r.IntervalRefresh
                             && r.TemperatureMax >= -55 && r.TemperatureMax <= 99
                             && r.TemperatureMin >= -55 && r.TemperatureMin <= 99
@@ -485,19 +460,7 @@ namespace IotGateway
                         }
                         return;
                     }
-                // 获取网关通信地址
-                case 40000:
-                    {
-                        MqttSend(topicPrefix + (int)ErrorCode.NoError, JsonConvert.SerializeObject(interact40000Response));
-                        return;
-                    }
-                // 获取网关信息
-                case 40001:
-                    {
-                        MqttSend(topicPrefix + (int)ErrorCode.NoError, JsonConvert.SerializeObject(interact40001Response));
-                        return;
-                    }
-                // 获取温度计参数
+                // 获取温度计配置
                 case 40100:
                     {
                         if (DeviceOfflineHandle(topicPrefix))
@@ -529,17 +492,17 @@ namespace IotGateway
         }
 
         /// <summary>
-        /// 获取网关通信地址 响应
+        /// 获取通信地址 响应
         /// </summary>
         private static readonly Interact40000.Response interact40000Response = new Interact40000.Response()
         {
             Uri = "mqtt://127.0.0.1:1883",
-            Username = "",
-            Password = ""
+            Username = "account",
+            Password = "pwd"
         };
 
         /// <summary>
-        /// 获取网关信息 响应
+        /// 获取网关配置 响应
         /// </summary>
         private static readonly Interact40001.Response interact40001Response = new Interact40001.Response()
         {
@@ -547,13 +510,13 @@ namespace IotGateway
             {
                 new Interact40001.Device()
                 {
-                    Type = 0,
-                    Sn = 0
+                    Sn = 0,
+                    Type = 0
                 },
                 new Interact40001.Device()
                 {
-                    Type = 1,
-                    Sn = 1
+                    Sn = 1,
+                    Type = 1
                 }
             }
         };
@@ -633,7 +596,7 @@ namespace IotGateway
                 for (int i = 0; i < map30100.Count; i++)
                 {
                     Tuple<long, DateTime> tuple = map30100.Peek();
-                    if (now.Subtract(tuple.Item2).TotalSeconds < timeoutSecond)
+                    if (now.Subtract(tuple.Item2).TotalSeconds < timeout)
                     {
                         break;
                     }
@@ -643,7 +606,7 @@ namespace IotGateway
                 for (int i = 0; i < map40100.Count; i++)
                 {
                     Tuple<long, DateTime> tuple = map40100.Peek();
-                    if (now.Subtract(tuple.Item2).TotalSeconds < timeoutSecond)
+                    if (now.Subtract(tuple.Item2).TotalSeconds < timeout)
                     {
                         break;
                     }

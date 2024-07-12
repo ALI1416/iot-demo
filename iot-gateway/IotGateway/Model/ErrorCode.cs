@@ -53,11 +53,11 @@
         /// <summary>
         /// 网关执行超时
         /// </summary>
-        GatewayRequestTimeout = 9,
+        GatewayRequestTimeout = 11,
         /// <summary>
         /// 设备执行超时
         /// </summary>
-        DeviceRequestTimeout = 10,
+        DeviceRequestTimeout = 12,
 
     }
 }

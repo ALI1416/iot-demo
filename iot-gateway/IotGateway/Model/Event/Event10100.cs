@@ -14,7 +14,7 @@
         {
 
             /// <summary>
-            /// 温度(m℃ 毫摄氏度)
+            /// 温度(0.0001℃ 0.0001摄氏度)
             /// </summary>
             public int Temperature { get; set; }
 

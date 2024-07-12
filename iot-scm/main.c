@@ -6,78 +6,88 @@
 #include "DELAY.H"
 #include "AT24C02.h"
 
-// 接收数据数组长度
+// 串口接收数据数组长度
 #define UART_RECEIVE_SIZE 8
-// 接收数据数组
-unsigned char UART_RECEIVE_DATA[UART_RECEIVE_SIZE];
-// 下一个接收数据存放下标
-unsigned char UART_RECEIVE_INDEX = 0;
-// 接收状态：0未接收；1接收中；2被定时器中断函数打断；
+// 串口接收数据数组
+unsigned char UartReceiveData[UART_RECEIVE_SIZE];
+// 串口下一个接收数据存放下标
+unsigned char UartReceiveIndex = 0;
+// 串口接收状态：
+// 0未接收；
+// 1接收中；
+// 2被定时器中断函数打断；
 // 3接收完成(数据要在UART_RECEIVE_SIZE毫秒内发送完成，否则无效)
-unsigned char UART_RECEIVE_STATUS = 0;
+unsigned char UartReceiveStatus = 0;
 
-// 温度最大值(实际为125)
-char TEMP_MAX = 99;
-// 温度最小值(实际为-55)
-char TEMP_MIN = -55;
-// 温度转换间隔最大值(秒)
+// 温度转换最大值(秒)
 unsigned char TEMP_CONVERT_MAX = 60;
-// 温度转换间隔最小值(秒)
+// 温度转换最小值(秒)
 unsigned char TEMP_CONVERT_MIN = 1;
 // 温度转换间隔(秒)
-unsigned char TEMP_CONVERT_TIME = 1;
-// 温度串口发送最大值(秒)
-unsigned char TEMP_SEND_MAX = 60;
-// 温度串口发送最小值(秒)
-unsigned char TEMP_SEND_MIN = 1;
-// 温度串口发送间隔(秒)
-unsigned char TEMP_SEND_TIME = 10;
+unsigned char TempConvertTime = 1;
 // 温度转换状态：0不可转换；1可转换
-unsigned char TEMP_CONVERT_STATUS = 1;
-// 温度串口发送状态：0不可发送；1可发送
-unsigned char TEMP_SEND_STATUS = 0;
+unsigned char TempConvertStatus = 1;
+
+// 串口发送最大值(秒)
+unsigned char UART_SEND_MAX = 60;
+// 串口发送最小值(秒)
+unsigned char UART_SEND_MIN = 1;
+// 串口发送间隔(秒)
+unsigned char UartSendTime = 10;
+// 串口发送状态：0不可发送；1可发送
+unsigned char UartSendStatus = 0;
+
+// 温度最大值(℃)(实际为125)
+char TEMP_MAX = 99;
+// 温度最小值(℃)(实际为-55)
+char TEMP_MIN = -55;
 // 温度*10000
 long Temp;
 // 温度整数部分(char)(Temp / 10000)
 char TempInt;
-// 高温报警
-char TEMP_HIGH = 30;
-// 低温报警
-char TEMP_LOW = 20;
-// 温度报警状态：0正常；bit0(0x01)温度过高；bit1(0x02)温度过低
-unsigned char TEMP_ALARM_STATUS;
-// 显示的温度设置(未保存)
-char THighShow, TLowShow, TSendShow, TConvertShow;
 
-// 温度设置刷新状态：0不可刷新；1可刷新
-unsigned char TEMP_SET_REFRESH_STATUS = 0;
+// 高温警报(℃)
+char TempAlertHigh = 30;
+// 低温警报(℃)
+char TempAlertLow = 20;
+// 温度警报状态：0无警报；bit0(0x01)温度过高；bit1(0x02)温度过低
+unsigned char TempAlertStatus = 0;
 
 void main()
 {
-  // 存储器里面的温度设置
-  char THigh, TLow, TSend, TConvert;
+  // 存储器里面的温度转换间隔
+  char StorageConvert;
+  // 存储器里面的串口发送间隔
+  char StorageSend;
+  // 存储器里面的高温警报
+  char StorageHigh;
+  // 存储器里面的低温警报
+  char StorageLow;
   Timer0_Init();
   UartInit();
   // 读取存储器里面的温度设置
-  THigh = AT24C02_ReadByte(0);
-  TLow = AT24C02_ReadByte(1);
-  TSend = AT24C02_ReadByte(2);
-  TConvert = AT24C02_ReadByte(3);
+  StorageConvert = AT24C02_ReadByte(0);
+  StorageSend = AT24C02_ReadByte(1);
+  StorageHigh = AT24C02_ReadByte(2);
+  StorageLow = AT24C02_ReadByte(3);
   // 存储器里的数据正确，才保存
-  if (THigh <= TEMP_MAX && TLow >= TEMP_MIN && THigh > TLow                 //
-      && TSend > TEMP_SEND_MIN - 1 && TSend < TEMP_SEND_MAX + 1             //
-      && TConvert > TEMP_CONVERT_MIN - 1 && TConvert < TEMP_CONVERT_MAX + 1 //
-      && TSend >= TConvert)
+  if (
+      // 温度转换间隔>=温度转换最小值 <=温度转换最大值
+      StorageConvert >= TEMP_CONVERT_MIN && StorageConvert <= TEMP_CONVERT_MAX
+      // 串口发送间隔>=串口发送最小值 <=串口发送最大值
+      && StorageSend >= UART_SEND_MIN && StorageSend <= UART_SEND_MAX
+      // 串口发送间隔>=温度转换间隔
+      && StorageSend >= StorageConvert
+      // 高温警报<=温度最大值 低温警报>=温度最小值
+      && StorageHigh <= TEMP_MAX && StorageLow >= TEMP_MIN
+      // 高温警报>低温警报
+      && StorageHigh > StorageLow)
   {
-    TEMP_HIGH = THigh;
-    TEMP_LOW = TLow;
-    TEMP_SEND_TIME = TSend;
-    TEMP_CONVERT_TIME = TConvert;
+    TempAlertHigh = StorageHigh;
+    TempAlertLow = StorageLow;
+    TempConvertTime = StorageConvert;
+    UartSendTime = StorageSend;
   }
-  THighShow = TEMP_HIGH;
-  TLowShow = TEMP_LOW;
-  TSendShow = TEMP_SEND_TIME;
-  TConvertShow = TEMP_CONVERT_TIME;
   // 上电先转换一次温度，防止第一次读数据错误
   DS18B20_ConvertT();
   // 等待转换完成
@@ -89,54 +99,61 @@ void main()
     //   温度事件：0x00
     //     温度x10000(32bit)
     // 故障(单片机 --> 网关)：0x40 - 0x7F
-    //   温度报警：0x40
-    //     温度报警状态(8bit)
+    //   温度警报：0x40
+    //     温度警报状态(8bit)
     // 互动请求(网关 --> 单片机)：0x80 - 0xBF
     //   设置温度参数：0x80
-    //     F温度读取时间间隔 C串口发送时间间隔 H高温报警 L低温报警(32bit)
+    //     T温度转换间隔 U串口发送间隔 H高温警报 L低温警报(32bit)
     //   读取温度参数：0x81
     // 互动响应(单片机 --> 网关)：0xC0 - 0xFF
     //   设置温度参数：0xC0
-    //     设置状态(8bit) 0x00成功 0x01失败
+    //     设置状态(8bit)
+    //       0x00 成功
+    //       0x01 失败
     //   读取温度参数：0xC1
-    //     F温度读取时间间隔 C串口发送时间间隔 H高温报警 L低温报警(32bit)
+    //     T温度转换间隔 U串口发送间隔 H高温警报 L低温警报(32bit)
     /* 数据接收完成 */
-    if (UART_RECEIVE_STATUS == 3)
+    if (UartReceiveStatus == 3)
     {
-      unsigned char FLAG = UART_RECEIVE_DATA[0];
+      // 数据头
+      unsigned char header = UartReceiveData[0];
       // 设置温度参数请求：0x80
-      if (FLAG == 0x80)
+      if (header == 0x80)
       {
-        // F温度读取时间间隔
-        TConvert = UART_RECEIVE_DATA[1];
-        // C串口发送时间间隔
-        TSend = UART_RECEIVE_DATA[2];
-        // H高温报警
-        THigh = UART_RECEIVE_DATA[3];
-        // L低温报警
-        TLow = UART_RECEIVE_DATA[4];
+        // T温度转换间隔
+        StorageConvert = UartReceiveData[1];
+        // U串口发送间隔
+        StorageSend = UartReceiveData[2];
+        // H高温警报
+        StorageHigh = UartReceiveData[3];
+        // L低温警报
+        StorageLow = UartReceiveData[4];
         // 数据正确
-        if (THigh <= TEMP_MAX && TLow >= TEMP_MIN && THigh > TLow                 //
-            && TSend > TEMP_SEND_MIN - 1 && TSend < TEMP_SEND_MAX + 1             //
-            && TConvert > TEMP_CONVERT_MIN - 1 && TConvert < TEMP_CONVERT_MAX + 1 //
-            && TSend >= TConvert)
+        if (
+            // 温度转换间隔>=温度转换最小值 <=温度转换最大值
+            StorageConvert >= TEMP_CONVERT_MIN && StorageConvert <= TEMP_CONVERT_MAX
+            // 串口发送间隔>=串口发送最小值 <=串口发送最大值
+            && StorageSend >= UART_SEND_MIN && StorageSend <= UART_SEND_MAX
+            // 串口发送间隔>=温度转换间隔
+            && StorageSend >= StorageConvert
+            // 高温警报<=温度最大值 低温警报>=温度最小值
+            && StorageHigh <= TEMP_MAX && StorageLow >= TEMP_MIN
+            // 高温警报>低温警报
+            && StorageHigh > StorageLow)
         {
-          TEMP_HIGH = THigh;
-          TEMP_LOW = TLow;
-          TEMP_SEND_TIME = TSend;
-          TEMP_CONVERT_TIME = TConvert;
-          THighShow = TEMP_HIGH;
-          TLowShow = TEMP_LOW;
-          TSendShow = TEMP_SEND_TIME;
-          TConvertShow = TEMP_CONVERT_TIME;
+          TempAlertHigh = StorageHigh;
+          TempAlertLow = StorageLow;
+          UartSendTime = StorageSend;
+          TempConvertTime = StorageConvert;
           // 写入数据到存储器
-          AT24C02_WriteByte(0, TEMP_HIGH);
+          AT24C02_WriteByte(0, TempConvertTime);
           delayMs(5);
-          AT24C02_WriteByte(1, TEMP_LOW);
+          AT24C02_WriteByte(1, UartSendTime);
           delayMs(5);
-          AT24C02_WriteByte(2, TEMP_SEND_TIME);
+          AT24C02_WriteByte(2, TempAlertHigh);
           delayMs(5);
-          AT24C02_WriteByte(3, TEMP_CONVERT_TIME);
+          AT24C02_WriteByte(3, TempAlertLow);
+          delayMs(5);
           // 设置温度参数响应：0xC0
           UartSendByte(0xC0);
           // 0x00 成功
@@ -152,25 +169,50 @@ void main()
         }
       }
       // 读取温度参数请求：0x81
-      if (FLAG == 0x81)
+      if (header == 0x81)
       {
         // 读取温度参数响应：0xC1
         UartSendByte(0xC1);
-        // F温度读取时间间隔
-        UartSendByte(TEMP_CONVERT_TIME);
-        // C串口发送时间间隔
-        UartSendByte(TEMP_SEND_TIME);
-        // H高温报警
-        UartSendByte(TEMP_HIGH);
-        // L低温报警
-        UartSendByte(TEMP_LOW);
+        // 温度转换间隔
+        UartSendByte(TempConvertTime);
+        // 串口发送间隔
+        UartSendByte(UartSendTime);
+        // 高温警报
+        UartSendByte(TempAlertHigh);
+        // 低温警报
+        UartSendByte(TempAlertLow);
       }
       // 重置状态和下标
-      UART_RECEIVE_INDEX = 0;
-      UART_RECEIVE_STATUS = 0;
+      UartReceiveIndex = 0;
+      UartReceiveStatus = 0;
     }
-    /* 温度串口发送时间到 */
-    if (TEMP_SEND_STATUS == 1)
+    /* 温度转换时间到 */
+    if (TempConvertStatus == 1)
+    {
+      // 温度转换
+      DS18B20_ConvertT();
+      Temp = DS18B20_ReadT();
+      TempInt = (char)(Temp / 10000);
+      // 高温还是低温
+      if (TempInt >= TempAlertHigh)
+      {
+        // 温度过高
+        TempAlertStatus = 0x01;
+      }
+      else if (TempInt < TempAlertLow)
+      {
+        // 温度过低
+        TempAlertStatus = 0x02;
+      }
+      else
+      {
+        // 正常
+        TempAlertStatus = 0;
+      }
+      TempConvertStatus = 0;
+    }
+    /* 串口发送时间到 */
+    if (UartSendStatus == 1)
     {
       unsigned char t0 = Temp >> 24;
       unsigned char t1 = (Temp & 0x00FF0000) >> 16;
@@ -183,41 +225,15 @@ void main()
       UartSendByte(t1);
       UartSendByte(t2);
       UartSendByte(t3);
-      if (TEMP_ALARM_STATUS != 0)
+      if (TempAlertStatus != 0)
       {
         delayMs(10);
-        // 温度报警：0x40
+        // 温度警报：0x40
         UartSendByte(0x40);
-        // 温度报警状态
-        UartSendByte(TEMP_ALARM_STATUS);
+        // 温度警报状态
+        UartSendByte(TempAlertStatus);
       }
-      TEMP_SEND_STATUS = 0;
-    }
-    /* 温度转换时间到 */
-    if (TEMP_CONVERT_STATUS == 1)
-    {
-      // 温度转换
-      DS18B20_ConvertT();
-      Temp = DS18B20_ReadT();
-      // 显示温度
-      TempInt = (char)(Temp / 10000);
-      // 显示高温还是低温
-      if (TempInt >= TEMP_HIGH)
-      {
-        // 温度过高
-        TEMP_ALARM_STATUS = 0x01;
-      }
-      else if (TempInt < TEMP_LOW)
-      {
-        // 温度过低
-        TEMP_ALARM_STATUS = 0x02;
-      }
-      else
-      {
-        // 正常
-        TEMP_ALARM_STATUS = 0;
-      }
-      TEMP_CONVERT_STATUS = 0;
+      UartSendStatus = 0;
     }
   }
 }
@@ -231,16 +247,16 @@ void UART_Routine() interrupt 4
   if (RI == 1)
   {
     // 放满了，重头开始
-    if (UART_RECEIVE_INDEX == UART_RECEIVE_SIZE)
+    if (UartReceiveIndex == UART_RECEIVE_SIZE)
     {
       // 重置状态和下标
-      UART_RECEIVE_INDEX = 0;
-      UART_RECEIVE_STATUS = 0;
+      UartReceiveIndex = 0;
+      UartReceiveStatus = 0;
     }
     // 放入数据
-    UART_RECEIVE_DATA[UART_RECEIVE_INDEX++] = SBUF;
+    UartReceiveData[UartReceiveIndex++] = SBUF;
     // 接收中
-    UART_RECEIVE_STATUS = 1;
+    UartReceiveStatus = 1;
     // 重置
     RI = 0;
   }
@@ -252,9 +268,8 @@ void UART_Routine() interrupt 4
 void Timer0_Routine() interrupt 1
 {
   // 静态，防止被销毁
-  static unsigned int UART_Count, Key_Count, //
-      Temp_Convert_Count, Temp_Send_Count,   //
-      Temp_Set_Refresh_Count, Temp_Set_Flash_Count;
+  static unsigned int UART_Count,          //
+      Temp_Convert_Count, UART_Send_Count; //
   // 复位
   TL0 = 0x66;
   TH0 = 0xFC;
@@ -262,28 +277,27 @@ void Timer0_Routine() interrupt 1
   if ((++UART_Count) >= UART_RECEIVE_SIZE)
   {
     UART_Count = 0;
-    // UART_RECEIVE被定时器中断函数打断
-    if (UART_RECEIVE_STATUS == 1)
+    if (UartReceiveStatus == 1)
     {
       // 接收中，置为打断
-      UART_RECEIVE_STATUS = 2;
+      UartReceiveStatus = 2;
     }
-    else if (UART_RECEIVE_STATUS == 2)
+    else if (UartReceiveStatus == 2)
     {
       // 打断，置为接收完成
-      UART_RECEIVE_STATUS = 3;
+      UartReceiveStatus = 3;
     }
   }
-  /* 温度转换 每隔TEMP_SEND_TIME秒 */
-  if ((++Temp_Convert_Count) >= 1000 * TEMP_CONVERT_TIME)
+  /* 温度转换 每隔UartSendTime秒 */
+  if ((++Temp_Convert_Count) >= 1000 * TempConvertTime)
   {
     Temp_Convert_Count = 0;
-    TEMP_CONVERT_STATUS = 1;
+    TempConvertStatus = 1;
   }
-  /* 温度串口发送 每隔TEMP_SEND_TIME秒 */
-  if ((++Temp_Send_Count) >= 1000 * TEMP_SEND_TIME)
+  /* 温度串口发送 每隔UartSendTime秒 */
+  if ((++UART_Send_Count) >= 1000 * UartSendTime)
   {
-    Temp_Send_Count = 0;
-    TEMP_SEND_STATUS = 1;
+    UART_Send_Count = 0;
+    UartSendStatus = 1;
   }
 }

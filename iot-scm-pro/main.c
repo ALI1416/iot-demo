@@ -163,14 +163,16 @@ void main()
         StorageLow = UartReceiveData[4];
         // 数据正确
         if (
-            // 高温警报<=温度最大值 低温警报>=温度最小值 高温警报>低温警报
-            StorageHigh <= TEMP_MAX && StorageLow >= TEMP_MIN && StorageHigh > StorageLow
             // 温度转换间隔>=温度转换最小值 <=温度转换最大值
-            && StorageConvert >= TEMP_CONVERT_MIN && StorageConvert <= TEMP_CONVERT_MAX
+            StorageConvert >= TEMP_CONVERT_MIN && StorageConvert <= TEMP_CONVERT_MAX
             // 串口发送间隔>=串口发送最小值 <=串口发送最大值
             && StorageSend >= UART_SEND_MIN && StorageSend <= UART_SEND_MAX
             // 串口发送间隔>=温度转换间隔
-            && StorageSend >= StorageConvert)
+            && StorageSend >= StorageConvert
+            // 高温警报<=温度最大值 低温警报>=温度最小值
+            && StorageHigh <= TEMP_MAX && StorageLow >= TEMP_MIN
+            // 高温警报>低温警报
+            && StorageHigh > StorageLow)
         {
           TempAlertHigh = StorageHigh;
           TempAlertLow = StorageLow;

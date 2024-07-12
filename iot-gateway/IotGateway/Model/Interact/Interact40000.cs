@@ -2,7 +2,7 @@
 {
 
     /// <summary>
-    /// 获取网关通信地址
+    /// 获取通信地址
     /// </summary>
     public class Interact40000
     {
