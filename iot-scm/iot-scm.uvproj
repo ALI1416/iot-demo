@@ -372,6 +372,16 @@
               <FilePath>.\TIMER0.h</FilePath>
             </File>
             <File>
+              <FileName>LCD1602.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD1602.c</FilePath>
+            </File>
+            <File>
+              <FileName>LCD1602.H</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD1602.H</FilePath>
+            </File>
+            <File>
               <FileName>OneWire.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\OneWire.c</FilePath>
@@ -420,6 +430,16 @@
               <FileName>DELAY.H</FileName>
               <FileType>5</FileType>
               <FilePath>.\DELAY.H</FilePath>
+            </File>
+            <File>
+              <FileName>Key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Key.c</FilePath>
+            </File>
+            <File>
+              <FileName>Key.H</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Key.H</FilePath>
             </File>
           </Files>
         </Group>
