@@ -1,3 +1,4 @@
+using log4net;
 using System;
 using System.IO.Ports;
 using System.Threading.Tasks;
@@ -12,6 +13,11 @@ namespace IotGateway.Service
     {
 
         /// <summary>
+        /// 日志实例
+        /// </summary>
+        private static readonly ILog log = LogManager.GetLogger(typeof(SerialPortService));
+
+        /// <summary>
         /// 已启动
         /// </summary>
         private bool isStarted = false;
@@ -20,7 +26,7 @@ namespace IotGateway.Service
         /// </summary>
         private SerialPort serialPort;
         /// <summary>
-        /// 接收消息回调函数&lt;消息>
+        /// 接收消息回调函数 消息
         /// </summary>
         private Action<byte[]> receiveCallback;
 
@@ -30,17 +36,22 @@ namespace IotGateway.Service
         /// <param name="portName">端口名</param>
         /// <param name="baudRate">波特率</param>
         /// <param name="reconnectTime">重连时间(秒，&lt;=0不重连)</param>
-        /// <param name="receiveCallback">接收消息回调函数&lt;消息></param>
-        public void Start(string portName, int baudRate, int reconnectTime, Action<byte[]> receiveCallback)
+        /// <param name="receiveCallback">接收消息回调函数 消息</param>
+        /// <returns>是否启动成功</returns>
+        public bool Start(string portName, int baudRate, int reconnectTime, Action<byte[]> receiveCallback)
         {
-            serialPort = new SerialPort(portName, baudRate);
+            bool isOpen = false;
             try
             {
-                // 打开串口
+                serialPort = new SerialPort(portName, baudRate);
+                // 开启串口
                 serialPort.Open();
+                isOpen = true;
+                log.Info("串口开启成功！");
             }
-            catch
+            catch (Exception e)
             {
+                log.Error("串口开启失败！", e);
             }
             this.receiveCallback = receiveCallback;
             // 接收消息
@@ -51,6 +62,7 @@ namespace IotGateway.Service
             {
                 Reconnect(reconnectTime);
             }
+            return isOpen;
         }
 
         /// <summary>
@@ -61,19 +73,20 @@ namespace IotGateway.Service
         {
             while (isStarted)
             {
+                // 延时
+                await Task.Delay(reconnectTime * 1000);
                 if (!serialPort.IsOpen)
                 {
                     try
                     {
-                        // 打开串口
                         serialPort.Open();
+                        log.Info("串口重连成功！");
                     }
-                    catch
+                    catch (Exception e)
                     {
+                        log.Error("串口重连失败！", e);
                     }
                 }
-                // 延时
-                await Task.Delay(reconnectTime * 1000);
             }
         }
 
@@ -87,15 +100,45 @@ namespace IotGateway.Service
             {
                 serialPort.DataReceived -= Receive;
                 serialPort.Close();
+                log.Info("串口关闭！");
             }
         }
 
         /// <summary>
-        /// 已开启
+        /// 开启串口
         /// </summary>
-        /// <returns>已开启</returns>
+        /// <returns>串口是否开启成功</returns>
+        public bool Open()
+        {
+            if (serialPort == null)
+            {
+                return false;
+            }
+            if (!serialPort.IsOpen)
+            {
+                try
+                {
+                    // 开启串口
+                    serialPort.Open();
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 串口是否开启成功
+        /// </summary>
+        /// <returns>串口是否开启成功</returns>
         public bool IsOpen()
         {
+            if (serialPort == null)
+            {
+                return false;
+            }
             return serialPort.IsOpen;
         }
 
@@ -110,6 +153,7 @@ namespace IotGateway.Service
             if (length > 0)
             {
                 byte[] buffer = new byte[length];
+                // 读取消息
                 serialPort.Read(buffer, 0, length);
                 receiveCallback(buffer);
             }
@@ -122,6 +166,10 @@ namespace IotGateway.Service
         /// <returns>是否发送成功</returns>
         public bool Send(byte[] data)
         {
+            if (serialPort == null)
+            {
+                return false;
+            }
             if (serialPort.IsOpen)
             {
                 try

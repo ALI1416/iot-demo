@@ -1,4 +1,4 @@
-﻿namespace IotGateway.Model
+namespace IotGateway.Model
 {
 
     /// <summary>

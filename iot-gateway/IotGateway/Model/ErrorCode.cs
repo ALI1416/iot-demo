@@ -1,4 +1,4 @@
-﻿namespace IotGateway.Model
+namespace IotGateway.Model
 {
 
     /// <summary>
@@ -33,7 +33,7 @@
         /// <summary>
         /// MQTT消息错误
         /// </summary>
-        MqttMsgError = 6,
+        MqttMessageError = 6,
         /// <summary>
         /// 命令代码错误
         /// </summary>

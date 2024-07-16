@@ -1,4 +1,4 @@
-﻿namespace IotGateway.Model.Interact
+namespace IotGateway.Model.Interact
 {
 
     /// <summary>
