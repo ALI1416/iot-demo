@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demo.mapper.GatewayMapper">
+
+  <sql id="col">
+    id,sn,name,last_online_time,comment
+  </sql>
+
+  <!-- 插入 -->
+  <insert id="insert" parameterType="GatewayVo">
+    INSERT
+    gateway(
+    id,sn,name
+    )VALUES(
+    #{id},#{sn},#{name}
+    )
+  </insert>
+
+  <!-- 查询所有(含设备)映射 -->
+  <resultMap id="findAllAndDeviceMap" type="GatewayVo">
+    <id column="id" property="id"/>
+    <result column="sn" property="sn"/>
+    <result column="name" property="name"/>
+    <result column="last_online_time" property="lastOnlineTime"/>
+    <result column="comment" property="comment"/>
+    <collection property="deviceList" ofType="DeviceVo">
+      <id column="deviceId" property="id"/>
+      <result column="deviceSn" property="sn"/>
+      <result column="deviceName" property="name"/>
+      <result column="deviceType" property="type"/>
+      <result column="deviceComment" property="comment"/>
+    </collection>
+  </resultMap>
+
+  <!-- 查询所有(含设备) -->
+  <select id="findAllAndDevice" resultMap="findAllAndDeviceMap">
+    SELECT
+      g.id,
+      g.sn,
+      g.name,
+      g.last_online_time,
+      g.comment,
+      d.id AS deviceId,
+      d.sn AS deviceSn,
+      d.name AS deviceName,
+      d.type AS deviceType,
+      d.comment AS deviceComment
+    FROM
+      gateway g
+    LEFT JOIN
+      device d
+    ON
+      d.gateway_id = g.id
+    ORDER BY
+      sn,
+      deviceSn
+  </select>
+
+  <!-- 查询唯一键 -->
+  <select id="findOne" parameterType="GatewayVo" resultType="GatewayVo">
+    SELECT
+    <include refid="col"/>
+    FROM
+    gateway
+    <where>
+      <if test="id != null">
+        AND id = #{id}
+      </if>
+      <if test="sn != null">
+        AND sn = #{sn}
+      </if>
+    </where>
+  </select>
+
+  <!-- 查询模板 -->
+  <sql id="findTemp">
+    <where>
+      <include refid="com.demo.mapper.BaseMapper.find"/>
+      <if test="sn != null">
+        AND sn = #{sn}
+      </if>
+      <if test="name != null">
+        AND name = #{name}
+      </if>
+      <include refid="com.demo.mapper.BaseMapper.chooseField">
+        <property name="field" value="last_online_time"/>
+        <property name="alias" value="lastOnlineTime"/>
+      </include>
+      <if test="comment != null">
+        AND comment = #{comment}
+      </if>
+    </where>
+  </sql>
+
+  <!-- 查询 -->
+  <select id="find" parameterType="GatewayVo" resultType="GatewayVo">
+    SELECT
+    <include refid="col"/>
+    FROM
+    gateway
+    <include refid="findTemp"/>
+  </select>
+
+</mapper>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demo.mapper.DeviceMapper">
+
+  <sql id="col">
+    id,gateway_id,sn,name,type,comment
+  </sql>
+
+  <!-- 插入 -->
+  <insert id="insert" parameterType="DeviceVo">
+    INSERT
+    device(
+    id,gateway_id,sn,name,type
+    )VALUES(
+    #{id},#{gatewayId},#{sn},#{name},#{type}
+    )
+  </insert>
+
+  <!-- 查询唯一键 -->
+  <select id="findOne" parameterType="DeviceVo" resultType="DeviceVo">
+    SELECT
+    <include refid="col"/>
+    FROM
+    device
+    <where>
+      <if test="id != null">
+        AND id = #{id}
+      </if>
+      <if test="sn != null">
+        AND sn = #{sn}
+      </if>
+    </where>
+  </select>
+
+  <!-- 查询模板 -->
+  <sql id="findTemp">
+    <where>
+      <include refid="com.demo.mapper.BaseMapper.find"/>
+      <if test="gatewayId != null">
+        AND gateway_id = #{gatewayId}
+      </if>
+      <if test="sn != null">
+        AND sn = #{sn}
+      </if>
+      <if test="name != null">
+        AND name = #{name}
+      </if>
+      <if test="type != null">
+        AND type = #{type}
+      </if>
+      <if test="comment != null">
+        AND comment = #{comment}
+      </if>
+    </where>
+  </sql>
+
+  <!-- 查询 -->
+  <select id="find" parameterType="DeviceVo" resultType="DeviceVo">
+    SELECT
+    <include refid="col"/>
+    FROM
+    device
+    <include refid="findTemp"/>
+  </select>
+
+  <!-- 查询通过gatewaySn -->
+  <select id="findByGatewaySn" parameterType="Long" resultType="DeviceVo">
+    SELECT
+      d.id,
+      d.gateway_id,
+      d.sn,
+      d.name,
+      d.type,
+      d.comment
+    FROM
+      device d,
+      gateway g
+    WHERE
+      d.gateway_id = g.id
+    AND
+      g.sn = #{gatewaySn}
+  </select>
+
+</mapper>
