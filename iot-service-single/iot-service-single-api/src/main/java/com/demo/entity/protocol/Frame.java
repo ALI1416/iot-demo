@@ -26,11 +26,6 @@ import lombok.Setter;
 public class Frame extends ToStringBase {
 
     /**
-     * 时间戳
-     */
-    // @Schema(description = "时间戳")
-    // private Timestamp timestamp;
-    /**
      * 请求序号
      */
     @Schema(description = "请求序号")
@@ -58,7 +53,6 @@ public class Frame extends ToStringBase {
 
     public Frame(Frame frame) {
         if (frame != null) {
-            // this.timestamp = frame.timestamp;
             this.requestSn = frame.requestSn;
             this.errorCode = frame.errorCode;
             this.event = frame.event;

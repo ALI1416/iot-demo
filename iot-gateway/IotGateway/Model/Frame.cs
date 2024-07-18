@@ -1,17 +1,12 @@
-using System;
-
 namespace IotGateway.Model
 {
+
     /// <summary>
     /// 协议帧
     /// </summary>
     public class Frame
     {
 
-        /// <summary>
-        /// 时间戳
-        /// </summary>
-        public long? Timestamp { get; set; }
         /// <summary>
         /// 请求序号
         /// </summary>
@@ -36,18 +31,6 @@ namespace IotGateway.Model
         /// 响应
         /// </summary>
         public object Response { get; set; }
-
-        /// <summary>
-        /// 获取初始化
-        /// </summary>
-        /// <returns>Frame</returns>
-        public static Frame GetInit()
-        {
-            return new Frame
-            {
-                Timestamp = new DateTimeOffset(DateTime.Now).ToUnixTimeMilliseconds()
-            };
-        }
 
     }
 }

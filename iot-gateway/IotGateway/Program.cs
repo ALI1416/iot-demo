@@ -68,7 +68,7 @@ namespace IotGateway
         {
             string logger = "串口收到消息 " + Utils.Bytes2Hex(data);
             string topic = null;
-            Frame frame = Frame.GetInit();
+            Frame frame = new Frame();
             switch (data[0])
             {
                 // 温度事件
@@ -172,8 +172,10 @@ namespace IotGateway
             }
             requestSn = (long)requestSnN;
             string mqttTopic = "$iot/response/" + gatewaySn + "/" + deviceSn + "/" + commandCode;
-            Frame mqttFrame = Frame.GetInit();
-            mqttFrame.RequestSn = requestSn;
+            Frame mqttFrame = new Frame
+            {
+                RequestSn = requestSn
+            };
             if ((deviceSn == 0) || (deviceSn == Program.deviceSn))
             {
                 JObject request = (JObject)frame.Request;
@@ -371,9 +373,11 @@ namespace IotGateway
         /// <param name="requestSn">请求序号</param>
         private static void SendTimeoutMessage(string topic, long requestSn)
         {
-            Frame frame = Frame.GetInit();
-            frame.RequestSn = requestSn;
-            frame.ErrorCode = (int)ErrorCode.DeviceRequestTimeout;
+            Frame frame = new Frame
+            {
+                RequestSn = requestSn,
+                ErrorCode = (int)ErrorCode.DeviceRequestTimeout
+            };
             string message = JsonConvert.SerializeObject(frame);
             log.Warn("设备执行超时！\n  MQTT发送主题 " + topic + " 消息 " + message);
             mqttService.Send(topic, Encoding.UTF8.GetBytes(message));
