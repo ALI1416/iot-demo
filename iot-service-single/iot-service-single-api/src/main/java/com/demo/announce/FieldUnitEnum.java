@@ -17,6 +17,11 @@ import lombok.Getter;
 public enum FieldUnitEnum {
 
     /**
+     * 无
+     */
+    NONE("", ""),
+
+    /**
      * 时间(year 年)
      */
     YEAR("year", "年"),
@@ -78,11 +83,7 @@ public enum FieldUnitEnum {
      * 百分比(% 百分之)
      */
     PERCENTAGE("%", "百分之"),
-
-    /**
-     * 无量纲
-     */
-    NONE("", "");
+    ;
 
     /**
      * 单位

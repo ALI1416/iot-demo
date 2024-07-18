@@ -1,9 +1,6 @@
 package com.demo.entity.protocol.interact;
 
-import com.demo.announce.DeviceType;
-import com.demo.announce.Field;
-import com.demo.announce.Protocol;
-import com.demo.announce.ProtocolType;
+import com.demo.announce.*;
 import com.demo.base.ControllerBase;
 import com.demo.base.ToStringBase;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -34,7 +31,7 @@ public class Interact40001 {
      */
     @Getter
     @Setter
-    @Schema(description = "响应")
+    @Schema(description = "响应", name = "Interact40001.Response")
     public static class Response extends ToStringBase implements com.demo.entity.protocol.Protocol.Data {
 
         /**
@@ -76,7 +73,7 @@ public class Interact40001 {
          * @see DeviceType
          */
         @Schema(description = "设备类型 0网关 1温度计")
-        @Field(name = "设备类型 0网关 1温度计")
+        @Field(name = "设备类型", status = FieldStatusEnum.DEVICE_TYPE)
         private Integer type;
 
     }

@@ -1,10 +1,10 @@
 package com.demo.controller;
 
 import com.demo.base.ControllerBase;
+import com.demo.constant.InteractType;
 import com.demo.entity.pojo.Result;
 import com.demo.entity.protocol.Protocol;
 import com.demo.entity.vo.ProtocolVo;
-import com.demo.service.GatewayService;
 import com.demo.service.InteractService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -55,9 +55,10 @@ public class InteractController extends ControllerBase {
             return paramIsError();
         }
         // 网关序号、设备序号、设备类型不匹配
-        if (GatewayService.notValid(gatewaySn, deviceSn, requestMap.getKey())) {
-            return paramIsError();
-        }
+        // if (GatewayService.notValid(gatewaySn, deviceSn, requestMap.getKey())) {
+        //     return paramIsError();
+        // }
+        protocol.setType(InteractType.DEFAULT.getCode());
         protocol.setRequest(requestMap.getValue());
         protocol.setRequestJson(null);
         // 插入并发送

@@ -25,7 +25,7 @@ public class Interact40100 {
     /**
      * 响应
      */
-    @Schema(description = "响应")
+    @Schema(description = "响应", name = "Interact40100.Response")
     public static class Response extends Interact30100.Request implements com.demo.entity.protocol.Protocol.Data {
     }
 

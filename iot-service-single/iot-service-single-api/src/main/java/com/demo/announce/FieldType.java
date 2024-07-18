@@ -13,6 +13,10 @@ package com.demo.announce;
 public enum FieldType {
 
     /**
+     * 无
+     */
+    NULL,
+    /**
      * 累积
      */
     ACCUMULATE,
@@ -24,10 +28,5 @@ public enum FieldType {
      * 状态
      */
     STATUS,
-
-    /**
-     * 无
-     */
-    NULL,
 
 }

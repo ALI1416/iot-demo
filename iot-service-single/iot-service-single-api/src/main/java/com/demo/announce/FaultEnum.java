@@ -18,14 +18,14 @@ import lombok.Getter;
 public enum FaultEnum {
 
     /**
+     * 空
+     */
+    NULL(null),
+    /**
      * 温度计故障
      */
     FAULT_20100(Fault20100.FAULT),
-
-    /**
-     * 空
-     */
-    NULL(null);
+    ;
 
     /**
      * 故障信息

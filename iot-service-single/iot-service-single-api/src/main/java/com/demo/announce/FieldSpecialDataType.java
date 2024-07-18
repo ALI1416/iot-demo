@@ -16,9 +16,5 @@ public enum FieldSpecialDataType {
      * 默认
      */
     DEFAULT,
-    /**
-     * hhmm格式时间
-     */
-    TIME_HHMM,
 
 }

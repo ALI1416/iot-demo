@@ -32,7 +32,7 @@ public class Interact30000 {
      */
     @Getter
     @Setter
-    @Schema(description = "请求")
+    @Schema(description = "请求", name = "Interact30000.Request")
     public static class Request extends ToStringBase implements com.demo.entity.protocol.Protocol.Data {
 
         /**

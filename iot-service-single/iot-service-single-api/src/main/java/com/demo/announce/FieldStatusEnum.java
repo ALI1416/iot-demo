@@ -19,42 +19,17 @@ public enum FieldStatusEnum {
     /**
      * 空
      */
-    NULL(new ProtocolInfo.FieldStatus(null, null));
-
+    NULL(new ProtocolInfo.FieldStatus(null, null)),
     /**
-     * 工作模式
+     * 设备类型
+     *
+     * @see DeviceType
      */
-    @Getter
-    public enum WorkMode {
-
-        /**
-         * 调试
-         */
-        DEBUG(0),
-        /**
-         * 峰谷
-         */
-        PEAK_VALLEY(1),
-        /**
-         * 增容
-         */
-        INCREASE_CAPACITY(2),
-        /**
-         * 远程
-         */
-        REMOTE(3),
-        ;
-
-        /**
-         * 编码
-         */
-        private final int code;
-
-        WorkMode(int code) {
-            this.code = code;
-        }
-
-    }
+    DEVICE_TYPE(
+            new ProtocolInfo.FieldStatus("0", "网关"),
+            new ProtocolInfo.FieldStatus("1", "温度计")
+    ),
+    ;
 
     /**
      * 字段状态
