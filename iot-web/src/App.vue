@@ -7,6 +7,7 @@ import {getCache} from '@/network/api/gateway'
 import {getInfo} from '@/network/api/protocol'
 import {onUnmounted, ref} from 'vue'
 import {activate, deactivate} from '@/stores/stomp'
+import Header from '@/components/header/Header.vue'
 
 const systemStore = useSystemStore()
 const gatewayStore = useGatewayStore()
@@ -67,6 +68,7 @@ setInterval(() => {
       v-if="gatewayListOk&&protocolInfoListOk&&wsOk"
       :locale="zhCn"
   >
-    <router-view></router-view>
+    <Header/>
+    <router-view/>
   </el-config-provider>
 </template>
