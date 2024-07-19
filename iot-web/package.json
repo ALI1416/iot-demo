@@ -1,26 +1,36 @@
 {
   "name": "vue3",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host --base=/abc",
     "build": "vite build",
-    "preview": "vite preview"
+    "build-check": "run-p type-check \"build {@}\" --",
+    "preview": "vite preview --host",
+    "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
     "@stomp/stompjs": "^7.0.0",
-    "axios": "^1.6.7",
-    "dayjs": "^1.11.10",
-    "echarts": "^5.4.3",
-    "element-plus": "^2.5.3",
+    "axios": "^1.7.2",
+    "dayjs": "^1.11.11",
+    "echarts": "^5.5.1",
+    "element-plus": "^2.7.7",
     "pinia": "^2.1.7",
-    "vue": "^3.3.11"
+    "vue": "^3.4.32",
+    "vue-router": "^4.4.0",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.5.2",
-    "unplugin-auto-import": "^0.17.5",
-    "unplugin-vue-components": "^0.26.0",
-    "vite": "^5.0.8"
+    "@tsconfig/node20": "^20.1.4",
+    "@types/node": "^20.14.11",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "@vue/tsconfig": "^0.5.1",
+    "npm-run-all2": "^6.2.2",
+    "typescript": "~5.5.3",
+    "unplugin-auto-import": "^0.18.0",
+    "unplugin-vue-components": "^0.27.3",
+    "vite": "^5.3.4",
+    "vue-tsc": "^2.0.26"
   }
 }

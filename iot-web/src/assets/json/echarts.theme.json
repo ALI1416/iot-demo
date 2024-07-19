@@ -1,0 +1,98 @@
+{
+  "legend": {
+    "textStyle": {
+      "color": "#FFF"
+    }
+  },
+  "tooltip": {
+    "backgroundColor": "rgba(0, 0, 0, 0.4)",
+    "borderWidth": 0,
+    "textStyle": {
+      "color": "#FFF"
+    },
+    "axisPointer": {
+      "lineStyle": {
+        "type": "solid",
+        "color": "#FFF",
+        "width": 1
+      }
+    }
+  },
+  "categoryAxis": {
+    "axisLine": {
+      "lineStyle": {
+        "color": "#FFF"
+      }
+    }
+  },
+  "valueAxis": {
+    "axisLine": {
+      "show": true,
+      "lineStyle": {
+        "color": "#FFF"
+      }
+    },
+    "splitLine": {
+      "lineStyle": {
+        "opacity": "0.3",
+        "color": "#FFF"
+      }
+    }
+  },
+  "bar": {
+    "label": {
+      "color": "#FFF"
+    },
+    "emphasis": {
+      "focus": "series"
+    }
+  },
+  "line": {
+    "smooth": true,
+    "symbol": "none",
+    "label": {
+      "color": "#FFF"
+    },
+    "emphasis": {
+      "focus": "series"
+    },
+    "markLine": {
+      "label": {
+        "show": false
+      },
+      "lineStyle": {
+        "width": 2
+      },
+      "symbol": [
+        "none",
+        "none"
+      ]
+    }
+  },
+  "gauge": {
+    "radius": "100%",
+    "silent": true,
+    "progress": {
+      "show": true
+    },
+    "axisTick": {
+      "show": false
+    },
+    "splitLine": {
+      "lineStyle": {
+        "color": "#FFF"
+      }
+    },
+    "axisLabel": {
+      "color": "#FFF"
+    },
+    "detail": {
+      "valueAnimation": true,
+      "color": "#FFF",
+      "offsetCenter": [
+        0,
+        "80%"
+      ]
+    }
+  }
+}
