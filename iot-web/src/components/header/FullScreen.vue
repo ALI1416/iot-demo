@@ -1,38 +1,32 @@
 <script lang="ts" setup>
 import {ref} from 'vue'
-import minSvg from '@/assets/images/fullscreen-shrink.min.svg'
-import maxSvg from '@/assets/images/fullscreen-expand.min.svg'
+import Box from '@/components/box/Box.vue'
+import shrinkSvg from '@/assets/images/fullscreen-shrink.svg'
+import expandSvg from '@/assets/images/fullscreen-expand.svg'
 
-const isFullScream = ref(false)
+const isFullscream = ref(false)
 
-function fullScream() {
+function fullscream() {
   if (document.fullscreenElement) {
     document.exitFullscreen()
-    isFullScream.value = false
+    isFullscream.value = false
   } else {
     document.documentElement.requestFullscreen()
-    isFullScream.value = true
+    isFullscream.value = true
   }
 }
 </script>
 
 <template>
-  <div class="fullScream" @click="fullScream">
-    <img
-        :src="isFullScream ? minSvg : maxSvg"
-        alt="全屏"
-    >
-  </div>
+  <Box @click="fullscream">
+    <img v-if="isFullscream" :src="shrinkSvg" alt="取消全屏" class="img">
+    <img v-else :src="expandSvg" alt="全屏" class="img">
+  </Box>
 </template>
 
 <style scoped>
-.fullScream {
-  width: 30px;
-  height: 30px;
-  border-radius: 3px;
-  margin-right: 10px;
-  padding: 4px;
-  border: 1px solid #CCC;
-  cursor: pointer;
+.img {
+  width: 24px;
+  height: 24px;
 }
 </style>

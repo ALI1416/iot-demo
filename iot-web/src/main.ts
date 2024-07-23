@@ -15,7 +15,7 @@ import * as echarts from 'echarts/core'
 import {SVGRenderer} from 'echarts/renderers'
 import {GridComponent, LegendComponent, MarkLineComponent, TooltipComponent} from 'echarts/components'
 import {BarChart, GaugeChart, LineChart} from 'echarts/charts'
-import theme from '@/assets/json/echarts.theme.json'
+import lightTheme from '@/assets/json/echarts.light.theme.json'
 
 /* ElementPlus非HTML组件样式 */
 // ElNotification
@@ -35,7 +35,7 @@ echarts.use([
   LineChart,
   GaugeChart
 ])
-echarts.registerTheme('theme', theme)
+echarts.registerTheme('lightTheme', lightTheme)
 
 createApp(App)
   .use(createPinia())

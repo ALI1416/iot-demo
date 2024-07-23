@@ -1,17 +1,25 @@
 <script lang="ts" setup>
-import Datetime from '@/components/header/Datetime.vue'
+import Menu from '@/components/header/Menu.vue'
+import Config from '@/components/header/Config.vue'
+import Debug from '@/components/header/Debug.vue'
 import Refresh from '@/components/header/Refresh.vue'
-import FullScreen from '@/components/header/FullScreen.vue'
+import Fullscreen from '@/components/header/Fullscreen.vue'
+import Datetime from '@/components/header/Datetime.vue'
 
 const webTitle = import.meta.env.VITE_WEB_TITLE
 </script>
 
 <template>
   <div class="header">
+    <div class="left">
+      <Menu/>
+      <Config/>
+      <Debug/>
+    </div>
     <div class="title">{{ webTitle }}</div>
     <div class="right">
       <Refresh/>
-      <FullScreen/>
+      <Fullscreen/>
       <Datetime/>
     </div>
   </div>
@@ -20,21 +28,18 @@ const webTitle = import.meta.env.VITE_WEB_TITLE
 <style scoped>
 .header {
   display: flex;
-  height: 60px;
   width: 100%;
-  padding: 5px 10px;
-  box-sizing: border-box;
+  height: 50px;
+  padding: 5px;
   justify-content: space-between;
 }
 
-.right {
+.left, .right {
+  padding-top: 5px;
   display: flex;
-  width: 350px;
-  justify-content: right;
 }
 
 .title {
-  margin-left: 350px;
   width: 100%;
   display: flex;
   align-items: center;

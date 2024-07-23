@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import refreshSvg from '@/assets/images/refresh.min.svg'
+import Box from '@/components/box/Box.vue'
+import refreshSvg from '@/assets/images/refresh.svg'
 
 function refresh() {
   location.reload()
@@ -7,19 +8,14 @@ function refresh() {
 </script>
 
 <template>
-  <div class="refresh" @click="refresh">
-    <img :src="refreshSvg" alt="刷新">
-  </div>
+  <Box @click="refresh">
+    <img :src="refreshSvg" alt="刷新" class="img">
+  </Box>
 </template>
 
 <style scoped>
-.refresh {
-  width: 34px;
-  height: 30px;
-  border-radius: 3px;
-  margin-right: 10px;
-  padding: 4px;
-  border: 1px solid #CCC;
-  cursor: pointer;
+.img {
+  width: 24px;
+  height: 24px;
 }
 </style>

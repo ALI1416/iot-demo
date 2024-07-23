@@ -2,7 +2,13 @@
   "legend": {
     "textStyle": {
       "color": "#FFF"
-    }
+    },
+    "pageIconColor": "#FFF",
+    "pageIconInactiveColor": "#AAA",
+    "pageTextStyle": {
+      "color": "#FFF"
+    },
+    "pageIconSize": 12
   },
   "tooltip": {
     "backgroundColor": "rgba(0, 0, 0, 0.4)",
