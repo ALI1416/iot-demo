@@ -1,15 +1,1 @@
-<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <path id="g" stroke-linecap="round" stroke-width="3" stroke="#6CF" d="M2 2 12 2M2 2 2 12M2 2 12 12" />
-    <!-- <g id="g" stroke-linecap="round" stroke-width="3" stroke="#FFF">
-      <line x1="2" y1="2" x2="12" y2="2" />
-      <line x1="2" y1="2" x2="2" y2="12" />
-      <line x1="2" y1="2" x2="12" y2="12" />
-    </g> -->
-  </defs>
-  <!-- <rect x="0" y="0" width="32" height="32" /> -->
-  <use href="#g" />
-  <use href="#g" transform="matrix(-1,0,0,1,32,0)" />
-  <use href="#g" transform="matrix(1,0,0,-1,0,32)" />
-  <use href="#g" transform="rotate(180,16,16)"/>
-</svg>
+<svg width="32" height="32" xmlns="http://www.w3.org/2000/svg"><defs><path id="a" stroke-linecap="round" stroke-width="3" stroke="#6CF" d="M2 2h10M2 2v10M2 2l10 10"/></defs><use href="#a"/><use href="#a" transform="matrix(-1 0 0 1 32 0)"/><use href="#a" transform="matrix(1 0 0 -1 0 32)"/><use href="#a" transform="rotate(180 16 16)"/></svg>

@@ -1,0 +1,19 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <g id="g" stroke-width="3" stroke="#6CF" fill="#6CF">
+      <!-- <circle cx="16" cy="6" r="5.5" fill="#CCC" />
+      <circle cx="16" cy="21" r="9.5" fill="#CCC" />
+      <rect x="6.5" y="6" width="19" height="15" fill="#AAA" fill-opacity="0.5" />
+      <rect x="6.5" y="9" width="19" height="12" fill="#AAA" fill-opacity="0.5" />
+      <rect x="14.5" y="14.5" width="3" height="16" fill="#AAA" /> -->
+      <path d="M12 6 A4 4, 0, 0 1, 20 6 M18 10.5 h-10 v10.5 A8 8, 0, 0 0, 13.5 28 v-17.5 Z" />
+      <!-- <line x1="4" y1="6" x2="8" y2="10" stroke-linecap="round" />
+      <line x1="2" y1="18" x2="8" y2="18" stroke-linecap="round" />
+      <line x1="4" y1="30" x2="9" y2="26" stroke-linecap="round" /> -->
+      <path d="M4 6 L8 10 M2 18 L8 18 M4 30 L9 26" stroke-linecap="round" />
+    </g>
+  </defs>
+  <!-- <rect x="0" y="0" width="32" height="32" /> -->
+  <use href="#g" />
+  <use href="#g" transform="matrix(-1,0,0,1,32,0)" />
+</svg>
