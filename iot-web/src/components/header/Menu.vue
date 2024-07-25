@@ -1,32 +1,43 @@
 <script lang="ts" setup>
 import {useRoute, useRouter} from 'vue-router'
 import {useGatewayStore} from '@/stores/gateway'
-import {type Ref, ref, watch} from 'vue'
-import type {MenuItemType} from '@/types'
+import {ref, watch} from 'vue'
 
 const route = useRoute()
 const router = useRouter()
 
 const gatewayStore = useGatewayStore()
 
-const list: Ref<MenuItemType[]> = ref([
+const selected = ref(['home'])
+
+const options: any = ref([
   {
-    key: 'SCADA',
-    name: 'SCADA',
+    value: 'home',
+    label: '主页',
   },
   {
-    key: 'Summary',
-    name: '汇总',
+    value: 'config',
+    label: '配置',
+  },
+  {
+    value: 'debug',
+    label: '调试',
   }
 ])
 
-const selected = ref('SCADA')
-
 for (let gateway of gatewayStore.gatewayList) {
-  list.value.push({
-    key: String(gateway.sn),
-    name: gateway.name
-  })
+  let option: any = {
+    value: String(gateway.sn),
+    label: gateway.name,
+    children: []
+  }
+  for (let device of gateway.deviceList) {
+    option.children.push({
+      value: String(device.sn),
+      label: device.name
+    })
+  }
+  options.value.push(option)
 }
 
 // 直接访问链接时选中(防止路由地址获取太早)
@@ -42,40 +53,36 @@ function itemSelected(path: string) {
   let paths = path.split('/')
   let tag = paths[1]
   if (tag) {
-    if (tag === 'summary') {
-      selected.value = 'Summary'
-    } else if (tag === 'single') {
-      selected.value = paths[2]
+    if (tag === 'config') {
+      selected.value = ['config']
+    } else if (tag === 'debug') {
+      selected.value = ['debug']
+    } else {
+      selected.value = [paths[2], paths[3]]
     }
   } else {
-    selected.value = 'SCADA'
+    selected.value = ['home']
   }
 }
 
-function itemChange(key: string) {
-  if (key === 'SCADA') {
+function itemChange(selected: string[]) {
+  let v0 = selected[0]
+  let v1 = selected[1]
+  if (v0 === 'home') {
     router.push('/')
-  } else if (key === 'Summary') {
-    router.push('/summary/income')
+  } else if (v0 === 'config') {
+    router.push('/config')
+  } else if (v0 === 'debug') {
+    router.push('/debug')
   } else {
-    router.push('/single/' + key + '/scada')
+    router.push('/device/' + v0 + '/' + v1)
   }
 }
 </script>
 
 <template>
   <div class="menu">
-    <el-select v-model="selected" @change="itemChange">
-      <el-option
-          v-for="item in list"
-          :key="item.key"
-          :label="item.name"
-          :value="item.key"
-      >
-        <span style="float:left">{{ item.name }}</span>
-        <span style="float:right;color:var(--el-text-color-secondary);font-size:12px;">{{ item.key }}</span>
-      </el-option>
-    </el-select>
+    <el-cascader v-model="selected" :options="options" :props="{expandTrigger: 'hover'}" @change="itemChange"/>
   </div>
 </template>
 

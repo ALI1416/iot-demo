@@ -8,18 +8,4 @@
  */
 type ReportType = 'MONTH' | 'DAY' | 'HOUR' | 'MINUTE'
 
-/**
- * 菜单项类型
- */
-type MenuItemType = {
-  /**
-   * 键
-   */
-  key: string,
-  /**
-   * 名称
-   */
-  name: string
-}
-
-export type {ReportType, MenuItemType}
+export type {ReportType}
