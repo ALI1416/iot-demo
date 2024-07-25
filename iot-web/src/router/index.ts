@@ -5,8 +5,8 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'Main',
-      component: () => import('@/views/main/Main.vue')
+      name: 'Home',
+      component: () => import('@/views/home/Home.vue')
     },
     {
       path: '/config',
@@ -17,6 +17,11 @@ const router = createRouter({
       path: '/debug',
       name: 'Debug',
       component: () => import('@/views/debug/Debug.vue')
+    },
+    {
+      path: '/device/:gatewaySn/:deviceSn',
+      name: 'Device',
+      component: () => import('@/views/device/Device.vue')
     },
     {
       path: '/:path(.*)*',

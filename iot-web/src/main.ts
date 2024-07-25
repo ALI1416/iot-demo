@@ -1,10 +1,10 @@
-import '@/assets/css/base.css'
-import '@/assets/fonts/fonts.css'
-
 import {createApp} from 'vue'
 import App from '@/App.vue'
 import {createPinia} from 'pinia'
 import router from '@/router'
+
+import '@/assets/css/base.css'
+import '@/assets/fonts/fonts.css'
 
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
@@ -17,8 +17,6 @@ import {GridComponent, LegendComponent, MarkLineComponent, TooltipComponent} fro
 import {BarChart, GaugeChart, LineChart} from 'echarts/charts'
 import lightTheme from '@/assets/json/echarts.light.theme.json'
 
-/* ElementPlus非HTML组件样式 */
-// ElNotification
 import 'element-plus/es/components/notification/style/css'
 
 dayjs.locale('zh-cn')

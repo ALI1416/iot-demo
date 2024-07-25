@@ -29,6 +29,5 @@ coverage
 
 *.tsbuildinfo
 
-# element-plus
 auto-imports.d.ts
 components.d.ts

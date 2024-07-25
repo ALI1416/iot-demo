@@ -70,7 +70,7 @@ type DeviceType = 0 | 1
  * 获取网关列表
  * @return Promise 网关列表
  */
-function getCache(): Promise<Gateway[]> {
+function get(): Promise<Gateway[]> {
   return http({
     url: PREFIX + 'getCache'
   })
@@ -80,5 +80,5 @@ export {
   type Gateway,
   type Device,
   type DeviceType,
-  getCache
+  get
 }

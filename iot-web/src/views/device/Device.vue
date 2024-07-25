@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  Main
+  Device
 </template>
 
 <style scoped>

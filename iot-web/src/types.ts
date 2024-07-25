@@ -1,10 +1,9 @@
 /**
- * 类型
+ * 通用类型
  */
 
 /**
- * 报表类型
- * 月|日|小时|分钟
+ * 报表类型 MONTH月 DAY日 HOUR小时 MINUTE分钟
  */
 type ReportType = 'MONTH' | 'DAY' | 'HOUR' | 'MINUTE'
 

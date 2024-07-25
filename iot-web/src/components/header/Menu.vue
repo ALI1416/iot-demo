@@ -89,6 +89,6 @@ function itemChange(selected: string[]) {
 <style scoped>
 .menu {
   width: 180px;
-  margin-right: 5px;
+  margin: 0 5px;
 }
 </style>

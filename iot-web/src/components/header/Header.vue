@@ -63,22 +63,16 @@ function fullscream() {
 <style scoped>
 .header {
   display: flex;
-  width: 100%;
   height: 50px;
-  padding: 5px;
   justify-content: space-between;
 }
 
 .left, .right {
-  padding-top: 5px;
   display: flex;
+  padding-top: 5px;
 }
 
 .title {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: 36px;
   font-weight: bold;
 }
