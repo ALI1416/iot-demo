@@ -22,7 +22,7 @@ type ProtocolInfo = {
    */
   type: ProtocolType
   /**
-   * 设备类型 GATEWAY网关 THERMOMETER温度计
+   * 设备类型 GATEWAY网关 THERMOMETER温度计 THERMO_HYGROMETER温湿度计
    */
   deviceType: DeviceType
   /**
@@ -57,9 +57,9 @@ type ProtocolInfo = {
 type ProtocolType = 'EVENT' | 'FAULT' | 'INTERACT'
 
 /**
- * 设备类型 GATEWAY网关 THERMOMETER温度计
+ * 设备类型 GATEWAY网关 THERMOMETER温度计 THERMO_HYGROMETER温湿度计
  */
-type DeviceType = 'GATEWAY' | 'THERMOMETER'
+type DeviceType = 'GATEWAY' | 'THERMOMETER' | 'THERMO_HYGROMETER'
 
 /**
  * 字段信息
