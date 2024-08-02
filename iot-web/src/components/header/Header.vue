@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import Box from '@/components/box/Box.vue'
+import Icon from '@/components/icon/Icon.vue'
 import Menu from '@/components/header/Menu.vue'
 import Datetime from '@/components/header/Datetime.vue'
 import homeSvg from '@/assets/images/home.svg'
@@ -35,26 +35,26 @@ function fullscream() {
 <template>
   <div class="header">
     <div class="left">
-      <Box @click="router.push('/')">
+      <Icon @click="router.push('/')">
         <img :src="homeSvg" alt="主页" class="img">
-      </Box>
+      </Icon>
       <Menu/>
-      <Box @click="router.push('/config')">
+      <Icon @click="router.push('/config')">
         <img :src="configSvg" alt="配置" class="img">
-      </Box>
-      <Box @click="router.push('/debug')">
+      </Icon>
+      <Icon @click="router.push('/debug')">
         <img :src="debugSvg" alt="调试" class="img">
-      </Box>
+      </Icon>
     </div>
     <div class="title">{{ webTitle }}</div>
     <div class="right">
-      <Box @click="refresh">
+      <Icon @click="refresh">
         <img :src="refreshSvg" alt="刷新" class="img">
-      </Box>
-      <Box @click="fullscream">
+      </Icon>
+      <Icon @click="fullscream">
         <img v-if="isFullscream" :src="shrinkSvg" alt="取消全屏" class="img">
         <img v-else :src="expandSvg" alt="全屏" class="img">
-      </Box>
+      </Icon>
       <Datetime/>
     </div>
   </div>

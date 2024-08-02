@@ -1,0 +1,95 @@
+{
+  "legend": {
+    "textStyle": {
+      "color": "#000"
+    },
+    "pageIconColor": "#000",
+    "pageIconInactiveColor": "#AAA",
+    "pageTextStyle": {
+      "color": "#000"
+    },
+    "pageIconSize": 12
+  },
+  "tooltip": {
+    "backgroundColor": "rgba(0, 0, 0, 0.4)",
+    "borderWidth": 0,
+    "textStyle": {
+      "color": "#000"
+    },
+    "axisPointer": {
+      "lineStyle": {
+        "type": "solid",
+        "color": "#000",
+        "width": 1
+      }
+    }
+  },
+  "categoryAxis": {
+    "axisLine": {
+      "lineStyle": {
+        "color": "#000"
+      }
+    }
+  },
+  "valueAxis": {
+    "axisLine": {
+      "show": true,
+      "lineStyle": {
+        "color": "#000"
+      }
+    },
+    "splitLine": {
+      "lineStyle": {
+        "opacity": "0.3",
+        "color": "#000"
+      }
+    }
+  },
+  "bar": {
+    "label": {
+      "color": "#000"
+    },
+    "emphasis": {
+      "focus": "series"
+    }
+  },
+  "line": {
+    "smooth": true,
+    "symbol": "none",
+    "label": {
+      "color": "#000"
+    },
+    "emphasis": {
+      "focus": "series"
+    },
+    "markLine": {
+      "label": {
+        "show": false
+      },
+      "lineStyle": {
+        "width": 2
+      },
+      "symbol": [
+        "none",
+        "none"
+      ]
+    }
+  },
+  "gauge": {
+    "radius": "100%",
+    "silent": true,
+    "progress": {
+      "show": true
+    },
+    "axisTick": {
+      "show": false
+    },
+    "detail": {
+      "valueAnimation": true,
+      "offsetCenter": [
+        0,
+        "80%"
+      ]
+    }
+  }
+}
