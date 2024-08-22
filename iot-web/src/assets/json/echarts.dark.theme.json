@@ -11,7 +11,7 @@
     "pageIconSize": 12
   },
   "tooltip": {
-    "backgroundColor": "rgba(0, 0, 0, 0.4)",
+    "backgroundColor": "rgba(255, 255, 255, 0.4)",
     "borderWidth": 0,
     "textStyle": {
       "color": "#000"

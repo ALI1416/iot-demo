@@ -13,7 +13,15 @@ import duration from 'dayjs/plugin/duration'
 
 import * as echarts from 'echarts/core'
 import {SVGRenderer} from 'echarts/renderers'
-import {GridComponent, LegendComponent, MarkLineComponent, TooltipComponent} from 'echarts/components'
+import {
+  DataZoomComponent,
+  GridComponent,
+  LegendComponent,
+  MarkLineComponent,
+  MarkPointComponent,
+  TooltipComponent,
+  VisualMapComponent
+} from 'echarts/components'
 import {BarChart, GaugeChart, LineChart} from 'echarts/charts'
 import lightTheme from '@/assets/json/echarts.light.theme.json'
 import darkTheme from '@/assets/json/echarts.dark.theme.json'
@@ -30,6 +38,9 @@ echarts.use([
   LegendComponent,
   TooltipComponent,
   MarkLineComponent,
+  MarkPointComponent,
+  VisualMapComponent,
+  DataZoomComponent,
   BarChart,
   LineChart,
   GaugeChart

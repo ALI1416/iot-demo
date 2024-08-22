@@ -31,10 +31,10 @@ setInterval(() => {
 .datetimeWeek {
   width: 250px;
   height: 30px;
-  border-radius: 3px;
   margin: 0 5px;
-  border: 1px solid #CCC;
   padding: 5px;
+  border: 1px solid #CCC;
+  border-radius: 3px;
   display: flex;
   align-items: center;
   justify-content: space-between;
