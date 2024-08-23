@@ -1,4 +1,5 @@
 import dayjs, {Dayjs} from 'dayjs'
+import type {DateType} from '@/types'
 
 /**
  * 时间工具
@@ -290,6 +291,33 @@ function getDuration(startDate: string, endDate: string): string {
   }
 }
 
+/**
+ * 获取时间字符串
+ * @param date 时间
+ * @param dateType 时间类型
+ * @return string 例如<br>
+ * `YEAR` 2024年<br>
+ * `MONTH` 2024年8月<br>
+ * `DAY` 2024年8月23日<br>
+ * `HOUR` 2024年8月23日16时
+ */
+function getDateString(date: Date | Dayjs, dateType: DateType) {
+  switch (dateType) {
+    case 'YEAR': {
+      return dayjs(date).format('YYYY年')
+    }
+    case 'MONTH': {
+      return dayjs(date).format('YYYY年M月')
+    }
+    case 'DAY': {
+      return dayjs(date).format('YYYY年M月D日')
+    }
+    case 'HOUR': {
+      return dayjs(date).format('YYYY年M月D日H时')
+    }
+  }
+}
+
 // endregion
 
 export {
@@ -309,5 +337,6 @@ export {
   getDateYear1Day,
   getStartDate,
   getEndDate,
-  getDuration
+  getDuration,
+  getDateString
 }

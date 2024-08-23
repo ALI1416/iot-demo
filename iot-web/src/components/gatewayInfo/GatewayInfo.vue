@@ -22,33 +22,26 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div class="box">
-    <div v-for="gateway of props.gatewayList" class="row">
+  <div v-for="gateway of props.gatewayList" class="row">
       <span class="title"
             @click="router.push('/device/' + gateway.sn + '/0')"
       >{{ gateway.name }}
       </span>
-      <div class="content">
-        <div v-for="device of gateway.deviceList" class="item">
-          <img :alt="getDeviceTypeName(device.type)"
-               :src="getDeviceTypeImgSrc(device.type)"
-               :title="getDeviceTypeName(device.type)"
-               class="img"
-               @click="router.push('/device/' + gateway.sn + '/' + device.sn)"
-          >
-          <div :title="device.name" class="text">{{ device.name }}</div>
-        </div>
+    <div class="content">
+      <div v-for="device of gateway.deviceList" class="item">
+        <img :alt="getDeviceTypeName(device.type)"
+             :src="getDeviceTypeImgSrc(device.type)"
+             :title="getDeviceTypeName(device.type)"
+             class="img"
+             @click="router.push('/device/' + gateway.sn + '/' + device.sn)"
+        >
+        <div :title="device.name" class="text">{{ device.name }}</div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.box {
-  height: 100%;
-  overflow: auto;
-}
-
 .row {
   border: 1px solid #CCC;
   margin: 10px 0;

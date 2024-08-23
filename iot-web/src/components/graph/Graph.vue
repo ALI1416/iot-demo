@@ -1,37 +1,78 @@
 <script lang="ts" setup>
 import refreshSvg from '@/assets/images/refresh.svg'
-import type {StyleValue} from '@vue/runtime-dom'
-
-export type Item = {
-  key: string | number
-  value: string
-}
+import {ref} from 'vue'
+import type {DateType} from '@/types'
 
 const props = defineProps<{
-  style?: StyleValue
   title: string
-  items?: Item[]
+  dateType?: DateType
   showRefresh?: boolean
 }>()
 
 const emits = defineEmits<{
-  itemClick: [Item['key']]
+  query: [Date]
   refresh: [void]
 }>()
 
+const year = ref(new Date())
+const month = ref(new Date())
+const day = ref(new Date())
+const hour = ref(new Date())
+
+function disabledDate(date: Date) {
+  return date > new Date()
+}
 </script>
 
 <template>
-  <div :style="props.style" class="graph">
+  <div class="graph">
     <div v-if="props.showRefresh" class="title title1">
       <span>{{ props.title }}</span>
       <div>
-        <button v-for="item in props.items"
-                :key="item.key"
-                class="item"
-                @click="emits('itemClick',item.key)"
-        >{{ item.value }}
-        </button>
+        <!-- 年 -->
+        <el-date-picker
+            v-if="props.dateType==='YEAR'"
+            v-model="year"
+            :clearable="false"
+            :disabled-date="disabledDate"
+            format="YYYY"
+            size="small"
+            type="year"
+            @change="emits('query',year)"
+        />
+        <!-- 月 -->
+        <el-date-picker
+            v-if="props.dateType==='MONTH'"
+            v-model="month"
+            :clearable="false"
+            :disabled-date="disabledDate"
+            format="YYYY-MM"
+            size="small"
+            type="month"
+            @change="emits('query',month)"
+        />
+        <!-- 日 -->
+        <el-date-picker
+            v-if="props.dateType==='DAY'"
+            v-model="day"
+            :clearable="false"
+            :disabled-date="disabledDate"
+            format="YYYY-MM-DD"
+            size="small"
+            type="date"
+            @change="emits('query',day)"
+        />
+        <!-- 小时 -->
+        <el-date-picker
+            v-if="props.dateType==='HOUR'"
+            v-model="hour"
+            :clearable="false"
+            :disabled-date="disabledDate"
+            format="YYYY-MM-DD HH时"
+            size="small"
+            type="datetime"
+            @change="emits('query',hour)"
+        />
         <img :src="refreshSvg" alt="刷新" class="refresh" @click="emits('refresh')">
       </div>
     </div>
@@ -72,7 +113,7 @@ const emits = defineEmits<{
 }
 
 .refresh {
-  margin-left: 5px;
+  margin-left: 30px;
   width: 20px;
   height: 20px;
   cursor: pointer;
