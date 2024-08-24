@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import refreshSvg from '@/assets/images/refresh.svg'
 import {ref} from 'vue'
-import type {DateType} from '@/types'
+import type {ReportType} from '@/types'
 
 const props = defineProps<{
   title: string
-  dateType?: DateType
+  reportType?: ReportType
   showRefresh?: boolean
 }>()
 
@@ -14,13 +14,14 @@ const emits = defineEmits<{
   refresh: [void]
 }>()
 
-const year = ref(new Date())
-const month = ref(new Date())
-const day = ref(new Date())
-const hour = ref(new Date())
+const date = ref(new Date())
 
 function disabledDate(date: Date) {
   return date > new Date()
+}
+
+function dateChange() {
+  emits('query', date.value)
 }
 </script>
 
@@ -29,49 +30,53 @@ function disabledDate(date: Date) {
     <div v-if="props.showRefresh" class="title title1">
       <span>{{ props.title }}</span>
       <div>
-        <!-- 年 -->
+        <!-- 月报表 -->
         <el-date-picker
-            v-if="props.dateType==='YEAR'"
-            v-model="year"
+            v-if="props.reportType==='MONTH'"
+            v-model="date"
             :clearable="false"
             :disabled-date="disabledDate"
-            format="YYYY"
+            format="YYYY年"
             size="small"
+            style="width:80px"
             type="year"
-            @change="emits('query',year)"
+            @change="dateChange"
         />
-        <!-- 月 -->
+        <!-- 日报表 -->
         <el-date-picker
-            v-if="props.dateType==='MONTH'"
-            v-model="month"
+            v-if="props.reportType==='DAY'"
+            v-model="date"
             :clearable="false"
             :disabled-date="disabledDate"
-            format="YYYY-MM"
+            format="YYYY年M月"
             size="small"
+            style="width:100px"
             type="month"
-            @change="emits('query',month)"
+            @change="dateChange"
         />
-        <!-- 日 -->
+        <!-- 小时报表 -->
         <el-date-picker
-            v-if="props.dateType==='DAY'"
-            v-model="day"
+            v-if="props.reportType==='HOUR'"
+            v-model="date"
             :clearable="false"
             :disabled-date="disabledDate"
-            format="YYYY-MM-DD"
+            format="YYYY年M月D日"
             size="small"
+            style="width:120px"
             type="date"
-            @change="emits('query',day)"
+            @change="dateChange"
         />
-        <!-- 小时 -->
+        <!-- 分钟报表 -->
         <el-date-picker
-            v-if="props.dateType==='HOUR'"
-            v-model="hour"
+            v-if="props.reportType==='MINUTE'"
+            v-model="date"
             :clearable="false"
             :disabled-date="disabledDate"
-            format="YYYY-MM-DD HH时"
+            format="YYYY年M月D日H时"
             size="small"
+            style="width:150px"
             type="datetime"
-            @change="emits('query',hour)"
+            @change="dateChange"
         />
         <img :src="refreshSvg" alt="刷新" class="refresh" @click="emits('refresh')">
       </div>
@@ -95,6 +100,7 @@ function disabledDate(date: Date) {
   height: 25px;
   line-height: 25px;
   font-size: 20px;
+  margin-bottom: 5px;
 }
 
 .title1 {
@@ -106,14 +112,8 @@ function disabledDate(date: Date) {
   text-align: center;
 }
 
-.item {
-  margin: 0 2px;
-  height: 20px;
-  cursor: pointer;
-}
-
 .refresh {
-  margin-left: 30px;
+  margin-left: 5px;
   width: 20px;
   height: 20px;
   cursor: pointer;

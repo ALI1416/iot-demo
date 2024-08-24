@@ -5,7 +5,7 @@ import {useGlobalStore} from '@/stores/global'
 import type {EChartsType} from 'echarts/core'
 import * as echarts from 'echarts/core'
 import Graph from '@/components/graph/Graph.vue'
-import {dateDay1Hour, dateHour1Minute, getDateMonth1Day, getDateString, getDateYear1Day} from '@/utils/DataUtil'
+import {dateDay1Hour, dateHour1Minute, dateYear1Month, getDateMonth1Day, getDateString} from '@/utils/DataUtil'
 
 const props = defineProps<{
   gatewaySn: number,
@@ -24,31 +24,18 @@ watch(() => globalStore.refresh10Minute, () => {
 onMounted(() => {
   realtimeChart = echarts.init(realtime.value, 'darkTheme')
   realtimeChart.setOption(realtimeOption)
+  historyMinuteChart = echarts.init(historyMinute.value, 'darkTheme')
+  historyMinuteChart.setOption(historyMinuteOption)
   historyHourChart = echarts.init(historyHour.value, 'darkTheme')
   historyHourChart.setOption(historyHourOption)
   historyDayChart = echarts.init(historyDay.value, 'darkTheme')
   historyDayChart.setOption(historyDayOption)
   historyMonthChart = echarts.init(historyMonth.value, 'darkTheme')
   historyMonthChart.setOption(historyMonthOption)
-  historyYearChart = echarts.init(historyYear.value, 'darkTheme')
-  historyYearChart.setOption(historyYearOption)
 })
 
 onUnmounted(() => {
 })
-
-const itemPrevious = 'previous'
-const itemNext = 'next'
-const items: Item[] = [
-  {
-    key: itemPrevious,
-    value: '上一组'
-  },
-  {
-    key: itemNext,
-    value: '下一组'
-  }
-]
 
 // region 实时温度
 
@@ -114,16 +101,16 @@ const realtimeOption: any = {
 
 // endregion
 
-// region 小时历史温度
+// region 分钟报表
 
-const historyHour = ref()
-let historyHourChart: EChartsType
+const historyMinute = ref()
+let historyMinuteChart: EChartsType
 
-const historyHourOption: any = {
+const historyMinuteOption: any = {
   color: ['#9C9'],
   grid: {
     top: 30,
-    bottom: 70,
+    bottom: 20,
     left: 30,
     right: 10
   },
@@ -173,9 +160,6 @@ const historyHourOption: any = {
       color: '#999'
     }
   },
-  dataZoom: {
-    type: 'slider'
-  },
   series: {
     name: '温度',
     type: 'line',
@@ -223,30 +207,30 @@ const historyHourOption: any = {
   }
 }
 
-const hour = ref(new Date())
-const hourTitle = ref(getDateString(hour.value, 'HOUR'))
+const minute = ref(new Date())
+const minuteTitle = ref(getDateString(minute.value, 'MINUTE'))
 
-function historyHourQuery(date: Date) {
-  hour.value = date
-  hourTitle.value = getDateString(date, 'HOUR')
+function historyMinuteQuery(date: Date) {
+  minute.value = date
+  minuteTitle.value = getDateString(date, 'MINUTE')
 }
 
-function historyHourRefresh() {
-  console.log('historyHourRefresh')
+function historyMinuteRefresh() {
+  console.log('historyMinuteRefresh')
 }
 
 // endregion
 
-// region 日历史温度
+// region 小时报表
 
-const historyDay = ref()
-let historyDayChart: EChartsType
+const historyHour = ref()
+let historyHourChart: EChartsType
 
-const historyDayOption: any = {
+const historyHourOption: any = {
   color: ['#9C9', '#F99', '#6CF'],
   grid: {
     top: 30,
-    bottom: 70,
+    bottom: 20,
     left: 30,
     right: 10
   },
@@ -273,8 +257,77 @@ const historyDayOption: any = {
     max: 30,
     min: 22
   },
-  dataZoom: {
-    type: 'slider'
+  series: [
+    {
+      name: '平均温度',
+      type: 'line',
+      data: [26, 27.5, 28, 27.1, 26, 27, 28.88, 24, 25, 26.23, 27.77]
+    },
+    {
+      name: '最高温度',
+      type: 'line',
+      data: [28, 28, 28.5, 28, 27, 28, 29, 28, 28, 28, 28]
+    },
+    {
+      name: '最低温度',
+      type: 'line',
+      data: [25, 26, 25, 26, 25, 26, 26, 23.5, 25, 25, 26]
+    }
+  ]
+}
+
+const hour = ref(new Date())
+const hourTitle = ref(getDateString(hour.value, 'HOUR'))
+
+function historyHourQuery(date: Date) {
+  hour.value = date
+  hourTitle.value = getDateString(date, 'HOUR')
+}
+
+function historyHourRefresh() {
+  console.log('historyHourRefresh')
+}
+
+// endregion
+
+// region 日温度
+
+const historyDay = ref()
+let historyDayChart: EChartsType
+
+const day = ref(new Date())
+const dayTitle = ref(getDateString(day.value, 'DAY'))
+
+const historyDayOption: any = {
+  color: ['#9C9', '#F99', '#6CF'],
+  grid: {
+    top: 30,
+    bottom: 20,
+    left: 30,
+    right: 10
+  },
+  legend: {},
+  tooltip: {
+    trigger: 'axis'
+  },
+  xAxis: {
+    type: 'category',
+    name: '日',
+    nameTextStyle: {
+      lineHeight: 28,
+      verticalAlign: 'top'
+    },
+    nameGap: 0,
+    data: getDateMonth1Day(day.value),
+    axisLabel: {
+      interval: 1
+    }
+  },
+  yAxis: {
+    name: '℃',
+    type: 'value',
+    max: 30,
+    min: 22
   },
   series: [
     {
@@ -295,9 +348,6 @@ const historyDayOption: any = {
   ]
 }
 
-const day = ref(new Date())
-const dayTitle = ref(getDateString(day.value, 'DAY'))
-
 function historyDayQuery(date: Date) {
   day.value = date
   dayTitle.value = getDateString(date, 'DAY')
@@ -309,7 +359,7 @@ function historyDayRefresh() {
 
 // endregion
 
-// region 月历史温度
+// region 月报表
 
 const historyMonth = ref()
 let historyMonthChart: EChartsType
@@ -318,7 +368,7 @@ const historyMonthOption: any = {
   color: ['#9C9', '#F99', '#6CF'],
   grid: {
     top: 30,
-    bottom: 70,
+    bottom: 20,
     left: 30,
     right: 10
   },
@@ -328,16 +378,13 @@ const historyMonthOption: any = {
   },
   xAxis: {
     type: 'category',
-    name: '日',
+    name: '月',
     nameTextStyle: {
       lineHeight: 28,
       verticalAlign: 'top'
     },
-    nameGap: -8,
-    data: getDateMonth1Day(2024, 8),
-    axisLabel: {
-      interval: 1
-    }
+    nameGap: 0,
+    data: dateYear1Month
   },
   yAxis: {
     name: '℃',
@@ -345,24 +392,21 @@ const historyMonthOption: any = {
     max: 30,
     min: 22
   },
-  dataZoom: {
-    type: 'slider'
-  },
   series: [
     {
       name: '平均温度',
       type: 'line',
-      data: [26, 27.5, 28, 27.1, 26, 27, 28.88, 24, 25, 26.23, 27.77]
+      data: [26, 27.5, 28, 27.1, 26, 27, 28.88, 24, 25, 26.23, 27.77, 27]
     },
     {
       name: '最高温度',
       type: 'line',
-      data: [28, 28, 28.5, 28, 27, 28, 29, 28, 28, 28, 28]
+      data: [28, 28, 28.5, 28, 27, 28, 29, 28, 28, 28, 28, 28]
     },
     {
       name: '最低温度',
       type: 'line',
-      data: [25, 26, 25, 26, 25, 26, 26, 23.5, 25, 25, 26]
+      data: [25, 26, 25, 26, 25, 26, 26, 23.5, 25, 25, 26, 26]
     }
   ]
 }
@@ -381,81 +425,6 @@ function historyMonthRefresh() {
 
 // endregion
 
-// region 年历史温度
-
-const historyYear = ref()
-let historyYearChart: EChartsType
-
-const historyYearOption: any = {
-  color: ['#9C9', '#F99', '#6CF'],
-  grid: {
-    top: 30,
-    bottom: 70,
-    left: 30,
-    right: 10
-  },
-  legend: {},
-  tooltip: {
-    trigger: 'axis'
-  },
-  xAxis: {
-    type: 'category',
-    name: '月',
-    nameTextStyle: {
-      lineHeight: 28,
-      verticalAlign: 'top'
-    },
-    nameGap: -8,
-    data: getDateYear1Day(2024),
-    axisLabel: {
-      interval: 30,
-      formatter: function (value: string) {
-        return Number(value.substring(0, 2))
-      }
-    }
-  },
-  yAxis: {
-    name: '℃',
-    type: 'value',
-    max: 30,
-    min: 22
-  },
-  dataZoom: {
-    type: 'slider'
-  },
-  series: [
-    {
-      name: '平均温度',
-      type: 'line',
-      data: [26, 27.5, 28, 27.1, 26, 27, 28.88, 24, 25, 26.23, 27.77]
-    },
-    {
-      name: '最高温度',
-      type: 'line',
-      data: [28, 28, 28.5, 28, 27, 28, 29, 28, 28, 28, 28]
-    },
-    {
-      name: '最低温度',
-      type: 'line',
-      data: [25, 26, 25, 26, 25, 26, 26, 23.5, 25, 25, 26]
-    }
-  ]
-}
-
-const year = ref(new Date())
-const yearTitle = ref(getDateString(year.value, 'YEAR'))
-
-function historyYearQuery(date: Date) {
-  year.value = date
-  yearTitle.value = getDateString(date, 'YEAR')
-}
-
-function historyYearRefresh() {
-  console.log('historyYearRefresh')
-}
-
-// endregion
-
 </script>
 
 <template>
@@ -464,19 +433,28 @@ function historyYearRefresh() {
       <div ref="realtime" class="realtime"/>
     </Graph>
     <Graph
+        :title="minuteTitle+' 历史温度'"
+        report-type="MINUTE"
+        show-refresh
+        @query="historyMinuteQuery"
+        @refresh="historyMinuteRefresh"
+    >
+      <div ref="historyMinute" class="historyMinute"/>
+    </Graph>
+  </div>
+  <div class="bottomBox">
+    <Graph
         :title="hourTitle+' 历史温度'"
-        date-type="HOUR"
+        report-type="HOUR"
         show-refresh
         @query="historyHourQuery"
         @refresh="historyHourRefresh"
     >
       <div ref="historyHour" class="historyHour"/>
     </Graph>
-  </div>
-  <div class="centerBox">
     <Graph
         :title="dayTitle+' 历史温度'"
-        date-type="DAY"
+        report-type="DAY"
         show-refresh
         @query="historyDayQuery"
         @refresh="historyDayRefresh"
@@ -485,7 +463,7 @@ function historyYearRefresh() {
     </Graph>
     <Graph
         :title="monthTitle+' 历史温度'"
-        date-type="MONTH"
+        report-type="MONTH"
         show-refresh
         @query="historyMonthQuery"
         @refresh="historyMonthRefresh"
@@ -493,22 +471,11 @@ function historyYearRefresh() {
       <div ref="historyMonth" class="historyMonth"/>
     </Graph>
   </div>
-  <div class="bottomBox">
-    <Graph
-        :title="yearTitle+' 历史温度'"
-        date-type="YEAR"
-        show-refresh
-        @query="historyYearQuery"
-        @refresh="historyYearRefresh"
-    >
-      <div ref="historyYear" class="historyYear"/>
-    </Graph>
-  </div>
 </template>
 
 <style scoped>
 .topBox {
-  padding: 0 10px;
+  padding: 10px;
   display: flex;
   justify-content: space-between;
 }
@@ -518,28 +485,19 @@ function historyYearRefresh() {
   height: 300px;
 }
 
-.historyHour {
+.historyMinute {
   width: calc(100vw - 380px);
   height: 300px;
 }
 
-.centerBox {
-  padding: 20px 10px;
+.bottomBox {
+  padding: 10px;
   display: flex;
   justify-content: space-between;
 }
 
-.historyDay, .historyMonth {
-  width: calc(100vw / 2 - 40px);
-  height: 300px;
-}
-
-.bottomBox {
-  padding: 0 10px;
-}
-
-.historyYear {
-  width: calc(100vw - 50px);
-  height: 300px;
+.historyHour, .historyDay, .historyMonth {
+  width: calc(100vw / 3 - 40px);
+  height: 250px;
 }
 </style>

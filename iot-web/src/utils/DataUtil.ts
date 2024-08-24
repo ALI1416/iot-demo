@@ -1,5 +1,5 @@
 import dayjs, {Dayjs} from 'dayjs'
-import type {DateType} from '@/types'
+import type {ReportType} from '@/types'
 
 /**
  * 时间工具
@@ -143,21 +143,6 @@ function getDateLeapYear1Day(): string[] {
 // region 方法
 
 /**
- * 6小时每隔1分钟
- * @param group 组 0~3
- * @return string[360] 例如[00:00,00:01,00:02...05:59]
- */
-function getDate6Hour1Minute(group: number): string[] {
-  let result: string[] = []
-  for (let i = group * 4; i < group * 4 + 6; i++) {
-    for (let j = 0; j < 60; j++) {
-      result.push(i.toString().padStart(2, '0') + ':' + (j).toString().padStart(2, '0'))
-    }
-  }
-  return result
-}
-
-/**
  * 7天每隔1天
  * @param date 时间(第7天)
  * @return string[7] 例如[01-01,01-02,01-03...01-07]
@@ -208,13 +193,18 @@ function getDate7Day30Minute(date: Date | Dayjs): string[] {
 
 /**
  * 本月每隔1天
- * @param year 年
- * @param month 月
+ * @param yearOrDate 年或时间
+ * @param month 月(当yearOrDate为年时需要)
  * @return number[28|29|30|31] 例如[1,2,3...31]
  */
-function getDateMonth1Day(year: number, month: number): number[] {
+function getDateMonth1Day(yearOrDate: number | Date | Dayjs, month?: number): number[] {
   let result: number[] = []
-  let d = dayjs().year(year).month(month)
+  let d: Dayjs
+  if (typeof yearOrDate === 'number' && month) {
+    d = dayjs().year(yearOrDate).month(month)
+  } else {
+    d = dayjs(yearOrDate)
+  }
   for (let i = 1; i < d.daysInMonth() + 1; i++) {
     result.push(i)
   }
@@ -294,25 +284,25 @@ function getDuration(startDate: string, endDate: string): string {
 /**
  * 获取时间字符串
  * @param date 时间
- * @param dateType 时间类型
+ * @param reportType 报表类型
  * @return string 例如<br>
- * `YEAR` 2024年<br>
- * `MONTH` 2024年8月<br>
- * `DAY` 2024年8月23日<br>
- * `HOUR` 2024年8月23日16时
+ * `MONTH` 2024年<br>
+ * `DAY` 2024年8月<br>
+ * `HOUR` 2024年8月23日<br>
+ * `MINUTE` 2024年8月23日16时
  */
-function getDateString(date: Date | Dayjs, dateType: DateType) {
-  switch (dateType) {
-    case 'YEAR': {
+function getDateString(date: Date | Dayjs, reportType: ReportType) {
+  switch (reportType) {
+    case 'MONTH': {
       return dayjs(date).format('YYYY年')
     }
-    case 'MONTH': {
+    case 'DAY': {
       return dayjs(date).format('YYYY年M月')
     }
-    case 'DAY': {
+    case 'HOUR': {
       return dayjs(date).format('YYYY年M月D日')
     }
-    case 'HOUR': {
+    case 'MINUTE': {
       return dayjs(date).format('YYYY年M月D日H时')
     }
   }
@@ -328,7 +318,6 @@ export {
   dateYear1Month,
   dateCommonYear1Day,
   dateLeapYear1Day,
-  getDate6Hour1Minute,
   getDate7Day1Day,
   getDate7Day1Hour,
   getDate7Day30Minute,
