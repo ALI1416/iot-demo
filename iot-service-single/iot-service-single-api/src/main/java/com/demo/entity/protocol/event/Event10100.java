@@ -1,8 +1,6 @@
 package com.demo.entity.protocol.event;
 
 import com.demo.announce.*;
-import com.demo.base.ControllerBase;
-import com.demo.base.ToStringBase;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +16,8 @@ import lombok.Setter;
  * @since 1.0.0
  **/
 @Schema(description = "温度计事件")
-@Protocol(code = 10100, name = "温度计事件", type = ProtocolType.EVENT, deviceType = DeviceType.THERMOMETER, event = Event10100.Event.class)
+@Protocol(code = 10100, name = "温度计事件", type = ProtocolType.EVENT, deviceType = DeviceType.THERMOMETER,
+        event = Event10100.Event.class, eventMinute = Event10100.EventMinute.class, eventHour = Event10100.EventHourDayMonth.class, eventDay = Event10100.EventHourDayMonth.class, eventMonth = Event10100.EventHourDayMonth.class)
 public class Event10100 {
 
     private Event10100() {
@@ -30,7 +29,7 @@ public class Event10100 {
     @Getter
     @Setter
     @Schema(description = "温度计事件", name = "Event10100.Event")
-    public static class Event extends ToStringBase implements com.demo.entity.protocol.Protocol.Data {
+    public static class Event implements com.demo.entity.protocol.Protocol.Data {
 
         /**
          * 温度(0.0001℃ 0.0001摄氏度)
@@ -46,8 +45,48 @@ public class Event10100 {
          */
         @Override
         public boolean dataCheckNotPass() {
-            return ControllerBase.existNull(temperature);
+            return temperature == null;
         }
+
+    }
+
+    /**
+     * 温度计事件报表-分钟
+     */
+    @Getter
+    @Setter
+    @Schema(description = "温度计事件报表-分钟", name = "Event10100.EventMinute")
+    public static class EventMinute extends com.demo.entity.protocol.Protocol.Default {
+
+        /**
+         * 平均温度(0.0001℃ 0.0001摄氏度)
+         */
+        @Schema(description = "平均温度(0.0001℃ 0.0001摄氏度)")
+        @Field(name = "平均温度", type = FieldType.AVG, unit = FieldUnitEnum.TEMPERATURE_N4, recommend = FieldUnitEnum.TEMPERATURE, divide = 10000)
+        private Integer temperatureAvg;
+
+    }
+
+    /**
+     * 温度计事件报表-小时-日-月
+     */
+    @Getter
+    @Setter
+    @Schema(description = "温度计事件报表-小时-日-月", name = "Event10100.EventHourDayMonth")
+    public static class EventHourDayMonth extends EventMinute {
+
+        /**
+         * 最高温度(0.0001℃ 0.0001摄氏度)
+         */
+        @Schema(description = "最高温度(0.0001℃ 0.0001摄氏度)")
+        @Field(name = "最高温度", type = FieldType.MAX, unit = FieldUnitEnum.TEMPERATURE_N4, recommend = FieldUnitEnum.TEMPERATURE, divide = 10000)
+        private Integer temperatureMax;
+        /**
+         * 最低温度(0.0001℃ 0.0001摄氏度)
+         */
+        @Schema(description = "最低温度(0.0001℃ 0.0001摄氏度)")
+        @Field(name = "最低温度", type = FieldType.MIN, unit = FieldUnitEnum.TEMPERATURE_N4, recommend = FieldUnitEnum.TEMPERATURE, divide = 10000)
+        private Integer temperatureMin;
 
     }
 

@@ -50,7 +50,27 @@ public @interface Protocol {
     /**
      * 事件
      */
-    Class<? extends com.demo.entity.protocol.Protocol.Data> event() default com.demo.entity.protocol.Protocol.NoData.class;
+    Class<? extends com.demo.entity.protocol.Protocol.Data> event() default com.demo.entity.protocol.Protocol.Default.class;
+
+    /**
+     * 事件报表-分钟
+     */
+    Class<? extends com.demo.entity.protocol.Protocol.Data> eventMinute() default com.demo.entity.protocol.Protocol.Default.class;
+
+    /**
+     * 事件报表-小时
+     */
+    Class<? extends com.demo.entity.protocol.Protocol.Data> eventHour() default com.demo.entity.protocol.Protocol.Default.class;
+
+    /**
+     * 事件报表-日
+     */
+    Class<? extends com.demo.entity.protocol.Protocol.Data> eventDay() default com.demo.entity.protocol.Protocol.Default.class;
+
+    /**
+     * 事件报表-月
+     */
+    Class<? extends com.demo.entity.protocol.Protocol.Data> eventMonth() default com.demo.entity.protocol.Protocol.Default.class;
 
     /**
      * 故障
@@ -60,11 +80,11 @@ public @interface Protocol {
     /**
      * 请求
      */
-    Class<? extends com.demo.entity.protocol.Protocol.Data> request() default com.demo.entity.protocol.Protocol.NoData.class;
+    Class<? extends com.demo.entity.protocol.Protocol.Data> request() default com.demo.entity.protocol.Protocol.Default.class;
 
     /**
      * 响应
      */
-    Class<? extends com.demo.entity.protocol.Protocol.Data> response() default com.demo.entity.protocol.Protocol.NoData.class;
+    Class<? extends com.demo.entity.protocol.Protocol.Data> response() default com.demo.entity.protocol.Protocol.Default.class;
 
 }

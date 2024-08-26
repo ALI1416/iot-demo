@@ -68,6 +68,26 @@ public class ProtocolInfo extends ToStringBase {
     @Schema(description = "事件")
     private List<FieldInfo> event;
     /**
+     * 事件报表-分钟
+     */
+    @Schema(description = "事件报表-分钟")
+    private List<FieldInfo> eventMinute;
+    /**
+     * 事件报表-小时
+     */
+    @Schema(description = "事件报表-小时")
+    private List<FieldInfo> eventHour;
+    /**
+     * 事件报表-日
+     */
+    @Schema(description = "事件报表-日")
+    private List<FieldInfo> eventDay;
+    /**
+     * 事件报表-月
+     */
+    @Schema(description = "事件报表-月")
+    private List<FieldInfo> eventMonth;
+    /**
      * 故障
      */
     @Schema(description = "故障")
@@ -89,6 +109,30 @@ public class ProtocolInfo extends ToStringBase {
     @Schema(description = "事件类")
     @JSONField(serialize = false, deserialize = false)
     private Class<? extends Protocol.Data> eventClass;
+    /**
+     * 事件报表-分钟类
+     */
+    @Schema(description = "事件报表-分钟类")
+    @JSONField(serialize = false, deserialize = false)
+    private Class<? extends Protocol.Data> eventMinuteClass;
+    /**
+     * 事件报表-小时类
+     */
+    @Schema(description = "事件报表-小时类")
+    @JSONField(serialize = false, deserialize = false)
+    private Class<? extends Protocol.Data> eventHourClass;
+    /**
+     * 事件报表-日类
+     */
+    @Schema(description = "事件报表-日类")
+    @JSONField(serialize = false, deserialize = false)
+    private Class<? extends Protocol.Data> eventDayClass;
+    /**
+     * 事件报表-月类
+     */
+    @Schema(description = "事件报表-月类")
+    @JSONField(serialize = false, deserialize = false)
+    private Class<? extends Protocol.Data> eventMonthClass;
     /**
      * 请求类
      */
@@ -338,9 +382,33 @@ public class ProtocolInfo extends ToStringBase {
             }
             // 事件
             Class<? extends Protocol.Data> eventClass = protocol.event();
-            if (eventClass != Protocol.NoData.class) {
+            if (eventClass != Protocol.Default.class) {
                 protocolInfo.setEvent(getFieldInfo(eventClass));
                 protocolInfo.setEventClass(eventClass);
+            }
+            // 事件报表-分钟
+            Class<? extends Protocol.Data> eventMinuteClass = protocol.eventMinute();
+            if (eventMinuteClass != Protocol.Default.class) {
+                protocolInfo.setEventMinute(getFieldInfo(eventMinuteClass));
+                protocolInfo.setEventMinuteClass(eventMinuteClass);
+            }
+            // 事件报表-小时
+            Class<? extends Protocol.Data> eventHourClass = protocol.eventHour();
+            if (eventHourClass != Protocol.Default.class) {
+                protocolInfo.setEventHour(getFieldInfo(eventHourClass));
+                protocolInfo.setEventHourClass(eventHourClass);
+            }
+            // 事件报表-日
+            Class<? extends Protocol.Data> eventDayClass = protocol.eventDay();
+            if (eventDayClass != Protocol.Default.class) {
+                protocolInfo.setEventDay(getFieldInfo(eventDayClass));
+                protocolInfo.setEventDayClass(eventDayClass);
+            }
+            // 事件报表-月
+            Class<? extends Protocol.Data> eventMonthClass = protocol.eventMonth();
+            if (eventMonthClass != Protocol.Default.class) {
+                protocolInfo.setEventMonth(getFieldInfo(eventMonthClass));
+                protocolInfo.setEventMonthClass(eventMonthClass);
             }
             // 故障
             if (protocol.fault() != FaultEnum.NULL) {
@@ -348,13 +416,13 @@ public class ProtocolInfo extends ToStringBase {
             }
             // 请求
             Class<? extends Protocol.Data> requestClass = protocol.request();
-            if (requestClass != Protocol.NoData.class) {
+            if (requestClass != Protocol.Default.class) {
                 protocolInfo.setRequest(getFieldInfo(requestClass));
                 protocolInfo.setRequestClass(requestClass);
             }
             // 响应
             Class<? extends Protocol.Data> responseClass = protocol.response();
-            if (responseClass != Protocol.NoData.class) {
+            if (responseClass != Protocol.Default.class) {
                 protocolInfo.setResponse(getFieldInfo(responseClass));
                 protocolInfo.setResponseClass(responseClass);
             }

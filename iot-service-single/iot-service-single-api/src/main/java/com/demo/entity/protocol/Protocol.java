@@ -138,22 +138,22 @@ public class Protocol extends MongoEntityBase {
         /**
          * 数据检查未通过
          *
-         * @return 数据检查未通过
+         * @return 数据检查是否通过
          */
         boolean dataCheckNotPass();
 
     }
 
     /**
-     * 没有数据
+     * 默认
      */
-    @Schema(description = "没有数据", name = "Protocol.NoData")
-    public static class NoData implements Data {
+    @Schema(description = "默认", name = "Protocol.Default")
+    public static class Default extends ToStringBase implements Data {
 
         /**
          * 数据检查未通过
          *
-         * @return 数据检查未通过
+         * @return 通过
          */
         @Override
         public boolean dataCheckNotPass() {

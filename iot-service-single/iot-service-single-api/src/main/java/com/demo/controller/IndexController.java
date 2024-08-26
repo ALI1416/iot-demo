@@ -39,13 +39,14 @@ public class IndexController {
      */
     @GetMapping("protocolEntity")
     @Operation(summary = "协议实体")
-    public Result protocol(Frame frame, Protocol protocol, ProtocolInfo protocolInfo,
-                           Event10100.Event event10100Event,
-                           Interact30000.Request interact30000Request,
-                           Interact30100.Request interact30100Request,
-                           Interact40000.Response interact40000Response,
-                           Interact40001.Response interact40001Response,
-                           Interact40100.Response interact40100Response
+    public Result protocol(
+            Frame frame, Protocol protocol, ProtocolInfo protocolInfo,
+            Event10100.Event event10100Event, Event10100.EventMinute event10100EventMinute, Event10100.EventHourDayMonth event10100EventHourDayMonth,
+            Interact30000.Request interact30000Request,
+            Interact30100.Request interact30100Request,
+            Interact40000.Response interact40000Response,
+            Interact40001.Response interact40001Response,
+            Interact40100.Response interact40100Response
     ) {
         return Result.o();
     }
