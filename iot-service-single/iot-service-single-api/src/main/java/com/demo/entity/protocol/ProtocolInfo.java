@@ -110,30 +110,6 @@ public class ProtocolInfo extends ToStringBase {
     @JSONField(serialize = false, deserialize = false)
     private Class<? extends Protocol.Data> eventClass;
     /**
-     * 事件报表-分钟类
-     */
-    @Schema(description = "事件报表-分钟类")
-    @JSONField(serialize = false, deserialize = false)
-    private Class<? extends Protocol.Data> eventMinuteClass;
-    /**
-     * 事件报表-小时类
-     */
-    @Schema(description = "事件报表-小时类")
-    @JSONField(serialize = false, deserialize = false)
-    private Class<? extends Protocol.Data> eventHourClass;
-    /**
-     * 事件报表-日类
-     */
-    @Schema(description = "事件报表-日类")
-    @JSONField(serialize = false, deserialize = false)
-    private Class<? extends Protocol.Data> eventDayClass;
-    /**
-     * 事件报表-月类
-     */
-    @Schema(description = "事件报表-月类")
-    @JSONField(serialize = false, deserialize = false)
-    private Class<? extends Protocol.Data> eventMonthClass;
-    /**
      * 请求类
      */
     @Schema(description = "请求类")
@@ -390,25 +366,21 @@ public class ProtocolInfo extends ToStringBase {
             Class<? extends Protocol.Data> eventMinuteClass = protocol.eventMinute();
             if (eventMinuteClass != Protocol.Default.class) {
                 protocolInfo.setEventMinute(getFieldInfo(eventMinuteClass));
-                protocolInfo.setEventMinuteClass(eventMinuteClass);
             }
             // 事件报表-小时
             Class<? extends Protocol.Data> eventHourClass = protocol.eventHour();
             if (eventHourClass != Protocol.Default.class) {
                 protocolInfo.setEventHour(getFieldInfo(eventHourClass));
-                protocolInfo.setEventHourClass(eventHourClass);
             }
             // 事件报表-日
             Class<? extends Protocol.Data> eventDayClass = protocol.eventDay();
             if (eventDayClass != Protocol.Default.class) {
                 protocolInfo.setEventDay(getFieldInfo(eventDayClass));
-                protocolInfo.setEventDayClass(eventDayClass);
             }
             // 事件报表-月
             Class<? extends Protocol.Data> eventMonthClass = protocol.eventMonth();
             if (eventMonthClass != Protocol.Default.class) {
                 protocolInfo.setEventMonth(getFieldInfo(eventMonthClass));
-                protocolInfo.setEventMonthClass(eventMonthClass);
             }
             // 故障
             if (protocol.fault() != FaultEnum.NULL) {

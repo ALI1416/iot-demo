@@ -62,7 +62,7 @@ public class Event10100 {
          * 平均温度(0.0001℃ 0.0001摄氏度)
          */
         @Schema(description = "平均温度(0.0001℃ 0.0001摄氏度)")
-        @Field(name = "平均温度", type = FieldType.AVG, unit = FieldUnitEnum.TEMPERATURE_N4, recommend = FieldUnitEnum.TEMPERATURE, divide = 10000)
+        @Field(name = "平均温度", unit = FieldUnitEnum.TEMPERATURE_N4, recommend = FieldUnitEnum.TEMPERATURE, divide = 10000)
         private Integer temperatureAvg;
 
     }
@@ -79,13 +79,13 @@ public class Event10100 {
          * 最高温度(0.0001℃ 0.0001摄氏度)
          */
         @Schema(description = "最高温度(0.0001℃ 0.0001摄氏度)")
-        @Field(name = "最高温度", type = FieldType.MAX, unit = FieldUnitEnum.TEMPERATURE_N4, recommend = FieldUnitEnum.TEMPERATURE, divide = 10000)
+        @Field(name = "最高温度", unit = FieldUnitEnum.TEMPERATURE_N4, recommend = FieldUnitEnum.TEMPERATURE, divide = 10000)
         private Integer temperatureMax;
         /**
          * 最低温度(0.0001℃ 0.0001摄氏度)
          */
         @Schema(description = "最低温度(0.0001℃ 0.0001摄氏度)")
-        @Field(name = "最低温度", type = FieldType.MIN, unit = FieldUnitEnum.TEMPERATURE_N4, recommend = FieldUnitEnum.TEMPERATURE, divide = 10000)
+        @Field(name = "最低温度", unit = FieldUnitEnum.TEMPERATURE_N4, recommend = FieldUnitEnum.TEMPERATURE, divide = 10000)
         private Integer temperatureMin;
 
     }

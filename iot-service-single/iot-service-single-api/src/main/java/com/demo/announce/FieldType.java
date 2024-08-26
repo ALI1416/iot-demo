@@ -29,17 +29,4 @@ public enum FieldType {
      */
     STATUS,
 
-    /**
-     * 平均值
-     */
-    AVG,
-    /**
-     * 最大值
-     */
-    MAX,
-    /**
-     * 最小值
-     */
-    MIN,
-
 }
