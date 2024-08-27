@@ -257,6 +257,39 @@ public class Protocol extends MongoEntityBase {
     }
 
     /**
+     * 故障
+     */
+    @Schema(description = "故障", name = "Protocol.Fault")
+    public interface Fault {
+
+        /**
+         * 故障数组
+         *
+         * @return 故障数组
+         */
+        ProtocolInfo.FaultInfo[] fault();
+
+    }
+
+    /**
+     * 默认故障
+     */
+    @Schema(description = "默认故障", name = "Protocol.DefaultFault")
+    public static class DefaultFault implements Fault {
+
+        /**
+         * 故障数组
+         *
+         * @return 故障数组
+         */
+        @Override
+        public ProtocolInfo.FaultInfo[] fault() {
+            return new ProtocolInfo.FaultInfo[0];
+        }
+
+    }
+
+    /**
      * 故障详情
      */
     @Getter

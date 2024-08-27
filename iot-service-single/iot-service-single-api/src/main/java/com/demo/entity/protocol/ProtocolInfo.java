@@ -421,8 +421,12 @@ public class ProtocolInfo extends ToStringBase {
                 }
             }
             // 故障
-            if (protocol.fault() != FaultEnum.NULL) {
-                protocolInfo.setFault(protocol.fault().getFaultInfo());
+            Class<? extends Protocol.Fault> faultClass = protocol.fault();
+            if (faultClass != Protocol.DefaultFault.class) {
+                try {
+                    protocolInfo.setFault(faultClass.getConstructor().newInstance().fault());
+                } catch (Exception ignored) {
+                }
             }
             // 请求
             Class<? extends Protocol.Data> requestClass = protocol.request();

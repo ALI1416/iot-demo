@@ -80,7 +80,7 @@ public @interface Protocol {
     /**
      * 故障
      */
-    FaultEnum fault() default FaultEnum.NULL;
+    Class<? extends com.demo.entity.protocol.Protocol.Fault> fault() default com.demo.entity.protocol.Protocol.DefaultFault.class;
 
     /**
      * 请求
