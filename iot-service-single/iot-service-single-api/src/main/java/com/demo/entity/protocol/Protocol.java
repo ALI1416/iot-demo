@@ -6,6 +6,7 @@ import com.demo.announce.ProtocolType;
 import com.demo.base.MongoEntityBase;
 import com.demo.base.ToStringBase;
 import com.demo.constant.InteractType;
+import com.demo.entity.vo.ProtocolVo;
 import com.demo.util.BitUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * <h1>协议</h1>
@@ -145,19 +147,111 @@ public class Protocol extends MongoEntityBase {
     }
 
     /**
-     * 默认
+     * 默认数据
      */
-    @Schema(description = "默认", name = "Protocol.Default")
-    public static class Default extends ToStringBase implements Data {
+    @Schema(description = "默认数据", name = "Protocol.DefaultData")
+    public static class DefaultData extends ToStringBase implements Data {
 
         /**
-         * 数据检查未通过
+         * 数据检查通过
          *
          * @return 通过
          */
         @Override
         public boolean dataCheckNotPass() {
             return false;
+        }
+
+    }
+
+    /**
+     * 事件报表处理
+     */
+    @Schema(description = "事件报表处理", name = "Protocol.EventReportHandle")
+    public interface EventReportHandle {
+
+        /**
+         * 分钟报表处理
+         *
+         * @param list 全部数据
+         * @return 分钟报表
+         */
+        ProtocolVo minute(List<ProtocolVo> list);
+
+        /**
+         * 小时报表处理
+         *
+         * @param list 分钟报表
+         * @return 小时报表
+         */
+        ProtocolVo hour(List<ProtocolVo> list);
+
+        /**
+         * 日报表处理
+         *
+         * @param list 小时报表
+         * @return 日报表
+         */
+        ProtocolVo day(List<ProtocolVo> list);
+
+        /**
+         * 月报表处理
+         *
+         * @param list 日报表
+         * @return 月报表
+         */
+        ProtocolVo month(List<ProtocolVo> list);
+
+    }
+
+    /**
+     * 默认事件报表处理
+     */
+    @Schema(description = "默认事件报表处理", name = "Protocol.DefaultEventReportHandle")
+    public static class DefaultEventReportHandle implements EventReportHandle {
+
+        /**
+         * 分钟报表处理
+         *
+         * @param list 全部数据
+         * @return 分钟报表
+         */
+        @Override
+        public ProtocolVo minute(List<ProtocolVo> list) {
+            return null;
+        }
+
+        /**
+         * 小时报表处理
+         *
+         * @param list 分钟报表
+         * @return 小时报表
+         */
+        @Override
+        public ProtocolVo hour(List<ProtocolVo> list) {
+            return null;
+        }
+
+        /**
+         * 日报表处理
+         *
+         * @param list 小时报表
+         * @return 日报表
+         */
+        @Override
+        public ProtocolVo day(List<ProtocolVo> list) {
+            return null;
+        }
+
+        /**
+         * 月报表处理
+         *
+         * @param list 日报表
+         * @return 月报表
+         */
+        @Override
+        public ProtocolVo month(List<ProtocolVo> list) {
+            return null;
         }
 
     }
@@ -317,6 +411,30 @@ public class Protocol extends MongoEntityBase {
             }
         }
         return faultDetailList;
+    }
+
+    /**
+     * 获取事件分钟报表
+     *
+     * @param commandCode 命令代码
+     * @param list        全部数据
+     * @return 分钟报表
+     */
+    public static ProtocolVo getEventReportMinute(int commandCode, List<ProtocolVo> list) {
+        if (list == null) {
+            return null;
+        }
+        ProtocolInfo info = ProtocolInfo.get(commandCode);
+        if (info == null
+                || info.getType() != ProtocolType.EVENT
+        ) {
+            return null;
+        }
+        Function<List<ProtocolVo>, ProtocolVo> function = info.getEventMinuteFunction();
+        if (function == null) {
+            return null;
+        }
+        return function.apply(list);
     }
 
 }

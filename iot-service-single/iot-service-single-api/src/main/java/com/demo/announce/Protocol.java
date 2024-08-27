@@ -1,8 +1,6 @@
 package com.demo.announce;
 
 import java.lang.annotation.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * <h1>协议</h1>
@@ -52,29 +50,32 @@ public @interface Protocol {
     /**
      * 事件
      */
-    Class<? extends com.demo.entity.protocol.Protocol.Data> event() default com.demo.entity.protocol.Protocol.Default.class;
+    Class<? extends com.demo.entity.protocol.Protocol.Data> event() default com.demo.entity.protocol.Protocol.DefaultData.class;
 
     /**
      * 事件分钟报表
      */
-    Class<? extends com.demo.entity.protocol.Protocol.Data> eventMinute() default com.demo.entity.protocol.Protocol.Default.class;
+    Class<? extends com.demo.entity.protocol.Protocol.Data> eventMinute() default com.demo.entity.protocol.Protocol.DefaultData.class;
 
     /**
      * 事件小时报表
      */
-    Class<? extends com.demo.entity.protocol.Protocol.Data> eventHour() default com.demo.entity.protocol.Protocol.Default.class;
+    Class<? extends com.demo.entity.protocol.Protocol.Data> eventHour() default com.demo.entity.protocol.Protocol.DefaultData.class;
 
     /**
      * 事件日报表
      */
-    Class<? extends com.demo.entity.protocol.Protocol.Data> eventDay() default com.demo.entity.protocol.Protocol.Default.class;
+    Class<? extends com.demo.entity.protocol.Protocol.Data> eventDay() default com.demo.entity.protocol.Protocol.DefaultData.class;
 
     /**
      * 事件月报表
      */
-    Class<? extends com.demo.entity.protocol.Protocol.Data> eventMonth() default com.demo.entity.protocol.Protocol.Default.class;
+    Class<? extends com.demo.entity.protocol.Protocol.Data> eventMonth() default com.demo.entity.protocol.Protocol.DefaultData.class;
 
-    Consumer eventMinute1();
+    /**
+     * 事件报表处理
+     */
+    Class<? extends com.demo.entity.protocol.Protocol.EventReportHandle> eventReportHandle() default com.demo.entity.protocol.Protocol.DefaultEventReportHandle.class;
 
     /**
      * 故障
@@ -84,11 +85,11 @@ public @interface Protocol {
     /**
      * 请求
      */
-    Class<? extends com.demo.entity.protocol.Protocol.Data> request() default com.demo.entity.protocol.Protocol.Default.class;
+    Class<? extends com.demo.entity.protocol.Protocol.Data> request() default com.demo.entity.protocol.Protocol.DefaultData.class;
 
     /**
      * 响应
      */
-    Class<? extends com.demo.entity.protocol.Protocol.Data> response() default com.demo.entity.protocol.Protocol.Default.class;
+    Class<? extends com.demo.entity.protocol.Protocol.Data> response() default com.demo.entity.protocol.Protocol.DefaultData.class;
 
 }

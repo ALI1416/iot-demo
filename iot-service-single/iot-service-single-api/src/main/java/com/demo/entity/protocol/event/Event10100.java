@@ -1,9 +1,12 @@
 package com.demo.entity.protocol.event;
 
 import com.demo.announce.*;
+import com.demo.entity.vo.ProtocolVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 /**
  * <h1>温度计事件</h1>
@@ -17,7 +20,9 @@ import lombok.Setter;
  **/
 @Schema(description = "温度计事件")
 @Protocol(code = 10100, name = "温度计事件", type = ProtocolType.EVENT, deviceType = DeviceType.THERMOMETER,
-        event = Event10100.Event.class, eventMinute = Event10100.EventMinute.class, eventHour = Event10100.EventHourDayMonth.class, eventDay = Event10100.EventHourDayMonth.class, eventMonth = Event10100.EventHourDayMonth.class
+        event = Event10100.Event.class, eventMinute = Event10100.EventMinute.class,
+        eventHour = Event10100.EventHourDayMonth.class, eventDay = Event10100.EventHourDayMonth.class, eventMonth = Event10100.EventHourDayMonth.class,
+        eventReportHandle = Event10100.EventReportHandle.class
 )
 public class Event10100 {
 
@@ -57,7 +62,7 @@ public class Event10100 {
     @Getter
     @Setter
     @Schema(description = "温度计事件分钟报表", name = "Event10100.EventMinute")
-    public static class EventMinute extends com.demo.entity.protocol.Protocol.Default {
+    public static class EventMinute extends com.demo.entity.protocol.Protocol.DefaultData {
 
         /**
          * 平均温度(0.0001℃ 0.0001摄氏度)
@@ -88,6 +93,57 @@ public class Event10100 {
         @Schema(description = "最低温度(0.0001℃ 0.0001摄氏度)")
         @Field(name = "最低温度", unit = FieldUnitEnum.TEMPERATURE_N4, recommend = FieldUnitEnum.TEMPERATURE, divide = 10000)
         private Integer temperatureMin;
+
+    }
+
+    /**
+     * 温度计事件报表处理
+     */
+    public static class EventReportHandle implements com.demo.entity.protocol.Protocol.EventReportHandle {
+
+        /**
+         * 分钟报表处理
+         *
+         * @param list 全部数据
+         * @return 分钟报表
+         */
+        @Override
+        public ProtocolVo minute(List<ProtocolVo> list) {
+            return null;
+        }
+
+        /**
+         * 小时报表处理
+         *
+         * @param list 分钟报表
+         * @return 小时报表
+         */
+        @Override
+        public ProtocolVo hour(List<ProtocolVo> list) {
+            return null;
+        }
+
+        /**
+         * 日报表处理
+         *
+         * @param list 小时报表
+         * @return 日报表
+         */
+        @Override
+        public ProtocolVo day(List<ProtocolVo> list) {
+            return null;
+        }
+
+        /**
+         * 月报表处理
+         *
+         * @param list 日报表
+         * @return 月报表
+         */
+        @Override
+        public ProtocolVo month(List<ProtocolVo> list) {
+            return null;
+        }
 
     }
 

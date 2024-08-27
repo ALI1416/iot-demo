@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.annotation.JSONField;
 import com.demo.announce.*;
 import com.demo.base.ToStringBase;
 import com.demo.entity.pojo.GlobalException;
+import com.demo.entity.vo.ProtocolVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,6 +16,7 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * <h1>协议信息</h1>
@@ -109,6 +111,30 @@ public class ProtocolInfo extends ToStringBase {
     @Schema(description = "事件类")
     @JSONField(serialize = false, deserialize = false)
     private Class<? extends Protocol.Data> eventClass;
+    /**
+     * 事件分钟报表方法
+     */
+    @Schema(description = "事件分钟报表方法")
+    @JSONField(serialize = false, deserialize = false)
+    private Function<List<ProtocolVo>, ProtocolVo> eventMinuteFunction;
+    /**
+     * 事件小时报表方法
+     */
+    @Schema(description = "事件小时报表方法")
+    @JSONField(serialize = false, deserialize = false)
+    private Function<List<ProtocolVo>, ProtocolVo> eventHourFunction;
+    /**
+     * 事件日报表方法
+     */
+    @Schema(description = "事件日报表方法")
+    @JSONField(serialize = false, deserialize = false)
+    private Function<List<ProtocolVo>, ProtocolVo> eventDayFunction;
+    /**
+     * 事件月报表方法
+     */
+    @Schema(description = "事件月报表方法")
+    @JSONField(serialize = false, deserialize = false)
+    private Function<List<ProtocolVo>, ProtocolVo> eventMonthFunction;
     /**
      * 请求类
      */
@@ -358,29 +384,41 @@ public class ProtocolInfo extends ToStringBase {
             }
             // 事件
             Class<? extends Protocol.Data> eventClass = protocol.event();
-            if (eventClass != Protocol.Default.class) {
+            if (eventClass != Protocol.DefaultData.class) {
                 protocolInfo.setEvent(getFieldInfo(eventClass));
                 protocolInfo.setEventClass(eventClass);
             }
             // 事件分钟报表
             Class<? extends Protocol.Data> eventMinuteClass = protocol.eventMinute();
-            if (eventMinuteClass != Protocol.Default.class) {
+            if (eventMinuteClass != Protocol.DefaultData.class) {
                 protocolInfo.setEventMinute(getFieldInfo(eventMinuteClass));
             }
             // 事件小时报表
             Class<? extends Protocol.Data> eventHourClass = protocol.eventHour();
-            if (eventHourClass != Protocol.Default.class) {
+            if (eventHourClass != Protocol.DefaultData.class) {
                 protocolInfo.setEventHour(getFieldInfo(eventHourClass));
             }
             // 事件日报表
             Class<? extends Protocol.Data> eventDayClass = protocol.eventDay();
-            if (eventDayClass != Protocol.Default.class) {
+            if (eventDayClass != Protocol.DefaultData.class) {
                 protocolInfo.setEventDay(getFieldInfo(eventDayClass));
             }
             // 事件月报表
             Class<? extends Protocol.Data> eventMonthClass = protocol.eventMonth();
-            if (eventMonthClass != Protocol.Default.class) {
+            if (eventMonthClass != Protocol.DefaultData.class) {
                 protocolInfo.setEventMonth(getFieldInfo(eventMonthClass));
+            }
+            // 事件报表处理
+            Class<? extends Protocol.EventReportHandle> eventReportHandleClass = protocol.eventReportHandle();
+            if (eventReportHandleClass != Protocol.EventReportHandle.class) {
+                try {
+                    Protocol.EventReportHandle handle = eventReportHandleClass.getConstructor().newInstance();
+                    protocolInfo.setEventMinuteFunction(handle::minute);
+                    protocolInfo.setEventHourFunction(handle::hour);
+                    protocolInfo.setEventDayFunction(handle::day);
+                    protocolInfo.setEventMonthFunction(handle::month);
+                } catch (Exception ignored) {
+                }
             }
             // 故障
             if (protocol.fault() != FaultEnum.NULL) {
@@ -388,13 +426,13 @@ public class ProtocolInfo extends ToStringBase {
             }
             // 请求
             Class<? extends Protocol.Data> requestClass = protocol.request();
-            if (requestClass != Protocol.Default.class) {
+            if (requestClass != Protocol.DefaultData.class) {
                 protocolInfo.setRequest(getFieldInfo(requestClass));
                 protocolInfo.setRequestClass(requestClass);
             }
             // 响应
             Class<? extends Protocol.Data> responseClass = protocol.response();
-            if (responseClass != Protocol.Default.class) {
+            if (responseClass != Protocol.DefaultData.class) {
                 protocolInfo.setResponse(getFieldInfo(responseClass));
                 protocolInfo.setResponseClass(responseClass);
             }
