@@ -1,6 +1,8 @@
 package com.demo.announce;
 
 import java.lang.annotation.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * <h1>协议</h1>
@@ -53,24 +55,26 @@ public @interface Protocol {
     Class<? extends com.demo.entity.protocol.Protocol.Data> event() default com.demo.entity.protocol.Protocol.Default.class;
 
     /**
-     * 事件报表-分钟
+     * 事件分钟报表
      */
     Class<? extends com.demo.entity.protocol.Protocol.Data> eventMinute() default com.demo.entity.protocol.Protocol.Default.class;
 
     /**
-     * 事件报表-小时
+     * 事件小时报表
      */
     Class<? extends com.demo.entity.protocol.Protocol.Data> eventHour() default com.demo.entity.protocol.Protocol.Default.class;
 
     /**
-     * 事件报表-日
+     * 事件日报表
      */
     Class<? extends com.demo.entity.protocol.Protocol.Data> eventDay() default com.demo.entity.protocol.Protocol.Default.class;
 
     /**
-     * 事件报表-月
+     * 事件月报表
      */
     Class<? extends com.demo.entity.protocol.Protocol.Data> eventMonth() default com.demo.entity.protocol.Protocol.Default.class;
+
+    Consumer eventMinute1();
 
     /**
      * 故障

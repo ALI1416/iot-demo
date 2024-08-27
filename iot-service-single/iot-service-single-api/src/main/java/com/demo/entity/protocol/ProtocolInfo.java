@@ -68,24 +68,24 @@ public class ProtocolInfo extends ToStringBase {
     @Schema(description = "事件")
     private List<FieldInfo> event;
     /**
-     * 事件报表-分钟
+     * 事件分钟报表
      */
-    @Schema(description = "事件报表-分钟")
+    @Schema(description = "事件分钟报表")
     private List<FieldInfo> eventMinute;
     /**
-     * 事件报表-小时
+     * 事件小时报表
      */
-    @Schema(description = "事件报表-小时")
+    @Schema(description = "事件小时报表")
     private List<FieldInfo> eventHour;
     /**
-     * 事件报表-日
+     * 事件日报表
      */
-    @Schema(description = "事件报表-日")
+    @Schema(description = "事件日报表")
     private List<FieldInfo> eventDay;
     /**
-     * 事件报表-月
+     * 事件月报表
      */
-    @Schema(description = "事件报表-月")
+    @Schema(description = "事件月报表")
     private List<FieldInfo> eventMonth;
     /**
      * 故障
@@ -362,22 +362,22 @@ public class ProtocolInfo extends ToStringBase {
                 protocolInfo.setEvent(getFieldInfo(eventClass));
                 protocolInfo.setEventClass(eventClass);
             }
-            // 事件报表-分钟
+            // 事件分钟报表
             Class<? extends Protocol.Data> eventMinuteClass = protocol.eventMinute();
             if (eventMinuteClass != Protocol.Default.class) {
                 protocolInfo.setEventMinute(getFieldInfo(eventMinuteClass));
             }
-            // 事件报表-小时
+            // 事件小时报表
             Class<? extends Protocol.Data> eventHourClass = protocol.eventHour();
             if (eventHourClass != Protocol.Default.class) {
                 protocolInfo.setEventHour(getFieldInfo(eventHourClass));
             }
-            // 事件报表-日
+            // 事件日报表
             Class<? extends Protocol.Data> eventDayClass = protocol.eventDay();
             if (eventDayClass != Protocol.Default.class) {
                 protocolInfo.setEventDay(getFieldInfo(eventDayClass));
             }
-            // 事件报表-月
+            // 事件月报表
             Class<? extends Protocol.Data> eventMonthClass = protocol.eventMonth();
             if (eventMonthClass != Protocol.Default.class) {
                 protocolInfo.setEventMonth(getFieldInfo(eventMonthClass));

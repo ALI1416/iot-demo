@@ -52,7 +52,7 @@ public class EventReportService extends ServiceBase {
         Timestamp createTimeStart = new Timestamp(timestampStart);
         Timestamp createTimeEnd = new Timestamp(timestampEnd);
         for (int gatewaySn : GatewayService.getGatewaySnList()) {
-            // 查询网关下所有数据
+            // 全部数据
             eventDao.find(gatewaySn, year, month, createTimeStart, createTimeEnd)
                     // 命令代码
                     .stream().collect(Collectors.groupingBy(Protocol::getCommandCode)).values().forEach(v ->
@@ -86,7 +86,7 @@ public class EventReportService extends ServiceBase {
         int day = calendar.get(DAY_OF_MONTH);
         int hour = calendar.get(HOUR_OF_DAY);
         for (int gatewaySn : GatewayService.getGatewaySnList()) {
-            // 查询网关下分钟报表
+            // 分钟报表
             eventDao.findReport(gatewaySn, year, month, day, hour, null, ReportType.MINUTE)
                     // 命令代码
                     .stream().collect(Collectors.groupingBy(Protocol::getCommandCode)).values().forEach(v ->
@@ -115,7 +115,7 @@ public class EventReportService extends ServiceBase {
         int month = calendar.get(MONTH) + 1;
         int day = calendar.get(DAY_OF_MONTH);
         for (int gatewaySn : GatewayService.getGatewaySnList()) {
-            // 查询网关下小时报表
+            // 小时报表
             eventDao.findReport(gatewaySn, year, month, day, null, null, ReportType.HOUR)
                     // 命令代码
                     .stream().collect(Collectors.groupingBy(Protocol::getCommandCode)).values().forEach(v ->
@@ -144,7 +144,7 @@ public class EventReportService extends ServiceBase {
         int year = calendar.get(YEAR);
         int month = calendar.get(MONTH) + 1;
         for (int gatewaySn : GatewayService.getGatewaySnList()) {
-            // 查询网关下小时报表
+            // 日报表
             eventDao.findReport(gatewaySn, year, month, null, null, null, ReportType.DAY)
                     // 命令代码
                     .stream().collect(Collectors.groupingBy(Protocol::getCommandCode)).values().forEach(v ->

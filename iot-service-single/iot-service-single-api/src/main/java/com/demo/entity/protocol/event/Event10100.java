@@ -17,7 +17,8 @@ import lombok.Setter;
  **/
 @Schema(description = "温度计事件")
 @Protocol(code = 10100, name = "温度计事件", type = ProtocolType.EVENT, deviceType = DeviceType.THERMOMETER,
-        event = Event10100.Event.class, eventMinute = Event10100.EventMinute.class, eventHour = Event10100.EventHourDayMonth.class, eventDay = Event10100.EventHourDayMonth.class, eventMonth = Event10100.EventHourDayMonth.class)
+        event = Event10100.Event.class, eventMinute = Event10100.EventMinute.class, eventHour = Event10100.EventHourDayMonth.class, eventDay = Event10100.EventHourDayMonth.class, eventMonth = Event10100.EventHourDayMonth.class
+)
 public class Event10100 {
 
     private Event10100() {
@@ -51,11 +52,11 @@ public class Event10100 {
     }
 
     /**
-     * 温度计事件报表-分钟
+     * 温度计事件分钟报表
      */
     @Getter
     @Setter
-    @Schema(description = "温度计事件报表-分钟", name = "Event10100.EventMinute")
+    @Schema(description = "温度计事件分钟报表", name = "Event10100.EventMinute")
     public static class EventMinute extends com.demo.entity.protocol.Protocol.Default {
 
         /**
@@ -68,11 +69,11 @@ public class Event10100 {
     }
 
     /**
-     * 温度计事件报表-小时-日-月
+     * 温度计事件小时日月报表
      */
     @Getter
     @Setter
-    @Schema(description = "温度计事件报表-小时-日-月", name = "Event10100.EventHourDayMonth")
+    @Schema(description = "温度计事件小时日月报表", name = "Event10100.EventHourDayMonth")
     public static class EventHourDayMonth extends EventMinute {
 
         /**
