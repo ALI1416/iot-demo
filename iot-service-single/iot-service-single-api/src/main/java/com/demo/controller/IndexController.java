@@ -41,7 +41,7 @@ public class IndexController {
     @Operation(summary = "协议实体")
     public Result protocol(
             Frame frame, Protocol protocol, ProtocolInfo protocolInfo,
-            Event10100.Event event10100Event, Event10100.EventMinute event10100EventMinute, Event10100.EventHourDayMonth event10100EventHourDayMonth,
+            Event10100.Event event10100Event, Event10100.ReportMinute event10100ReportMinute, Event10100.ReportHourDayMonth event10100EventHourDayMonth,
             Interact30000.Request interact30000Request,
             Interact30100.Request interact30100Request,
             Interact40000.Response interact40000Response,

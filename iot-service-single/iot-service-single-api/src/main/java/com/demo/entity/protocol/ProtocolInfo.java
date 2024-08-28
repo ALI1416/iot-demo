@@ -120,25 +120,25 @@ public class ProtocolInfo extends ToStringBase {
      */
     @Schema(description = "事件分钟报表方法")
     @JSONField(serialize = false, deserialize = false)
-    private Function<List<ProtocolVo>, ProtocolVo> eventMinuteFunction;
+    private Function<List<ProtocolVo>, ProtocolVo> eventReportMinuteFunction;
     /**
      * 事件小时报表方法
      */
     @Schema(description = "事件小时报表方法")
     @JSONField(serialize = false, deserialize = false)
-    private Function<List<ProtocolVo>, ProtocolVo> eventHourFunction;
+    private Function<List<ProtocolVo>, ProtocolVo> eventReportHourFunction;
     /**
      * 事件日报表方法
      */
     @Schema(description = "事件日报表方法")
     @JSONField(serialize = false, deserialize = false)
-    private Function<List<ProtocolVo>, ProtocolVo> eventDayFunction;
+    private Function<List<ProtocolVo>, ProtocolVo> eventReportDayFunction;
     /**
      * 事件月报表方法
      */
     @Schema(description = "事件月报表方法")
     @JSONField(serialize = false, deserialize = false)
-    private Function<List<ProtocolVo>, ProtocolVo> eventMonthFunction;
+    private Function<List<ProtocolVo>, ProtocolVo> eventReportMonthFunction;
     /**
      * 请求类
      */
@@ -415,12 +415,12 @@ public class ProtocolInfo extends ToStringBase {
                 Class<? extends Protocol.ReportHandle> reportHandleClass = eventAnno.reportHandle();
                 try {
                     Protocol.ReportHandle handle = reportHandleClass.getConstructor().newInstance();
-                    protocolInfo.setEventMinuteFunction(handle::minute);
-                    protocolInfo.setEventHourFunction(handle::hour);
-                    protocolInfo.setEventDayFunction(handle::day);
-                    protocolInfo.setEventMonthFunction(handle::month);
+                    protocolInfo.setEventReportMinuteFunction(handle::minute);
+                    protocolInfo.setEventReportHourFunction(handle::hour);
+                    protocolInfo.setEventReportDayFunction(handle::day);
+                    protocolInfo.setEventReportMonthFunction(handle::month);
                 } catch (Exception e) {
-                    throw new RuntimeException("ProtocolAnno#event#reportHandle解析异常！", e);
+                    throw new RuntimeException(clazz.getName() + " 的注解 " + ProtocolAnno.Event.class.getName() + " 解析异常", e);
                 }
             }
             // 故障
@@ -433,7 +433,7 @@ public class ProtocolInfo extends ToStringBase {
                 try {
                     protocolInfo.setFault(faultClass.getConstructor().newInstance().fault());
                 } catch (Exception e) {
-                    throw new RuntimeException("ProtocolAnno#fault#fault解析异常！", e);
+                    throw new RuntimeException(clazz.getName() + " 的注解 " + ProtocolAnno.Fault.class.getName() + " 解析异常", e);
                 }
             }
             // 交互
@@ -457,7 +457,11 @@ public class ProtocolInfo extends ToStringBase {
                 }
             }
             if (protocolInfo.getType() == null) {
-                throw new RuntimeException("ProtocolAnno必须指定event/fault/interact");
+                throw new RuntimeException(clazz.getName() + " 的注解 " + ProtocolAnno.class.getName()
+                        + " 必须指定 " + ProtocolAnno.Event.class.getName()
+                        + " 或 " + ProtocolAnno.Fault.class.getName()
+                        + " 或 " + ProtocolAnno.Interact.class.getName()
+                );
             }
             list.add(protocolInfo);
         }

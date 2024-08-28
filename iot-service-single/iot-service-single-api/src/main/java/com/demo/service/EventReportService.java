@@ -6,7 +6,6 @@ import com.demo.base.ServiceBase;
 import com.demo.constant.ReportType;
 import com.demo.dao.mongo.EventDao;
 import com.demo.entity.protocol.Protocol;
-import com.demo.entity.vo.ProtocolVo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -57,17 +56,10 @@ public class EventReportService extends ServiceBase {
                     // 命令代码
                     .stream().collect(Collectors.groupingBy(Protocol::getCommandCode)).values().forEach(v ->
                             // 设备代码
-                            v.stream().collect(Collectors.groupingBy(Protocol::getDeviceSn)).values().forEach(list -> {
-                                ProtocolVo data = list.get(0);
-                                // 设置月、日、小时、分钟
-                                Calendar c = new Builder().setInstant(data.getCreateTime()).build();
-                                data.setMonth(c.get(Calendar.MONTH) + 1);
-                                data.setDay(c.get(Calendar.DAY_OF_MONTH));
-                                data.setHour(c.get(Calendar.HOUR_OF_DAY));
-                                data.setMinute(c.get(Calendar.MINUTE));
-                                // 插入报表
-                                eventDao.insertReport(data, gatewaySn, year, ReportType.MINUTE);
-                            })
+                            v.stream().collect(Collectors.groupingBy(Protocol::getDeviceSn)).values().forEach(list ->
+                                    // 插入报表
+                                    eventDao.insertReport(Protocol.getEventReportMinute(list), gatewaySn, year, ReportType.MINUTE)
+                            )
                     );
         }
     }
@@ -91,13 +83,10 @@ public class EventReportService extends ServiceBase {
                     // 命令代码
                     .stream().collect(Collectors.groupingBy(Protocol::getCommandCode)).values().forEach(v ->
                             // 设备代码
-                            v.stream().collect(Collectors.groupingBy(Protocol::getDeviceSn)).values().forEach(list -> {
-                                ProtocolVo data = list.get(0);
-                                // 清空分钟
-                                data.setMinute(null);
-                                // 插入报表
-                                eventDao.insertReport(data, gatewaySn, year, ReportType.HOUR);
-                            })
+                            v.stream().collect(Collectors.groupingBy(Protocol::getDeviceSn)).values().forEach(list ->
+                                    // 插入报表
+                                    eventDao.insertReport(Protocol.getEventReportHour(list), gatewaySn, year, ReportType.HOUR)
+                            )
                     );
         }
     }
@@ -120,13 +109,10 @@ public class EventReportService extends ServiceBase {
                     // 命令代码
                     .stream().collect(Collectors.groupingBy(Protocol::getCommandCode)).values().forEach(v ->
                             // 设备代码
-                            v.stream().collect(Collectors.groupingBy(Protocol::getDeviceSn)).values().forEach(list -> {
-                                ProtocolVo data = list.get(0);
-                                // 清空小时
-                                data.setHour(null);
-                                // 插入报表
-                                eventDao.insertReport(data, gatewaySn, year, ReportType.DAY);
-                            })
+                            v.stream().collect(Collectors.groupingBy(Protocol::getDeviceSn)).values().forEach(list ->
+                                    // 插入报表
+                                    eventDao.insertReport(Protocol.getEventReportDay(list), gatewaySn, year, ReportType.DAY)
+                            )
                     );
         }
     }
@@ -149,13 +135,10 @@ public class EventReportService extends ServiceBase {
                     // 命令代码
                     .stream().collect(Collectors.groupingBy(Protocol::getCommandCode)).values().forEach(v ->
                             // 设备代码
-                            v.stream().collect(Collectors.groupingBy(Protocol::getDeviceSn)).values().forEach(list -> {
-                                ProtocolVo data = list.get(0);
-                                // 清空日
-                                data.setDay(null);
-                                // 插入报表
-                                eventDao.insertReport(data, gatewaySn, year, ReportType.MONTH);
-                            })
+                            v.stream().collect(Collectors.groupingBy(Protocol::getDeviceSn)).values().forEach(list ->
+                                    // 插入报表
+                                    eventDao.insertReport(Protocol.getEventReportMonth(list), gatewaySn, year, ReportType.MONTH)
+                            )
                     );
         }
     }

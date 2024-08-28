@@ -8,7 +8,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Calendar;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * <h1>温度计事件</h1>
@@ -22,9 +24,9 @@ import java.util.List;
  **/
 @Schema(description = "温度计事件")
 @ProtocolAnno(code = 10100, name = "温度计事件", deviceType = DeviceType.THERMOMETER,
-        event = @ProtocolAnno.Event(event = Event10100.Event.class, reportMinute = Event10100.EventMinute.class,
-                reportHour = Event10100.EventHourDayMonth.class, reportDay = Event10100.EventHourDayMonth.class,
-                reportMonth = Event10100.EventHourDayMonth.class, reportHandle = Event10100.ReportHandle.class)
+        event = @ProtocolAnno.Event(event = Event10100.Event.class, reportMinute = Event10100.ReportMinute.class,
+                reportHour = Event10100.ReportHourDayMonth.class, reportDay = Event10100.ReportHourDayMonth.class,
+                reportMonth = Event10100.ReportHourDayMonth.class, reportHandle = Event10100.ReportHandle.class)
 )
 public class Event10100 {
 
@@ -63,8 +65,8 @@ public class Event10100 {
      */
     @Getter
     @Setter
-    @Schema(description = "温度计事件分钟报表", name = "Event10100.EventMinute")
-    public static class EventMinute extends Protocol.DefaultData {
+    @Schema(description = "温度计事件分钟报表", name = "Event10100.ReportMinute")
+    public static class ReportMinute extends Protocol.DefaultData {
 
         /**
          * 平均温度(0.0001℃ 0.0001摄氏度)
@@ -76,12 +78,12 @@ public class Event10100 {
     }
 
     /**
-     * 温度计事件小时日月报表
+     * 温度计事件小时/日/月报表
      */
     @Getter
     @Setter
-    @Schema(description = "温度计事件小时日月报表", name = "Event10100.EventHourDayMonth")
-    public static class EventHourDayMonth extends EventMinute {
+    @Schema(description = "温度计事件小时/日/月报表", name = "Event10100.ReportHourDayMonth")
+    public static class ReportHourDayMonth extends ReportMinute {
 
         /**
          * 最高温度(0.0001℃ 0.0001摄氏度)
@@ -111,7 +113,20 @@ public class Event10100 {
          */
         @Override
         public ProtocolVo minute(List<ProtocolVo> list) {
-            return null;
+            ProtocolVo data = list.get(0);
+            // 设置月、日、小时、分钟
+            Calendar c = new Calendar.Builder().setInstant(data.getCreateTime()).build();
+            data.setMonth(c.get(Calendar.MONTH) + 1);
+            data.setDay(c.get(Calendar.DAY_OF_MONTH));
+            data.setHour(c.get(Calendar.HOUR_OF_DAY));
+            data.setMinute(c.get(Calendar.MINUTE));
+            // 删除创建时间
+            data.setCreateTime(null);
+            // 计算
+            ReportMinute event = new ReportMinute();
+            event.setTemperatureAvg((int) Math.round(list.stream().mapToInt(m -> ((Event) m.getEvent()).temperature).average().getAsDouble()));
+            data.setEvent(event);
+            return data;
         }
 
         /**
@@ -122,7 +137,17 @@ public class Event10100 {
          */
         @Override
         public ProtocolVo hour(List<ProtocolVo> list) {
-            return null;
+            ProtocolVo data = list.get(0);
+            // 删除分钟
+            data.setMinute(null);
+            // 计算
+            ReportHourDayMonth event = new ReportHourDayMonth();
+            int[] intArray = list.stream().mapToInt(m -> ((ReportMinute) m.getEvent()).temperatureAvg).toArray();
+            event.setTemperatureAvg((int) Math.round(IntStream.of(intArray).average().getAsDouble()));
+            event.setTemperatureMax(IntStream.of(intArray).max().getAsInt());
+            event.setTemperatureMin(IntStream.of(intArray).min().getAsInt());
+            data.setEvent(event);
+            return data;
         }
 
         /**
@@ -133,7 +158,26 @@ public class Event10100 {
          */
         @Override
         public ProtocolVo day(List<ProtocolVo> list) {
-            return null;
+            ProtocolVo data = list.get(0);
+            // 删除小时
+            data.setHour(null);
+            // 计算
+            data.setEvent(getDayMonthEvent(list));
+            return data;
+        }
+
+        /**
+         * 获取日月事件
+         *
+         * @param list 小时/月报表
+         * @return 日/月事件
+         */
+        private static ReportHourDayMonth getDayMonthEvent(List<ProtocolVo> list) {
+            ReportHourDayMonth event = new ReportHourDayMonth();
+            event.setTemperatureAvg((int) Math.round(list.stream().mapToInt(m -> ((ReportHourDayMonth) m.getEvent()).getTemperatureAvg()).average().getAsDouble()));
+            event.setTemperatureMax(list.stream().mapToInt(m -> ((ReportHourDayMonth) m.getEvent()).temperatureMax).max().getAsInt());
+            event.setTemperatureMin(list.stream().mapToInt(m -> ((ReportHourDayMonth) m.getEvent()).temperatureMin).min().getAsInt());
+            return event;
         }
 
         /**
@@ -144,7 +188,12 @@ public class Event10100 {
          */
         @Override
         public ProtocolVo month(List<ProtocolVo> list) {
-            return null;
+            ProtocolVo data = list.get(0);
+            // 删除日
+            data.setDay(null);
+            // 计算
+            data.setEvent(getDayMonthEvent(list));
+            return data;
         }
 
     }

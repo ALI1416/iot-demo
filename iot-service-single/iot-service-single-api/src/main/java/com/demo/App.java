@@ -1,5 +1,6 @@
 package com.demo;
 
+import com.demo.entity.protocol.ProtocolInfo;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -40,6 +41,7 @@ import java.util.TimeZone;
 public class App {
 
     public static void main(String[] args) {
+        ProtocolInfo.getTable();
         // 默认时区：北京
         TimeZone.setDefault(TimeZone.getTimeZone("GMT+8"));
         SpringApplication.run(App.class, args);
