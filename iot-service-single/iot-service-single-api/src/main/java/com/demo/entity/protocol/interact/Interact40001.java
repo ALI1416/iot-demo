@@ -1,8 +1,12 @@
 package com.demo.entity.protocol.interact;
 
-import com.demo.announce.*;
+import com.demo.announce.DeviceType;
+import com.demo.announce.FieldAnno;
+import com.demo.announce.FieldStatusEnum;
+import com.demo.announce.ProtocolAnno;
 import com.demo.base.ControllerBase;
 import com.demo.base.ToStringBase;
+import com.demo.entity.protocol.Protocol;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +24,9 @@ import java.util.List;
  * @since 1.0.0
  **/
 @Schema(description = "获取网关配置")
-@Protocol(code = 40001, name = "获取网关配置", type = ProtocolType.INTERACT, deviceType = DeviceType.GATEWAY, response = Interact40001.Response.class)
+@ProtocolAnno(code = 40001, name = "获取网关配置", deviceType = DeviceType.GATEWAY,
+        interact = @ProtocolAnno.Interact(response = Interact40001.Response.class)
+)
 public class Interact40001 {
 
     private Interact40001() {
@@ -32,13 +38,13 @@ public class Interact40001 {
     @Getter
     @Setter
     @Schema(description = "响应", name = "Interact40001.Response")
-    public static class Response extends ToStringBase implements com.demo.entity.protocol.Protocol.Data {
+    public static class Response extends ToStringBase implements Protocol.Data {
 
         /**
          * 设备列表
          */
         @Schema(description = "设备列表")
-        @Field(name = "设备列表")
+        @FieldAnno(name = "设备列表")
         private List<Device> deviceList;
 
         /**
@@ -65,7 +71,7 @@ public class Interact40001 {
          * 设备序号
          */
         @Schema(description = "设备序号")
-        @Field(name = "设备序号")
+        @FieldAnno(name = "设备序号")
         private Integer sn;
         /**
          * 设备类型 0网关 1温度计
@@ -73,7 +79,7 @@ public class Interact40001 {
          * @see DeviceType
          */
         @Schema(description = "设备类型 0网关 1温度计")
-        @Field(name = "设备类型", status = FieldStatusEnum.DEVICE_TYPE)
+        @FieldAnno(name = "设备类型", status = FieldStatusEnum.DEVICE_TYPE)
         private Integer type;
 
     }

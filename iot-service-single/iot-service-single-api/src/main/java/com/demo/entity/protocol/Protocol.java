@@ -2,7 +2,7 @@ package com.demo.entity.protocol;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.demo.announce.ProtocolType;
+import com.demo.constant.ProtocolType;
 import com.demo.base.MongoEntityBase;
 import com.demo.base.ToStringBase;
 import com.demo.constant.InteractType;
@@ -165,10 +165,10 @@ public class Protocol extends MongoEntityBase {
     }
 
     /**
-     * 事件报表处理
+     * 报表处理
      */
-    @Schema(description = "事件报表处理", name = "Protocol.EventReportHandle")
-    public interface EventReportHandle {
+    @Schema(description = "报表处理", name = "Protocol.ReportHandle")
+    public interface ReportHandle {
 
         /**
          * 分钟报表处理
@@ -205,10 +205,10 @@ public class Protocol extends MongoEntityBase {
     }
 
     /**
-     * 默认事件报表处理
+     * 默认报表处理
      */
-    @Schema(description = "默认事件报表处理", name = "Protocol.DefaultEventReportHandle")
-    public static class DefaultEventReportHandle implements EventReportHandle {
+    @Schema(description = "默认报表处理", name = "Protocol.DefaultReportHandle")
+    public static class DefaultReportHandle implements ReportHandle {
 
         /**
          * 分钟报表处理

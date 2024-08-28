@@ -4,6 +4,7 @@ import cn.z.tool.ClassScanner;
 import com.alibaba.fastjson2.annotation.JSONField;
 import com.demo.announce.*;
 import com.demo.base.ToStringBase;
+import com.demo.constant.ProtocolType;
 import com.demo.entity.pojo.GlobalException;
 import com.demo.entity.vo.ProtocolVo;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,7 +12,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -28,6 +31,7 @@ import java.util.function.Function;
  * @author ALI[ali-k@foxmail.com]
  * @since 1.0.0
  **/
+@Slf4j
 @Getter
 @Setter
 @Schema(description = "协议信息")
@@ -65,44 +69,44 @@ public class ProtocolInfo extends ToStringBase {
     private String comment;
 
     /**
-     * 事件
+     * 事件字段信息列表
      */
-    @Schema(description = "事件")
+    @Schema(description = "事件字段信息列表")
     private List<FieldInfo> event;
     /**
-     * 事件分钟报表
+     * 事件分钟报表字段信息列表
      */
-    @Schema(description = "事件分钟报表")
+    @Schema(description = "事件分钟报表字段信息列表")
     private List<FieldInfo> eventMinute;
     /**
-     * 事件小时报表
+     * 事件小时报表字段信息列表
      */
-    @Schema(description = "事件小时报表")
+    @Schema(description = "事件小时报表字段信息列表")
     private List<FieldInfo> eventHour;
     /**
-     * 事件日报表
+     * 事件日报表字段信息列表
      */
-    @Schema(description = "事件日报表")
+    @Schema(description = "事件日报表字段信息列表")
     private List<FieldInfo> eventDay;
     /**
-     * 事件月报表
+     * 事件月报表字段信息列表
      */
-    @Schema(description = "事件月报表")
+    @Schema(description = "事件月报表字段信息列表")
     private List<FieldInfo> eventMonth;
     /**
-     * 故障
+     * 故障信息列表
      */
-    @Schema(description = "故障")
+    @Schema(description = "故障信息列表")
     private FaultInfo[] fault;
     /**
-     * 请求
+     * 请求字段信息列表
      */
-    @Schema(description = "请求")
+    @Schema(description = "请求字段信息列表")
     private List<FieldInfo> request;
     /**
-     * 响应
+     * 响应字段信息列表
      */
-    @Schema(description = "响应")
+    @Schema(description = "响应字段信息列表")
     private List<FieldInfo> response;
 
     /**
@@ -361,84 +365,99 @@ public class ProtocolInfo extends ToStringBase {
         Set<Class<?>> classSet = ClassScanner.getClass(packageName);
         for (Class<?> clazz : classSet) {
             // 含注解的类
-            com.demo.announce.Protocol protocol = clazz.getAnnotation(com.demo.announce.Protocol.class);
-            if (protocol == null) {
+            ProtocolAnno protocolAnno = clazz.getAnnotation(ProtocolAnno.class);
+            if (protocolAnno == null) {
                 continue;
             }
             ProtocolInfo protocolInfo = new ProtocolInfo();
             // 命令代码
-            protocolInfo.setCommandCode(protocol.code());
+            protocolInfo.setCommandCode(protocolAnno.code());
             // 命令名
-            protocolInfo.setName(protocol.name());
-            // 协议类型
-            protocolInfo.setType(protocol.type());
+            protocolInfo.setName(protocolAnno.name());
             // 设备类型
-            protocolInfo.setDeviceType(protocol.deviceType());
+            protocolInfo.setDeviceType(protocolAnno.deviceType());
             // 特殊处理
-            if (protocol.special()) {
+            if (protocolAnno.special()) {
                 protocolInfo.setSpecial(true);
             }
             // 备注
-            if (!protocol.comment().isEmpty()) {
-                protocolInfo.setComment(protocol.comment());
+            if (!protocolAnno.comment().isEmpty()) {
+                protocolInfo.setComment(protocolAnno.comment());
             }
             // 事件
-            Class<? extends Protocol.Data> eventClass = protocol.event();
-            if (eventClass != Protocol.DefaultData.class) {
+            ProtocolAnno.Event eventAnno = protocolAnno.event();
+            if (eventAnno.event() != Protocol.DefaultData.class
+                    && eventAnno.reportMinute() != Protocol.DefaultData.class
+                    && eventAnno.reportHour() != Protocol.DefaultData.class
+                    && eventAnno.reportDay() != Protocol.DefaultData.class
+                    && eventAnno.reportMonth() != Protocol.DefaultData.class
+                    && eventAnno.reportHandle() != Protocol.DefaultReportHandle.class
+            ) {
+                // 协议类型
+                protocolInfo.setType(ProtocolType.EVENT);
+                // 全部数据类
+                Class<? extends Protocol.Data> eventClass = eventAnno.event();
                 protocolInfo.setEvent(getFieldInfo(eventClass));
                 protocolInfo.setEventClass(eventClass);
-            }
-            // 事件分钟报表
-            Class<? extends Protocol.Data> eventMinuteClass = protocol.eventMinute();
-            if (eventMinuteClass != Protocol.DefaultData.class) {
-                protocolInfo.setEventMinute(getFieldInfo(eventMinuteClass));
-            }
-            // 事件小时报表
-            Class<? extends Protocol.Data> eventHourClass = protocol.eventHour();
-            if (eventHourClass != Protocol.DefaultData.class) {
-                protocolInfo.setEventHour(getFieldInfo(eventHourClass));
-            }
-            // 事件日报表
-            Class<? extends Protocol.Data> eventDayClass = protocol.eventDay();
-            if (eventDayClass != Protocol.DefaultData.class) {
-                protocolInfo.setEventDay(getFieldInfo(eventDayClass));
-            }
-            // 事件月报表
-            Class<? extends Protocol.Data> eventMonthClass = protocol.eventMonth();
-            if (eventMonthClass != Protocol.DefaultData.class) {
-                protocolInfo.setEventMonth(getFieldInfo(eventMonthClass));
-            }
-            // 事件报表处理
-            Class<? extends Protocol.EventReportHandle> eventReportHandleClass = protocol.eventReportHandle();
-            if (eventReportHandleClass != Protocol.EventReportHandle.class) {
+                // 分钟报表类
+                Class<? extends Protocol.Data> reportMinuteClass = eventAnno.reportMinute();
+                protocolInfo.setEventMinute(getFieldInfo(reportMinuteClass));
+                // 小时报表类
+                Class<? extends Protocol.Data> reportHourClass = eventAnno.reportHour();
+                protocolInfo.setEventHour(getFieldInfo(reportHourClass));
+                // 日报表类
+                Class<? extends Protocol.Data> reportDayClass = eventAnno.reportDay();
+                protocolInfo.setEventDay(getFieldInfo(reportDayClass));
+                // 月报表类
+                Class<? extends Protocol.Data> reportMonthClass = eventAnno.reportMonth();
+                protocolInfo.setEventMonth(getFieldInfo(reportMonthClass));
+                // 报表处理类
+                Class<? extends Protocol.ReportHandle> reportHandleClass = eventAnno.reportHandle();
                 try {
-                    Protocol.EventReportHandle handle = eventReportHandleClass.getConstructor().newInstance();
+                    Protocol.ReportHandle handle = reportHandleClass.getConstructor().newInstance();
                     protocolInfo.setEventMinuteFunction(handle::minute);
                     protocolInfo.setEventHourFunction(handle::hour);
                     protocolInfo.setEventDayFunction(handle::day);
                     protocolInfo.setEventMonthFunction(handle::month);
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                    throw new RuntimeException("ProtocolAnno#event#reportHandle解析异常！", e);
                 }
             }
             // 故障
-            Class<? extends Protocol.Fault> faultClass = protocol.fault();
-            if (faultClass != Protocol.DefaultFault.class) {
+            ProtocolAnno.Fault faultAnno = protocolAnno.fault();
+            if (faultAnno.fault() != Protocol.DefaultFault.class) {
+                // 协议类型
+                protocolInfo.setType(ProtocolType.FAULT);
+                // 故障类
+                Class<? extends Protocol.Fault> faultClass = faultAnno.fault();
                 try {
                     protocolInfo.setFault(faultClass.getConstructor().newInstance().fault());
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                    throw new RuntimeException("ProtocolAnno#fault#fault解析异常！", e);
                 }
             }
-            // 请求
-            Class<? extends Protocol.Data> requestClass = protocol.request();
-            if (requestClass != Protocol.DefaultData.class) {
-                protocolInfo.setRequest(getFieldInfo(requestClass));
-                protocolInfo.setRequestClass(requestClass);
+            // 交互
+            ProtocolAnno.Interact interactAnno = protocolAnno.interact();
+            if (interactAnno.request() != Protocol.DefaultData.class
+                    || interactAnno.response() != Protocol.DefaultData.class
+            ) {
+                // 协议类型
+                protocolInfo.setType(ProtocolType.INTERACT);
+                // 请求类
+                Class<? extends Protocol.Data> requestClass = interactAnno.request();
+                if (requestClass != Protocol.DefaultData.class) {
+                    protocolInfo.setRequest(getFieldInfo(requestClass));
+                    protocolInfo.setRequestClass(requestClass);
+                }
+                // 响应类
+                Class<? extends Protocol.Data> responseClass = interactAnno.response();
+                if (responseClass != Protocol.DefaultData.class) {
+                    protocolInfo.setResponse(getFieldInfo(responseClass));
+                    protocolInfo.setResponseClass(responseClass);
+                }
             }
-            // 响应
-            Class<? extends Protocol.Data> responseClass = protocol.response();
-            if (responseClass != Protocol.DefaultData.class) {
-                protocolInfo.setResponse(getFieldInfo(responseClass));
-                protocolInfo.setResponseClass(responseClass);
+            if (protocolInfo.getType() == null) {
+                throw new RuntimeException("ProtocolAnno必须指定event/fault/interact");
             }
             list.add(protocolInfo);
         }
@@ -470,15 +489,15 @@ public class ProtocolInfo extends ToStringBase {
      * @param fieldArray 字段数组
      * @return 字段信息列表
      */
-    private static List<FieldInfo> getFieldArrayFieldInfo(java.lang.reflect.Field[] fieldArray) {
+    private static List<FieldInfo> getFieldArrayFieldInfo(Field[] fieldArray) {
         List<FieldInfo> list = new ArrayList<>();
-        for (java.lang.reflect.Field field : fieldArray) {
+        for (Field field : fieldArray) {
             // 含注解的字段
-            Field field1 = field.getAnnotation(Field.class);
-            if (field1 == null) {
+            FieldAnno fieldAnno = field.getAnnotation(FieldAnno.class);
+            if (fieldAnno == null) {
                 continue;
             }
-            list.add(getFieldInfo(field.getName(), field.getGenericType(), field1));
+            list.add(getFieldInfo(field.getName(), field.getGenericType(), fieldAnno));
         }
         return list;
     }
@@ -486,23 +505,23 @@ public class ProtocolInfo extends ToStringBase {
     /**
      * 获取字段信息
      *
-     * @param key   字段键
-     * @param type  Type
-     * @param field Field
+     * @param key       字段键
+     * @param type      Type
+     * @param fieldAnno Field
      * @return 字段信息
      */
-    private static FieldInfo getFieldInfo(String key, Type type, Field field) {
+    private static FieldInfo getFieldInfo(String key, Type type, FieldAnno fieldAnno) {
         FieldInfo fieldInfo = new FieldInfo();
         // 字段键
         fieldInfo.setKey(key);
         // 字段名
-        fieldInfo.setName(field.name());
+        fieldInfo.setName(fieldAnno.name());
         if (type instanceof ParameterizedType parameterizedType) {
             // 泛型 例如List<Integer>
             if (Collection.class.isAssignableFrom((Class<?>) (parameterizedType.getRawType()))) {
                 // 集合类型
                 fieldInfo.setDataType(FieldDataType.ARRAY);
-                fieldInfo.setChild(getFieldInfo(null, parameterizedType.getActualTypeArguments()[0], field));
+                fieldInfo.setChild(getFieldInfo(null, parameterizedType.getActualTypeArguments()[0], fieldAnno));
             } else {
                 // 非集合类型
                 throw new GlobalException("字段 [" + key + "] 泛型形参类型 [ " + type + " ] 为 非集合类型");
@@ -510,13 +529,13 @@ public class ProtocolInfo extends ToStringBase {
         } else if (type instanceof GenericArrayType genericArrayType) {
             // 泛型数组 例如List<Integer>[]
             fieldInfo.setDataType(FieldDataType.ARRAY);
-            fieldInfo.setChild(getFieldInfo(null, genericArrayType.getGenericComponentType(), field));
+            fieldInfo.setChild(getFieldInfo(null, genericArrayType.getGenericComponentType(), fieldAnno));
         } else if (type instanceof Class<?> clazz) {
             // 普通数组类型、非数组类型 例如int[]、int
             if (clazz.isArray()) {
                 // 数组类型
                 fieldInfo.setDataType(FieldDataType.ARRAY);
-                fieldInfo.setChild(getFieldInfo(null, clazz.getComponentType(), field));
+                fieldInfo.setChild(getFieldInfo(null, clazz.getComponentType(), fieldAnno));
             } else {
                 // 非数组类型
                 fieldInfo.setDataType(getDataType(clazz));
@@ -525,7 +544,7 @@ public class ProtocolInfo extends ToStringBase {
                     fieldInfo.setChildren(getFieldInfo(clazz));
                 } else {
                     // 普通类型
-                    setNormalTypeData(fieldInfo, field);
+                    setNormalTypeData(fieldInfo, fieldAnno);
                 }
             }
         } else {
@@ -539,60 +558,60 @@ public class ProtocolInfo extends ToStringBase {
      * 设置普通类型数据
      *
      * @param fieldInfo ProtocolInfo.Data
-     * @param field     ProtocolField
+     * @param fieldAnno ProtocolField
      */
-    private static void setNormalTypeData(FieldInfo fieldInfo, Field field) {
+    private static void setNormalTypeData(FieldInfo fieldInfo, FieldAnno fieldAnno) {
         // 字段类型
-        if (field.type() != FieldType.NULL) {
-            fieldInfo.setType(field.type());
+        if (fieldAnno.type() != FieldType.NULL) {
+            fieldInfo.setType(fieldAnno.type());
         }
         // 字段特殊数据类型
-        if (field.specialDataType() != FieldSpecialDataType.DEFAULT) {
-            fieldInfo.setSpecialDataType(field.specialDataType());
+        if (fieldAnno.specialDataType() != FieldSpecialDataType.DEFAULT) {
+            fieldInfo.setSpecialDataType(fieldAnno.specialDataType());
         }
         // 字段单位
-        if (field.unit() != FieldUnitEnum.NONE) {
-            fieldInfo.setUnit(field.unit().getFieldUnit());
+        if (fieldAnno.unit() != FieldUnitEnum.NONE) {
+            fieldInfo.setUnit(fieldAnno.unit().getFieldUnit());
         }
         // 推荐字段单位
-        if (field.recommend() != FieldUnitEnum.NONE) {
-            fieldInfo.setRecommend(field.recommend().getFieldUnit());
+        if (fieldAnno.recommend() != FieldUnitEnum.NONE) {
+            fieldInfo.setRecommend(fieldAnno.recommend().getFieldUnit());
         }
         // 推荐字段单位转换-乘以
-        if (field.multiply() != 1) {
-            fieldInfo.setMultiply(field.multiply());
+        if (fieldAnno.multiply() != 1) {
+            fieldInfo.setMultiply(fieldAnno.multiply());
         }
         // 推荐字段单位转换-除以
-        if (field.divide() != 1) {
-            fieldInfo.setDivide(field.divide());
+        if (fieldAnno.divide() != 1) {
+            fieldInfo.setDivide(fieldAnno.divide());
         }
         // 字段状态
-        if (field.status() != FieldStatusEnum.NULL) {
-            fieldInfo.setStatus(field.status().getStatus());
+        if (fieldAnno.status() != FieldStatusEnum.NULL) {
+            fieldInfo.setStatus(fieldAnno.status().getStatus());
         }
         // 最大值
-        if (!field.max().isEmpty()) {
-            fieldInfo.setMax(field.max());
+        if (!fieldAnno.max().isEmpty()) {
+            fieldInfo.setMax(fieldAnno.max());
         }
         // 最小值
-        if (!field.min().isEmpty()) {
-            fieldInfo.setMin(field.min());
+        if (!fieldAnno.min().isEmpty()) {
+            fieldInfo.setMin(fieldAnno.min());
         }
         // 最大字符长度
-        if (field.maxLength() != Integer.MAX_VALUE) {
-            fieldInfo.setMaxLength(field.maxLength());
+        if (fieldAnno.maxLength() != Integer.MAX_VALUE) {
+            fieldInfo.setMaxLength(fieldAnno.maxLength());
         }
         // 最小字符长度
-        if (field.minLength() != 0) {
-            fieldInfo.setMinLength(field.minLength());
+        if (fieldAnno.minLength() != 0) {
+            fieldInfo.setMinLength(fieldAnno.minLength());
         }
         // 特殊处理
-        if (field.special()) {
+        if (fieldAnno.special()) {
             fieldInfo.setSpecial(true);
         }
         // 备注
-        if (!field.comment().isEmpty()) {
-            fieldInfo.setComment(field.comment());
+        if (!fieldAnno.comment().isEmpty()) {
+            fieldInfo.setComment(fieldAnno.comment());
         }
     }
 

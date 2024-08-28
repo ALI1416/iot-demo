@@ -1,4 +1,4 @@
-package com.demo.announce;
+package com.demo.constant;
 
 /**
  * <h1>协议类型</h1>

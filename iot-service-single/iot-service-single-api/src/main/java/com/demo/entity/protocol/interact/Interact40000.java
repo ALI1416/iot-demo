@@ -1,8 +1,8 @@
 package com.demo.entity.protocol.interact;
 
 import com.demo.announce.DeviceType;
-import com.demo.announce.Protocol;
-import com.demo.announce.ProtocolType;
+import com.demo.announce.ProtocolAnno;
+import com.demo.entity.protocol.Protocol;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
@@ -16,7 +16,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @since 1.0.0
  **/
 @Schema(description = "获取通信地址")
-@Protocol(code = 40000, name = "获取通信地址", type = ProtocolType.INTERACT, deviceType = DeviceType.GATEWAY, response = Interact40000.Response.class)
+@ProtocolAnno(code = 40000, name = "获取通信地址", deviceType = DeviceType.GATEWAY,
+        interact = @ProtocolAnno.Interact(response = Interact40000.Response.class)
+)
 public class Interact40000 {
 
     private Interact40000() {
@@ -26,7 +28,7 @@ public class Interact40000 {
      * 响应
      */
     @Schema(description = "响应", name = "Interact40000.Response")
-    public static class Response extends Interact30000.Request implements com.demo.entity.protocol.Protocol.Data {
+    public static class Response extends Interact30000.Request implements Protocol.Data {
     }
 
 }

@@ -1,8 +1,8 @@
 package com.demo.entity.protocol.fault;
 
 import com.demo.announce.DeviceType;
-import com.demo.announce.Protocol;
-import com.demo.announce.ProtocolType;
+import com.demo.announce.ProtocolAnno;
+import com.demo.entity.protocol.Protocol;
 import com.demo.entity.protocol.ProtocolInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -17,7 +17,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @since 1.0.0
  **/
 @Schema(description = "温度计故障")
-@Protocol(code = 20100, name = "温度计故障", type = ProtocolType.FAULT, deviceType = DeviceType.THERMOMETER, fault = Fault20100.Fault.class)
+@ProtocolAnno(code = 20100, name = "温度计故障", deviceType = DeviceType.THERMOMETER,
+        fault = @ProtocolAnno.Fault(fault = Fault20100.Fault.class)
+)
 public class Fault20100 {
 
     private Fault20100() {
@@ -26,7 +28,7 @@ public class Fault20100 {
     /**
      * 温度计故障
      */
-    public static class Fault implements com.demo.entity.protocol.Protocol.Fault {
+    public static class Fault implements Protocol.Fault {
 
         /**
          * 故障数组

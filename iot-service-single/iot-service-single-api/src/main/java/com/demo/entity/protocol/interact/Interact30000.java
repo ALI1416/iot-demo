@@ -1,11 +1,11 @@
 package com.demo.entity.protocol.interact;
 
 import com.demo.announce.DeviceType;
-import com.demo.announce.Field;
-import com.demo.announce.Protocol;
-import com.demo.announce.ProtocolType;
+import com.demo.announce.FieldAnno;
+import com.demo.announce.ProtocolAnno;
 import com.demo.base.ControllerBase;
 import com.demo.base.ToStringBase;
+import com.demo.entity.protocol.Protocol;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +21,9 @@ import lombok.Setter;
  * @since 1.0.0
  **/
 @Schema(description = "设置通信地址")
-@Protocol(code = 30000, name = "设置通信地址", type = ProtocolType.INTERACT, deviceType = DeviceType.GATEWAY, request = Interact30000.Request.class)
+@ProtocolAnno(code = 30000, name = "设置通信地址", deviceType = DeviceType.GATEWAY,
+        interact = @ProtocolAnno.Interact(request = Interact30000.Request.class)
+)
 public class Interact30000 {
 
     private Interact30000() {
@@ -33,25 +35,25 @@ public class Interact30000 {
     @Getter
     @Setter
     @Schema(description = "请求", name = "Interact30000.Request")
-    public static class Request extends ToStringBase implements com.demo.entity.protocol.Protocol.Data {
+    public static class Request extends ToStringBase implements Protocol.Data {
 
         /**
          * URI
          */
         @Schema(description = "URI")
-        @Field(name = "URI")
+        @FieldAnno(name = "URI")
         private String uri;
         /**
          * 用户名
          */
         @Schema(description = "用户名")
-        @Field(name = "用户名")
+        @FieldAnno(name = "用户名")
         private String username;
         /**
          * 密码
          */
         @Schema(description = "密码")
-        @Field(name = "密码")
+        @FieldAnno(name = "密码")
         private String password;
 
         /**
