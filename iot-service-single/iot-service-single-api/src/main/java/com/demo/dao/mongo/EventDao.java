@@ -49,6 +49,32 @@ public class EventDao extends DaoBase {
     }
 
     /**
+     * 查询(倒序)
+     *
+     * @param gatewaySn       网关序号
+     * @param deviceSn        设备序号
+     * @param commandCode     命令代码
+     * @param year            年
+     * @param month           月
+     * @param createTimeStart 起始时间(包含)
+     * @param createTimeEnd   结束时间(不包含)
+     * @return List ProtocolVo
+     */
+    public List<ProtocolVo> find(int gatewaySn, Integer deviceSn, Integer commandCode, int year, int month, Timestamp createTimeStart, Timestamp createTimeEnd) {
+        Criteria criteria = new Criteria();
+        criteria.and("createTime").gte(createTimeStart).lt(createTimeEnd);
+        if (deviceSn != null) {
+            criteria.and("deviceSn").is(deviceSn);
+        }
+        if (commandCode != null) {
+            criteria.and("commandCode").is(commandCode);
+        }
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        Query query = Query.query(criteria).with(sort);
+        return mongoTemp.find(query, CLAZZ, MongoConstant.getEventCollectionName(gatewaySn, year, month));
+    }
+
+    /**
      * 插入报表
      *
      * @param protocol   ProtocolVo
@@ -61,65 +87,76 @@ public class EventDao extends DaoBase {
     }
 
     /**
-     * 查询(倒序)
+     * 构造Query
      *
-     * @param gatewaySn       网关序号
-     * @param year            年
-     * @param month           月
-     * @param createTimeStart 起始时间(包含)
-     * @param createTimeEnd   结束时间(不包含)
-     * @return List ProtocolVo
+     * @param deviceSn    设备序号
+     * @param commandCode 命令代码
+     * @param month       月
+     * @param day         日
+     * @param hour        小时
+     * @param minute      分钟
+     * @return Query
      */
-    public List<ProtocolVo> find(int gatewaySn, int year, int month, Timestamp createTimeStart, Timestamp createTimeEnd) {
+    public static Query buildQuery(Integer deviceSn, Integer commandCode, Integer month, Integer day, Integer hour, Integer minute) {
         Criteria criteria = new Criteria();
-        criteria.and("createTime").gte(createTimeStart).lt(createTimeEnd);
+        if (deviceSn != null) {
+            criteria.and("deviceSn").is(deviceSn);
+        }
+        if (commandCode != null) {
+            criteria.and("commandCode").is(commandCode);
+        }
+        if (month != null) {
+            criteria.and("month").is(month);
+            if (day != null) {
+                criteria.and("day").is(day);
+                if (hour != null) {
+                    criteria.and("hour").is(hour);
+                    if (minute != null) {
+                        criteria.and("minute").is(minute);
+                    }
+                }
+            }
+        }
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
-        Query query = Query.query(criteria).with(sort);
-        return mongoTemp.find(query, CLAZZ, MongoConstant.getEventCollectionName(gatewaySn, year, month));
+        return Query.query(criteria).with(sort);
     }
 
     /**
      * 查询报表(倒序)
      *
-     * @param gatewaySn  网关序号
-     * @param year       年
-     * @param month      月
-     * @param day        日
-     * @param hour       小时
-     * @param minute     分钟
-     * @param reportType 报表类型
+     * @param gatewaySn   网关序号
+     * @param deviceSn    设备序号
+     * @param commandCode 命令代码
+     * @param year        年
+     * @param month       月
+     * @param day         日
+     * @param hour        小时
+     * @param minute      分钟
+     * @param reportType  报表类型
      * @return List ProtocolVo
      */
-    public List<ProtocolVo> findReport(int gatewaySn, int year, Integer month, Integer day, Integer hour, Integer minute, ReportType reportType) {
-        Criteria criteria = new Criteria();
-        if (month != null) {
-            criteria.and("month").is(month);
-        }
-        if (day != null) {
-            criteria.and("day").is(day);
-        }
-        if (hour != null) {
-            criteria.and("hour").is(hour);
-        }
-        if (minute != null) {
-            criteria.and("minute").is(minute);
-        }
-        Sort sort = Sort.by(Sort.Direction.DESC, "id");
-        Query query = Query.query(criteria).with(sort);
+    public List<ProtocolVo> findReport(int gatewaySn, Integer deviceSn, Integer commandCode, int year, Integer month, Integer day, Integer hour, Integer minute, ReportType reportType) {
+        Query query = buildQuery(deviceSn, commandCode, month, day, hour, minute);
         return mongoTemp.find(query, CLAZZ, MongoConstant.getEventReportCollectionName(gatewaySn, year, reportType));
     }
 
     /**
-     * 查询报表
+     * 删除报表
      *
-     * @param query      Query
-     * @param gatewaySn  网关序号
-     * @param year       年
-     * @param reportType 报表类型
-     * @return List ProtocolVo
+     * @param gatewaySn   网关序号
+     * @param deviceSn    设备序号
+     * @param commandCode 命令代码
+     * @param year        年
+     * @param month       月
+     * @param day         日
+     * @param hour        小时
+     * @param minute      分钟
+     * @param reportType  报表类型
+     * @return 删除条数
      */
-    public List<ProtocolVo> findReport(Query query, int gatewaySn, int year, ReportType reportType) {
-        return mongoTemp.find(query, CLAZZ, MongoConstant.getEventReportCollectionName(gatewaySn, year, reportType));
+    public long deleteReport(int gatewaySn, Integer deviceSn, Integer commandCode, int year, Integer month, Integer day, Integer hour, Integer minute, ReportType reportType) {
+        Query query = buildQuery(deviceSn, commandCode, month, day, hour, minute);
+        return mongoTemp.delete(query, MongoConstant.getEventReportCollectionName(gatewaySn, year, reportType));
     }
 
     /**

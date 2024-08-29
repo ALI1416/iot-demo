@@ -67,7 +67,7 @@ public class DeviceController extends ControllerBase {
     @GetMapping("findByGatewaySn")
     @Operation(summary = "查询通过网关序号")
     @Parameter(name = "gatewaySn", description = "网关序号")
-    public Result<List<DeviceVo>> findByGatewaySn(long gatewaySn) {
+    public Result<List<DeviceVo>> findByGatewaySn(int gatewaySn) {
         return Result.o(deviceService.findByGatewaySn(gatewaySn));
     }
 

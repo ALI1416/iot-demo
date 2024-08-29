@@ -66,7 +66,7 @@ public class GatewayService extends ServiceBase {
      * @return GatewayVo
      */
     public GatewayVo findBySn(int sn) {
-        return gatewayDao.findById(sn);
+        return gatewayDao.findBySn(sn);
     }
 
     /**

@@ -54,7 +54,17 @@ public class DeviceService extends ServiceBase {
      * @return DeviceVo
      */
     public DeviceVo findBySn(int sn) {
-        return deviceDao.findById(sn);
+        return deviceDao.findBySn(sn);
+    }
+
+    /**
+     * 查询通过gatewaySn
+     *
+     * @param gatewaySn gatewaySn
+     * @return List DeviceVo
+     */
+    public List<DeviceVo> findByGatewaySn(int gatewaySn) {
+        return deviceDao.findByGatewaySn(gatewaySn);
     }
 
     /**
@@ -65,16 +75,6 @@ public class DeviceService extends ServiceBase {
      */
     public PageInfo<DeviceVo> find(DeviceVo device) {
         return pagination(() -> deviceDao.find(device), device.getPages(), device.getRows(), device.getOrderBy());
-    }
-
-    /**
-     * 查询通过gatewaySn
-     *
-     * @param gatewaySn gatewaySn
-     * @return List DeviceVo
-     */
-    public List<DeviceVo> findByGatewaySn(long gatewaySn) {
-        return deviceDao.findByGatewaySn(gatewaySn);
     }
 
 }

@@ -25,7 +25,7 @@ public class Device extends EntityBase {
      * 网关id
      */
     @Schema(description = "网关id")
-    private Integer gatewayId;
+    private Long gatewayId;
     /**
      * 设备序号
      */

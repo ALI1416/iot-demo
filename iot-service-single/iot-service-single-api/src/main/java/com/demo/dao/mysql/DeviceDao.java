@@ -79,7 +79,7 @@ public class DeviceDao extends DaoBase {
      * @param gatewaySn gatewaySn
      * @return List DeviceVo
      */
-    public List<DeviceVo> findByGatewaySn(long gatewaySn) {
+    public List<DeviceVo> findByGatewaySn(int gatewaySn) {
         return deviceMapper.findByGatewaySn(gatewaySn);
     }
 

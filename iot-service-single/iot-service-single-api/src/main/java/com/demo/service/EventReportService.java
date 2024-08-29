@@ -49,85 +49,179 @@ public class EventReportService extends ServiceBase {
         int day = calendar.get(DAY_OF_MONTH);
         int hour = calendar.get(HOUR_OF_DAY);
         int minute = calendar.get(MINUTE);
-        reportMinute(year, month, day, hour, minute);
+        reportMinute(null, null, null, year, month, day, hour, minute);
     }
 
     /**
      * 分钟报表
      *
-     * @param year   年
-     * @param month  月
-     * @param day    日
-     * @param hour   小时
-     * @param minute 分钟
+     * @param gatewaySn   网关序号
+     * @param deviceSn    设备序号<br>
+     *                    null 所有设备
+     * @param commandCode 命令代码<br>
+     *                    null 所有命令
+     * @param year        年
+     * @param month       月
+     * @param day         日
+     * @param hour        小时
+     * @param minute      分钟
      */
-    public void reportMinute(int year, int month, int day, int hour, int minute) {
+    private void reportMinuteInner(int gatewaySn, Integer deviceSn, Integer commandCode, int year, int month, int day, int hour, int minute) {
         // 这一分钟的0秒0毫秒
         long timestampStart = DateUtils.getTimestamp(year, month, day, hour, minute, 0, 0);
         Timestamp createTimeStart = new Timestamp(timestampStart);
         // 下一分钟的0秒0毫秒
         Timestamp createTimeEnd = new Timestamp(timestampStart + TimestampUtils.MILLS_OF_MINUTE);
-        for (int gatewaySn : GatewayService.getGatewaySnList()) {
-            // 全部数据
-            eventDao.find(gatewaySn, year, month, createTimeStart, createTimeEnd)
-                    // 命令代码
-                    .stream().collect(Collectors.groupingBy(Protocol::getCommandCode)).values().forEach(v ->
-                            // 设备代码
-                            v.stream().collect(Collectors.groupingBy(Protocol::getDeviceSn)).values().forEach(list ->
-                                    // 插入报表
-                                    eventDao.insertReport(Protocol.getEventReportMinute(list), gatewaySn, year, ReportType.MINUTE)
-                            )
-                    );
-        }
+        // 全部数据
+        eventDao.find(gatewaySn, deviceSn, commandCode, year, month, createTimeStart, createTimeEnd)
+                // 设备序号
+                .stream().collect(Collectors.groupingBy(Protocol::getDeviceSn)).values().forEach(v ->
+                        // 命令代码
+                        v.stream().collect(Collectors.groupingBy(Protocol::getCommandCode)).values().forEach(list ->
+                                // 插入报表
+                                eventDao.insertReport(Protocol.getEventReportMinute(list), gatewaySn, year, ReportType.MINUTE)
+                        )
+                );
     }
 
     /**
      * 分钟报表
      *
-     * @param year  年
-     * @param month 月
-     * @param day   日
-     * @param hour  小时
+     * @param gatewaySn   网关序号<br>
+     *                    null 所有网关
+     * @param deviceSn    设备序号<br>
+     *                    null 所有设备
+     * @param commandCode 命令代码<br>
+     *                    null 所有命令
+     * @param year        年
+     * @param month       月<br>
+     *                    null 1-12月
+     * @param day         日<br>
+     *                    null 1-31日
+     * @param hour        小时<br>
+     *                    null 0-23小时
+     * @param minute      分钟<br>
+     *                    null 0-59分钟
      */
-    public void reportMinute(int year, int month, int day, int hour) {
-        for (int i = 0; i < 60; i++) {
-            reportMinute(year, month, day, hour, i);
+    public void reportMinute(Integer gatewaySn, Integer deviceSn, Integer commandCode, int year, Integer month, Integer day, Integer hour, Integer minute) {
+        if (gatewaySn == null) {
+            if (month == null) {
+                for (int i = 1; i < 13; i++) {
+                    for (int j = 1; j < 31; j++) {
+                        for (int k = 0; k < 24; k++) {
+                            for (int m = 0; m < 60; m++) {
+                                for (int g : GatewayService.getGatewaySnList()) {
+                                    reportMinuteInner(g, deviceSn, commandCode, year, i, j, k, m);
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (day == null) {
+                    for (int j = 1; j < 31; j++) {
+                        for (int k = 0; k < 24; k++) {
+                            for (int m = 0; m < 60; m++) {
+                                for (int g : GatewayService.getGatewaySnList()) {
+                                    reportMinuteInner(g, deviceSn, commandCode, year, month, j, k, m);
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    if (hour == null) {
+                        for (int k = 0; k < 24; k++) {
+                            for (int m = 0; m < 60; m++) {
+                                for (int g : GatewayService.getGatewaySnList()) {
+                                    reportMinuteInner(g, deviceSn, commandCode, year, month, day, k, m);
+                                }
+                            }
+                        }
+                    } else {
+                        if (minute == null) {
+                            for (int m = 0; m < 60; m++) {
+                                for (int g : GatewayService.getGatewaySnList()) {
+                                    reportMinuteInner(g, deviceSn, commandCode, year, month, day, hour, m);
+                                }
+                            }
+                        } else {
+                            for (int g : GatewayService.getGatewaySnList()) {
+                                reportMinuteInner(g, deviceSn, commandCode, year, month, day, hour, minute);
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            if (month == null) {
+                for (int i = 1; i < 13; i++) {
+                    for (int j = 1; j < 31; j++) {
+                        for (int k = 0; k < 24; k++) {
+                            for (int m = 0; m < 60; m++) {
+                                reportMinuteInner(gatewaySn, deviceSn, commandCode, year, i, j, k, m);
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (day == null) {
+                    for (int j = 1; j < 31; j++) {
+                        for (int k = 0; k < 24; k++) {
+                            for (int m = 0; m < 60; m++) {
+                                reportMinuteInner(gatewaySn, deviceSn, commandCode, year, month, j, k, m);
+                            }
+                        }
+                    }
+                } else {
+                    if (hour == null) {
+                        for (int k = 0; k < 24; k++) {
+                            for (int m = 0; m < 60; m++) {
+                                reportMinuteInner(gatewaySn, deviceSn, commandCode, year, month, day, k, m);
+                            }
+                        }
+                    } else {
+                        if (minute == null) {
+                            for (int m = 0; m < 60; m++) {
+                                reportMinuteInner(gatewaySn, deviceSn, commandCode, year, month, day, hour, m);
+                            }
+                        } else {
+                            reportMinuteInner(gatewaySn, deviceSn, commandCode, year, month, day, hour, minute);
+                        }
+                    }
+                }
+            }
         }
     }
 
     /**
-     * 分钟报表
+     * 删除分钟报表
      *
-     * @param year  年
-     * @param month 月
-     * @param day   日
+     * @param gatewaySn   网关序号<br>
+     *                    null 所有网关
+     * @param deviceSn    设备序号<br>
+     *                    null 所有设备
+     * @param commandCode 命令代码<br>
+     *                    null 所有命令
+     * @param year        年
+     * @param month       月<br>
+     *                    null 1-12月
+     * @param day         日<br>
+     *                    null 1-31日
+     * @param hour        小时<br>
+     *                    null 0-23小时
+     * @param minute      分钟<br>
+     *                    null 0-59分钟
+     * @return 删除条数
      */
-    public void reportMinute(int year, int month, int day) {
-        for (int i = 0; i < 24; i++) {
-            reportMinute(year, month, day, i);
-        }
-    }
-
-    /**
-     * 分钟报表
-     *
-     * @param year  年
-     * @param month 月
-     */
-    public void reportMinute(int year, int month) {
-        for (int i = 1; i < 32; i++) {
-            reportMinute(year, month, i);
-        }
-    }
-
-    /**
-     * 分钟报表
-     *
-     * @param year 年
-     */
-    public void reportMinute(int year) {
-        for (int i = 1; i < 13; i++) {
-            reportMinute(year, i);
+    public long reportMinuteDelete(Integer gatewaySn, Integer deviceSn, Integer commandCode, int year, Integer month, Integer day, Integer hour, Integer minute) {
+        if (gatewaySn == null) {
+            long count = 0;
+            for (int g : GatewayService.getGatewaySnList()) {
+                count += eventDao.deleteReport(g, deviceSn, commandCode, year, month, day, hour, minute, ReportType.MINUTE);
+            }
+            return count;
+        } else {
+            return eventDao.deleteReport(gatewaySn, deviceSn, commandCode, year, month, day, hour, minute, ReportType.MINUTE);
         }
     }
 
@@ -144,65 +238,143 @@ public class EventReportService extends ServiceBase {
         int month = calendar.get(MONTH) + 1;
         int day = calendar.get(DAY_OF_MONTH);
         int hour = calendar.get(HOUR_OF_DAY);
-        reportHour(year, month, day, hour);
+        reportHour(null, null, null, year, month, day, hour);
     }
 
     /**
      * 小时报表
      *
-     * @param year  年
-     * @param month 月
-     * @param day   日
-     * @param hour  小时
+     * @param gatewaySn   网关序号
+     * @param deviceSn    设备序号<br>
+     *                    null 所有设备
+     * @param commandCode 命令代码<br>
+     *                    null 所有命令
+     * @param year        年
+     * @param month       月
+     * @param day         日
+     * @param hour        小时
      */
-    public void reportHour(int year, int month, int day, int hour) {
-        for (int gatewaySn : GatewayService.getGatewaySnList()) {
-            // 分钟报表
-            eventDao.findReport(gatewaySn, year, month, day, hour, null, ReportType.MINUTE)
-                    // 命令代码
-                    .stream().collect(Collectors.groupingBy(Protocol::getCommandCode)).values().forEach(v ->
-                            // 设备代码
-                            v.stream().collect(Collectors.groupingBy(Protocol::getDeviceSn)).values().forEach(list ->
-                                    // 插入报表
-                                    eventDao.insertReport(Protocol.getEventReportHour(list), gatewaySn, year, ReportType.HOUR)
-                            )
-                    );
+    private void reportHourInner(int gatewaySn, Integer deviceSn, Integer commandCode, int year, int month, int day, int hour) {
+        // 分钟报表
+        eventDao.findReport(gatewaySn, deviceSn, commandCode, year, month, day, hour, null, ReportType.MINUTE)
+                // 设备序号
+                .stream().collect(Collectors.groupingBy(Protocol::getDeviceSn)).values().forEach(v ->
+                        // 命令代码
+                        v.stream().collect(Collectors.groupingBy(Protocol::getCommandCode)).values().forEach(list ->
+                                // 插入报表
+                                eventDao.insertReport(Protocol.getEventReportHour(list), gatewaySn, year, ReportType.HOUR)
+                        )
+                );
+    }
+
+    /**
+     * 小时报表
+     *
+     * @param gatewaySn   网关序号<br>
+     *                    null 所有网关
+     * @param deviceSn    设备序号<br>
+     *                    null 所有设备
+     * @param commandCode 命令代码<br>
+     *                    null 所有命令
+     * @param year        年
+     * @param month       月<br>
+     *                    null 1-12月
+     * @param day         日<br>
+     *                    null 1-31日
+     * @param hour        小时<br>
+     *                    null 0-23小时
+     */
+    public void reportHour(Integer gatewaySn, Integer deviceSn, Integer commandCode, int year, Integer month, Integer day, Integer hour) {
+        if (gatewaySn == null) {
+            if (month == null) {
+                for (int i = 1; i < 13; i++) {
+                    for (int j = 1; j < 31; j++) {
+                        for (int k = 0; k < 24; k++) {
+                            for (int g : GatewayService.getGatewaySnList()) {
+                                reportHourInner(g, deviceSn, commandCode, year, i, j, k);
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (day == null) {
+                    for (int j = 1; j < 31; j++) {
+                        for (int k = 0; k < 24; k++) {
+                            for (int g : GatewayService.getGatewaySnList()) {
+                                reportHourInner(g, deviceSn, commandCode, year, month, j, k);
+                            }
+                        }
+                    }
+                } else {
+                    if (hour == null) {
+                        for (int k = 0; k < 24; k++) {
+                            for (int g : GatewayService.getGatewaySnList()) {
+                                reportHourInner(g, deviceSn, commandCode, year, month, day, k);
+                            }
+                        }
+                    } else {
+                        for (int g : GatewayService.getGatewaySnList()) {
+                            reportHourInner(g, deviceSn, commandCode, year, month, day, hour);
+                        }
+                    }
+                }
+            }
+        } else {
+            if (month == null) {
+                for (int i = 1; i < 13; i++) {
+                    for (int j = 1; j < 31; j++) {
+                        for (int k = 0; k < 24; k++) {
+                            reportHourInner(gatewaySn, deviceSn, commandCode, year, i, j, k);
+                        }
+                    }
+                }
+            } else {
+                if (day == null) {
+                    for (int j = 1; j < 31; j++) {
+                        for (int k = 0; k < 24; k++) {
+                            reportHourInner(gatewaySn, deviceSn, commandCode, year, month, j, k);
+                        }
+                    }
+                } else {
+                    if (hour == null) {
+                        for (int k = 0; k < 24; k++) {
+                            reportHourInner(gatewaySn, deviceSn, commandCode, year, month, day, k);
+                        }
+                    } else {
+                        reportHourInner(gatewaySn, deviceSn, commandCode, year, month, day, hour);
+                    }
+                }
+            }
         }
     }
 
     /**
-     * 小时报表
+     * 删除小时报表
      *
-     * @param year  年
-     * @param month 月
-     * @param day   日
+     * @param gatewaySn   网关序号<br>
+     *                    null 所有网关
+     * @param deviceSn    设备序号<br>
+     *                    null 所有设备
+     * @param commandCode 命令代码<br>
+     *                    null 所有命令
+     * @param year        年
+     * @param month       月<br>
+     *                    null 1-12月
+     * @param day         日<br>
+     *                    null 1-31日
+     * @param hour        小时<br>
+     *                    null 0-23小时
+     * @return 删除条数
      */
-    public void reportHour(int year, int month, int day) {
-        for (int i = 0; i < 24; i++) {
-            reportHour(year, month, day, i);
-        }
-    }
-
-    /**
-     * 小时报表
-     *
-     * @param year  年
-     * @param month 月
-     */
-    public void reportHour(int year, int month) {
-        for (int i = 1; i < 32; i++) {
-            reportHour(year, month, i);
-        }
-    }
-
-    /**
-     * 小时报表
-     *
-     * @param year 年
-     */
-    public void reportHour(int year) {
-        for (int i = 1; i < 13; i++) {
-            reportHour(year, i);
+    public long reportHourDelete(Integer gatewaySn, Integer deviceSn, Integer commandCode, int year, Integer month, Integer day, Integer hour) {
+        if (gatewaySn == null) {
+            long count = 0;
+            for (int g : GatewayService.getGatewaySnList()) {
+                count += eventDao.deleteReport(g, deviceSn, commandCode, year, month, day, hour, null, ReportType.HOUR);
+            }
+            return count;
+        } else {
+            return eventDao.deleteReport(gatewaySn, deviceSn, commandCode, year, month, day, hour, null, ReportType.HOUR);
         }
     }
 
@@ -218,51 +390,116 @@ public class EventReportService extends ServiceBase {
         int year = calendar.get(YEAR);
         int month = calendar.get(MONTH) + 1;
         int day = calendar.get(DAY_OF_MONTH);
-        reportDay(year, month, day);
+        reportDay(null, null, null, year, month, day);
     }
 
     /**
      * 日报表
      *
-     * @param year  年
-     * @param month 月
-     * @param day   日
+     * @param gatewaySn   网关序号
+     * @param deviceSn    设备序号<br>
+     *                    null 所有设备
+     * @param commandCode 命令代码<br>
+     *                    null 所有命令
+     * @param year        年
+     * @param month       月
+     * @param day         日
      */
-    public void reportDay(int year, int month, int day) {
-        for (int gatewaySn : GatewayService.getGatewaySnList()) {
-            // 小时报表
-            eventDao.findReport(gatewaySn, year, month, day, null, null, ReportType.HOUR)
-                    // 命令代码
-                    .stream().collect(Collectors.groupingBy(Protocol::getCommandCode)).values().forEach(v ->
-                            // 设备代码
-                            v.stream().collect(Collectors.groupingBy(Protocol::getDeviceSn)).values().forEach(list ->
-                                    // 插入报表
-                                    eventDao.insertReport(Protocol.getEventReportDay(list), gatewaySn, year, ReportType.DAY)
-                            )
-                    );
+    private void reportDayInner(int gatewaySn, Integer deviceSn, Integer commandCode, int year, int month, int day) {
+        // 小时报表
+        eventDao.findReport(gatewaySn, deviceSn, commandCode, year, month, day, null, null, ReportType.HOUR)
+                // 设备序号
+                .stream().collect(Collectors.groupingBy(Protocol::getDeviceSn)).values().forEach(v ->
+                        // 命令代码
+                        v.stream().collect(Collectors.groupingBy(Protocol::getCommandCode)).values().forEach(list ->
+                                // 插入报表
+                                eventDao.insertReport(Protocol.getEventReportDay(list), gatewaySn, year, ReportType.DAY)
+                        )
+                );
+    }
+
+    /**
+     * 日报表
+     *
+     * @param gatewaySn   网关序号<br>
+     *                    null 所有网关
+     * @param deviceSn    设备序号<br>
+     *                    null 所有设备
+     * @param commandCode 命令代码<br>
+     *                    null 所有命令
+     * @param year        年
+     * @param month       月<br>
+     *                    null 1-12月
+     * @param day         日<br>
+     *                    null 1-31日
+     */
+    public void reportDay(Integer gatewaySn, Integer deviceSn, Integer commandCode, int year, Integer month, Integer day) {
+        if (gatewaySn == null) {
+            if (month == null) {
+                for (int i = 1; i < 13; i++) {
+                    for (int j = 1; j < 31; j++) {
+                        for (int g : GatewayService.getGatewaySnList()) {
+                            reportDayInner(g, deviceSn, commandCode, year, i, j);
+                        }
+                    }
+                }
+            } else {
+                if (day == null) {
+                    for (int j = 1; j < 31; j++) {
+                        for (int g : GatewayService.getGatewaySnList()) {
+                            reportDayInner(g, deviceSn, commandCode, year, month, j);
+                        }
+                    }
+                } else {
+                    for (int g : GatewayService.getGatewaySnList()) {
+                        reportDayInner(g, deviceSn, commandCode, year, month, day);
+                    }
+                }
+            }
+        } else {
+            if (month == null) {
+                for (int i = 1; i < 13; i++) {
+                    for (int j = 1; j < 31; j++) {
+                        reportDayInner(gatewaySn, deviceSn, commandCode, year, i, j);
+                    }
+                }
+            } else {
+                if (day == null) {
+                    for (int j = 1; j < 31; j++) {
+                        reportDayInner(gatewaySn, deviceSn, commandCode, year, month, j);
+                    }
+                } else {
+                    reportDayInner(gatewaySn, deviceSn, commandCode, year, month, day);
+                }
+            }
         }
     }
 
     /**
-     * 日报表
+     * 删除日报表
      *
-     * @param year  年
-     * @param month 月
+     * @param gatewaySn   网关序号<br>
+     *                    null 所有网关
+     * @param deviceSn    设备序号<br>
+     *                    null 所有设备
+     * @param commandCode 命令代码<br>
+     *                    null 所有命令
+     * @param year        年
+     * @param month       月<br>
+     *                    null 1-12月
+     * @param day         日<br>
+     *                    null 1-31日
+     * @return 删除条数
      */
-    public void reportDay(int year, int month) {
-        for (int i = 1; i < 32; i++) {
-            reportDay(year, month, i);
-        }
-    }
-
-    /**
-     * 日报表
-     *
-     * @param year 年
-     */
-    public void reportDay(int year) {
-        for (int i = 1; i < 13; i++) {
-            reportDay(year, i);
+    public long reportDayDelete(Integer gatewaySn, Integer deviceSn, Integer commandCode, int year, Integer month, Integer day) {
+        if (gatewaySn == null) {
+            long count = 0;
+            for (int g : GatewayService.getGatewaySnList()) {
+                count += eventDao.deleteReport(g, deviceSn, commandCode, year, month, day, null, null, ReportType.DAY);
+            }
+            return count;
+        } else {
+            return eventDao.deleteReport(gatewaySn, deviceSn, commandCode, year, month, day, null, null, ReportType.DAY);
         }
     }
 
@@ -278,38 +515,93 @@ public class EventReportService extends ServiceBase {
         calendar.add(MONTH, -1);
         int year = calendar.get(YEAR);
         int month = calendar.get(MONTH) + 1;
-        reportMonth(year, month);
+        reportMonth(null, null, null, year, month);
     }
 
     /**
      * 月报表
      *
-     * @param year  年
-     * @param month 月
+     * @param gatewaySn   网关序号
+     * @param deviceSn    设备序号<br>
+     *                    null 所有设备
+     * @param commandCode 命令代码<br>
+     *                    null 所有命令
+     * @param year        年
+     * @param month       月
      */
-    public void reportMonth(int year, int month) {
-        for (int gatewaySn : GatewayService.getGatewaySnList()) {
-            // 日报表
-            eventDao.findReport(gatewaySn, year, month, null, null, null, ReportType.DAY)
-                    // 命令代码
-                    .stream().collect(Collectors.groupingBy(Protocol::getCommandCode)).values().forEach(v ->
-                            // 设备代码
-                            v.stream().collect(Collectors.groupingBy(Protocol::getDeviceSn)).values().forEach(list ->
-                                    // 插入报表
-                                    eventDao.insertReport(Protocol.getEventReportMonth(list), gatewaySn, year, ReportType.MONTH)
-                            )
-                    );
+    private void reportMonthInner(int gatewaySn, Integer deviceSn, Integer commandCode, int year, int month) {
+        // 日报表
+        eventDao.findReport(gatewaySn, deviceSn, commandCode, year, month, null, null, null, ReportType.DAY)
+                // 设备序号
+                .stream().collect(Collectors.groupingBy(Protocol::getDeviceSn)).values().forEach(v ->
+                        // 命令代码
+                        v.stream().collect(Collectors.groupingBy(Protocol::getCommandCode)).values().forEach(list ->
+                                // 插入报表
+                                eventDao.insertReport(Protocol.getEventReportMonth(list), gatewaySn, year, ReportType.MONTH)
+                        )
+                );
+    }
+
+    /**
+     * 月报表
+     *
+     * @param gatewaySn   网关序号<br>
+     *                    null 所有网关
+     * @param deviceSn    设备序号<br>
+     *                    null 所有设备
+     * @param commandCode 命令代码<br>
+     *                    null 所有命令
+     * @param year        年
+     * @param month       月<br>
+     *                    null 1-12月
+     */
+    public void reportMonth(Integer gatewaySn, Integer deviceSn, Integer commandCode, int year, Integer month) {
+        if (gatewaySn == null) {
+            if (month == null) {
+                for (int i = 1; i < 13; i++) {
+                    for (int g : GatewayService.getGatewaySnList()) {
+                        reportMonthInner(g, deviceSn, commandCode, year, i);
+                    }
+                }
+            } else {
+                for (int g : GatewayService.getGatewaySnList()) {
+                    reportMonthInner(g, deviceSn, commandCode, year, month);
+                }
+            }
+        } else {
+            if (month == null) {
+                for (int i = 1; i < 13; i++) {
+                    reportMonthInner(gatewaySn, deviceSn, commandCode, year, i);
+                }
+            } else {
+                reportMonthInner(gatewaySn, deviceSn, commandCode, year, month);
+            }
         }
     }
 
     /**
-     * 月报表
+     * 删除月报表
      *
-     * @param year 年
+     * @param gatewaySn   网关序号<br>
+     *                    null 所有网关
+     * @param deviceSn    设备序号<br>
+     *                    null 所有设备
+     * @param commandCode 命令代码<br>
+     *                    null 所有命令
+     * @param year        年
+     * @param month       月<br>
+     *                    null 1-12月
+     * @return 删除条数
      */
-    public void reportMonth(int year) {
-        for (int i = 1; i < 13; i++) {
-            reportMonth(year, i);
+    public long reportMonthDelete(Integer gatewaySn, Integer deviceSn, Integer commandCode, int year, Integer month) {
+        if (gatewaySn == null) {
+            long count = 0;
+            for (int g : GatewayService.getGatewaySnList()) {
+                count += eventDao.deleteReport(g, deviceSn, commandCode, year, month, null, null, null, ReportType.MONTH);
+            }
+            return count;
+        } else {
+            return eventDao.deleteReport(gatewaySn, deviceSn, commandCode, year, month, null, null, null, ReportType.MONTH);
         }
     }
 

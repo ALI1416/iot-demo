@@ -20,7 +20,7 @@ public interface DeviceMapper {
     /**
      * 插入
      *
-     * @param device id,gateway_id,sn,name,type
+     * @param device id,gatewayId,sn,name,type
      * @return 执行成功数量
      */
     int insert(DeviceVo device);
@@ -47,6 +47,6 @@ public interface DeviceMapper {
      * @param gatewaySn gatewaySn
      * @return List DeviceVo
      */
-    List<DeviceVo> findByGatewaySn(long gatewaySn);
+    List<DeviceVo> findByGatewaySn(int gatewaySn);
 
 }

@@ -14,7 +14,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -66,23 +65,12 @@ public class EventService extends ServiceBase {
     }
 
     /**
-     * 查找报表最后一个
+     * 构造Criteria
      *
      * @param protocol ProtocolVo
-     * @return ProtocolVo(没有返回null)
+     * @return Criteria
      */
-    public ProtocolVo findReportLastOne(ProtocolVo protocol) {
-        protocol.setPages(1);
-        protocol.setRows(1);
-        protocol.setOrderBy("id desc");
-        List<ProtocolVo> list = findReportPage(protocol).getList();
-        if (list.isEmpty()) {
-            return null;
-        }
-        return list.get(0);
-    }
-
-    private static Criteria buildCriteria(ProtocolVo protocol) {
+    public static Criteria buildCriteria(ProtocolVo protocol) {
         Criteria criteria = new Criteria();
         if (protocol.getDeviceSn() != null) {
             criteria.and("deviceSn").is(protocol.getDeviceSn());

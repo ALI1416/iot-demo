@@ -64,7 +64,7 @@
   </select>
 
   <!-- 查询通过gatewaySn -->
-  <select id="findByGatewaySn" parameterType="Long" resultType="DeviceVo">
+  <select id="findByGatewaySn" parameterType="Integer" resultType="DeviceVo">
     SELECT
       d.id,
       d.gateway_id,
