@@ -1,18 +1,23 @@
 <script lang="ts" setup>
 import {onMounted, onUnmounted, ref, watch} from 'vue'
-import {useGatewayStore} from '@/stores/gateway'
+import {useSystemStore} from '@/stores/system'
 import {useGlobalStore} from '@/stores/global'
 import type {EChartsType} from 'echarts/core'
 import * as echarts from 'echarts/core'
 import Graph from '@/components/graph/Graph.vue'
 import {dateDay1Hour, dateHour1Minute, dateYear1Month, getDateMonth1Day, getDateString} from '@/utils/DataUtil'
+import {subscribe, unsubscribeGroup} from '@/stores/stomp'
+import {round2} from '@/utils/MathUtil'
+import {findLast} from '@/network/api/interact'
+
+// region 系统
 
 const props = defineProps<{
   gatewaySn: number,
   deviceSn: number
 }>()
 
-const gatewayStore = useGatewayStore()
+const systemStore = useSystemStore()
 const globalStore = useGlobalStore()
 
 /**
@@ -32,10 +37,78 @@ onMounted(() => {
   historyDayChart.setOption(historyDayOption)
   historyMonthChart = echarts.init(historyMonth.value, 'darkTheme')
   historyMonthChart.setOption(historyMonthOption)
+  setRange()
+  subscribeData()
+})
+
+watch(props, () => {
+  setRange()
+  unsubscribeGroup(STOMP_GROUP)
+  subscribeData()
+  realtimeChart.clear()
+  updateRealtimeData(undefined)
+})
+
+/**
+ * 重新调整尺寸
+ */
+watch(() => systemStore.resize, () => {
+  realtimeChart.resize()
+  historyMinuteChart.resize()
+  historyHourChart.resize()
+  historyDayChart.resize()
+  historyMonthChart.resize()
 })
 
 onUnmounted(() => {
+  unsubscribeGroup(STOMP_GROUP)
 })
+
+// endregion
+
+// region 设置界限
+
+function setRange() {
+  findLast({gatewaySn: props.gatewaySn, deviceSn: props.deviceSn, commandCode: 40100}).then(res => {
+    if (!res) {
+      return
+    }
+    // 整数
+    let max: number = res.response.temperatureMax
+    let min: number = res.response.temperatureMin
+    // 最大值为上限+5并且是5的倍数
+    let seriesMax = Math.ceil((max + 0.1) / 5) * 5
+    realtimeOption.series.max = seriesMax
+    // 最小值为上限-5并且是5的倍数
+    let seriesMin = Math.floor((min - 0.1) / 5) * 5
+    realtimeOption.series.min = seriesMin
+    // 分隔符每隔5度一个
+    let seriesTotal = seriesMax - seriesMin
+    realtimeOption.series.splitNumber = seriesTotal / 5
+    // 上限
+    realtimeOption.series.axisLine.lineStyle.color[1][0] = 1 - (seriesMax - max) / seriesTotal
+    // 下限
+    realtimeOption.series.axisLine.lineStyle.color[0][0] = (min - seriesMin) / seriesTotal
+    realtimeChart.setOption(realtimeOption)
+  })
+}
+
+// endregion
+
+// region stomp
+
+const STOMP_GROUP = 'thermometer'
+
+const EVENT_PREFIX = '/topic/iot/event/'
+
+function subscribeData() {
+  subscribe(STOMP_GROUP, EVENT_PREFIX + props.gatewaySn + '/' + props.deviceSn + '/' + 10100, function (res) {
+    let e = JSON.parse(res.body).event
+    updateRealtimeData(e.temperature)
+  })
+}
+
+// endregion
 
 // region 实时温度
 
@@ -47,9 +120,9 @@ const realtimeOption: any = {
     type: 'gauge',
     radius: '75%',
     center: ['50%', '55%'],
-    min: -100,
-    max: 100,
-    splitNumber: 10,
+    max: 35,
+    min: 15,
+    splitNumber: 4,
     progress: {
       show: true,
       width: 10,
@@ -64,8 +137,8 @@ const realtimeOption: any = {
       lineStyle: {
         width: 20,
         color: [
-          [0.2, '#6CF'],
-          [0.8, '#9C9'],
+          [0.25, '#6CF'],
+          [0.75, '#9C9'],
           [1, '#F99']
         ]
       }
@@ -73,7 +146,7 @@ const realtimeOption: any = {
     axisTick: {
       show: true,
       distance: -30,
-      splitNumber: 10,
+      splitNumber: 5,
       lineStyle: {
         color: 'auto',
         width: 2
@@ -94,9 +167,21 @@ const realtimeOption: any = {
       offsetCenter: [0, '-5%'],
       fontSize: 40,
       formatter: '{value} ℃'
-    },
-    data: [-88.88]
+    }
   }
+}
+
+/**
+ * 更新实时温度数据
+ * @param temperature 温度
+ */
+function updateRealtimeData(temperature: number | undefined) {
+  if (typeof temperature !== 'undefined') {
+    realtimeOption.series.data = [round2(temperature / 10000)]
+  } else {
+    delete realtimeOption.series.data
+  }
+  realtimeChart.setOption(realtimeOption)
 }
 
 // endregion
@@ -227,7 +312,7 @@ const historyHour = ref()
 let historyHourChart: EChartsType
 
 const historyHourOption: any = {
-  color: ['#9C9', '#F99', '#6CF'],
+  color: ['#F99', '#9C9', '#6CF'],
   grid: {
     top: 30,
     bottom: 20,
@@ -259,14 +344,14 @@ const historyHourOption: any = {
   },
   series: [
     {
-      name: '平均温度',
-      type: 'line',
-      data: [26, 27.5, 28, 27.1, 26, 27, 28.88, 24, 25, 26.23, 27.77]
-    },
-    {
       name: '最高温度',
       type: 'line',
       data: [28, 28, 28.5, 28, 27, 28, 29, 28, 28, 28, 28]
+    },
+    {
+      name: '平均温度',
+      type: 'line',
+      data: [26, 27.5, 28, 27.1, 26, 27, 28.88, 24, 25, 26.23, 27.77]
     },
     {
       name: '最低温度',
@@ -299,7 +384,7 @@ const day = ref(new Date())
 const dayTitle = ref(getDateString(day.value, 'DAY'))
 
 const historyDayOption: any = {
-  color: ['#9C9', '#F99', '#6CF'],
+  color: ['#F99', '#9C9', '#6CF'],
   grid: {
     top: 30,
     bottom: 20,
@@ -331,14 +416,14 @@ const historyDayOption: any = {
   },
   series: [
     {
-      name: '平均温度',
-      type: 'line',
-      data: [26, 27.5, 28, 27.1, 26, 27, 28.88, 24, 25, 26.23, 27.77]
-    },
-    {
       name: '最高温度',
       type: 'line',
       data: [28, 28, 28.5, 28, 27, 28, 29, 28, 28, 28, 28]
+    },
+    {
+      name: '平均温度',
+      type: 'line',
+      data: [26, 27.5, 28, 27.1, 26, 27, 28.88, 24, 25, 26.23, 27.77]
     },
     {
       name: '最低温度',
@@ -365,7 +450,7 @@ const historyMonth = ref()
 let historyMonthChart: EChartsType
 
 const historyMonthOption: any = {
-  color: ['#9C9', '#F99', '#6CF'],
+  color: ['#F99', '#9C9', '#6CF'],
   grid: {
     top: 30,
     bottom: 20,
@@ -394,14 +479,14 @@ const historyMonthOption: any = {
   },
   series: [
     {
-      name: '平均温度',
-      type: 'line',
-      data: [26, 27.5, 28, 27.1, 26, 27, 28.88, 24, 25, 26.23, 27.77, 27]
-    },
-    {
       name: '最高温度',
       type: 'line',
       data: [28, 28, 28.5, 28, 27, 28, 29, 28, 28, 28, 28, 28]
+    },
+    {
+      name: '平均温度',
+      type: 'line',
+      data: [26, 27.5, 28, 27.1, 26, 27, 28.88, 24, 25, 26.23, 27.77, 27]
     },
     {
       name: '最低温度',

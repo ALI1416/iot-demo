@@ -11,7 +11,7 @@
  Target Server Version : 80300 (8.3.0)
  File Encoding         : 65001
 
- Date: 17/07/2024 16:35:36
+ Date: 30/08/2024 14:46:26
 */
 
 SET NAMES utf8mb4;
@@ -38,8 +38,12 @@ CREATE TABLE `device`  (
 -- ----------------------------
 -- Records of device
 -- ----------------------------
-INSERT INTO `device` VALUES (0, 0, 0, '网关', 0, '');
-INSERT INTO `device` VALUES (1, 0, 1, '温度计', 1, '');
+INSERT INTO `device` VALUES (12300, 123, 0, '网关', 0, '');
+INSERT INTO `device` VALUES (12301, 123, 1, '温度计', 1, '');
+INSERT INTO `device` VALUES (12302, 123, 2, '温湿度计', 2, '');
+INSERT INTO `device` VALUES (12400, 124, 0, '网关', 0, '');
+INSERT INTO `device` VALUES (12401, 124, 1, '温度计', 1, '');
+INSERT INTO `device` VALUES (12500, 125, 0, '网关', 0, '');
 
 -- ----------------------------
 -- Table structure for gateway
@@ -58,6 +62,8 @@ CREATE TABLE `gateway`  (
 -- ----------------------------
 -- Records of gateway
 -- ----------------------------
-INSERT INTO `gateway` VALUES (0, 123, '网关123号', '1970-01-01 00:00:00', '');
+INSERT INTO `gateway` VALUES (123, 123, '网关123号', '1970-01-01 00:00:00', '');
+INSERT INTO `gateway` VALUES (124, 124, '网关124号', '1970-01-01 00:00:00', '');
+INSERT INTO `gateway` VALUES (125, 125, '网关125号', '1970-01-01 00:00:00', '');
 
 SET FOREIGN_KEY_CHECKS = 1;
