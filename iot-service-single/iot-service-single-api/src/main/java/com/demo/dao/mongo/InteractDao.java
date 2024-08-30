@@ -3,10 +3,13 @@ package com.demo.dao.mongo;
 import cn.z.clock.Clock;
 import cn.z.id.Id;
 import cn.z.mongo.MongoTemp;
+import cn.z.mongo.entity.Page;
+import cn.z.mongo.entity.Pageable;
 import com.demo.base.DaoBase;
 import com.demo.constant.MongoConstant;
 import com.demo.entity.vo.ProtocolVo;
 import lombok.AllArgsConstructor;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 /**
@@ -76,6 +79,19 @@ public class InteractDao extends DaoBase {
         return tryAnyNoTransactionReturnT(() -> mongoTemp.save(protocol,
                 MongoConstant.getInteractCollectionName(protocol.getGatewaySn(), protocol.getCreateTime())
         ));
+    }
+
+    /**
+     * 分页查询
+     *
+     * @param query     Query
+     * @param pageable  Pageable
+     * @param gatewaySn 网关序号
+     * @param year      年
+     * @return Page ProtocolVo
+     */
+    public Page<ProtocolVo> findPage(Query query, int gatewaySn, int year, Pageable pageable) {
+        return mongoTemp.findPage(query, pageable, CLAZZ, MongoConstant.getInteractCollectionName(gatewaySn, year));
     }
 
 }

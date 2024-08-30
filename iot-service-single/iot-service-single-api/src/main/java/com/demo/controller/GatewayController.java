@@ -72,20 +72,20 @@ public class GatewayController extends ControllerBase {
     }
 
     /**
-     * 获取网关表缓存
+     * 获取
      */
-    @GetMapping("getCache")
-    @Operation(summary = "获取网关表缓存")
-    public static Result<List<GatewayVo>> getCache() {
+    @GetMapping("get")
+    @Operation(summary = "获取")
+    public static Result<List<GatewayVo>> get() {
         return Result.o(GatewayService.getTable());
     }
 
     /**
-     * 更新网关表缓存
+     * 刷新
      */
-    @GetMapping("updateCache")
-    @Operation(summary = "更新网关表缓存")
-    public Result updateCache() {
+    @GetMapping("refresh")
+    @Operation(summary = "刷新")
+    public Result refresh() {
         gatewayService.updateTable();
         return Result.o();
     }

@@ -211,9 +211,9 @@ type FaultInfo = {
  * 获取协议信息列表
  * @return Promise 协议信息列表
  */
-function getInfo(): Promise<ProtocolInfo[]> {
+function get(): Promise<ProtocolInfo[]> {
   return http({
-    url: PREFIX + 'getInfo'
+    url: PREFIX + 'get'
   })
 }
 
@@ -228,5 +228,5 @@ export {
   type FieldUnit,
   type FieldStatus,
   type FaultInfo,
-  getInfo
+  get
 }

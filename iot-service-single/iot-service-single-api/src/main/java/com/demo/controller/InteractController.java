@@ -7,13 +7,11 @@ import com.demo.entity.protocol.Protocol;
 import com.demo.entity.vo.ProtocolVo;
 import com.demo.service.InteractService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -69,6 +67,18 @@ public class InteractController extends ControllerBase {
             log.warn("互动请求发送失败:[{}]", protocol);
         }
         return Result.o(result);
+    }
+
+    /**
+     * 获取最后一条成功消息
+     */
+    @GetMapping("findLast")
+    @Operation(summary = "获取最后一条成功消息")
+    @Parameter(name = "gatewaySn", description = "网关序号")
+    @Parameter(name = "deviceSn", description = "设备序号")
+    @Parameter(name = "commandCode", description = "命令代码")
+    public Result<ProtocolVo> findLast(int gatewaySn, int deviceSn, int commandCode) {
+        return Result.o(interactService.findLast(gatewaySn, deviceSn, commandCode));
     }
 
 }

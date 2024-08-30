@@ -54,7 +54,7 @@ public class EventController extends ControllerBase {
     @Parameter(name = "deviceSn", description = "设备序号")
     @Parameter(name = "commandCode", description = "命令代码")
     public static Result<ProtocolVo> findLast(int gatewaySn, int deviceSn, int commandCode) {
-        return com.demo.entity.pojo.Result.o(EventService.getMsg(gatewaySn, deviceSn, commandCode));
+        return Result.o(EventService.getMsg(gatewaySn, deviceSn, commandCode));
     }
 
     /**

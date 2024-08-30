@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.demo.base.MongoEntityBase;
 import com.demo.base.ToStringBase;
+import com.demo.constant.InteractErrorCode;
 import com.demo.constant.InteractType;
 import com.demo.constant.ProtocolType;
 import com.demo.entity.vo.ProtocolVo;
@@ -56,27 +57,10 @@ public class Protocol extends MongoEntityBase {
     @Schema(description = "命令代码")
     private Integer commandCode;
     /**
-     * 交互类型
-     *
-     * @see InteractType
-     */
-    @Schema(description = "交互类型")
-    private Integer type;
-    /**
      * 事件
      */
     @Schema(description = "事件")
     private Data event;
-    /**
-     * 故障列表
-     */
-    @Schema(description = "故障列表")
-    private List<Integer> faultList;
-    /**
-     * 故障详情列表
-     */
-    @Schema(description = "故障详情列表")
-    private List<FaultDetail> faultDetailList;
     /**
      * 请求
      */
@@ -88,10 +72,29 @@ public class Protocol extends MongoEntityBase {
     @Schema(description = "响应")
     private Data response;
     /**
+     * 交互-交互类型
+     *
+     * @see InteractType
+     */
+    @Schema(description = "交互-交互类型")
+    private Integer type;
+    /**
      * 交互-错误代码
+     *
+     * @see InteractErrorCode
      */
     @Schema(description = "交互-错误代码")
     private Integer errorCode;
+    /**
+     * 故障-故障列表
+     */
+    @Schema(description = "故障-故障列表")
+    private List<Integer> faultList;
+    /**
+     * 故障-故障详情列表
+     */
+    @Schema(description = "故障-故障详情列表")
+    private List<FaultDetail> faultDetailList;
     /**
      * 故障详情-分组号
      */

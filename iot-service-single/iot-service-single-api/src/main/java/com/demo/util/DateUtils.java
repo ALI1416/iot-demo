@@ -24,6 +24,15 @@ public class DateUtils {
     /**
      * 获取年
      *
+     * @return 年
+     */
+    public static int getYear() {
+        return Calendar.getInstance().get(YEAR);
+    }
+
+    /**
+     * 获取年
+     *
      * @param timestamp 时间戳
      * @return 年
      */

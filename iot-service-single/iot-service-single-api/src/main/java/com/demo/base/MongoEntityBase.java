@@ -30,20 +30,10 @@ public class MongoEntityBase extends ToStringBase {
     @Schema(description = "id")
     private Long id;
     /**
-     * 创建者id
-     */
-    @Schema(description = "创建者id")
-    private Long createId;
-    /**
      * 创建时间
      */
     @Schema(description = "创建时间")
     private Timestamp createTime;
-    /**
-     * 更新者id
-     */
-    @Schema(description = "更新者id")
-    private Long updateId;
     /**
      * 更新时间
      */

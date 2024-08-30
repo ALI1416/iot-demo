@@ -6,8 +6,8 @@ import {useSystemStore} from '@/stores/system'
 import {useGatewayStore} from '@/stores/gateway'
 import {useProtocolStore} from '@/stores/protocol'
 
-import {get as getGateway} from '@/network/api/gateway'
-import {getInfo as getProtocolInfo} from '@/network/api/protocol'
+import {get as getGatewayList} from '@/network/api/gateway'
+import {get as getProtocolInfoList} from '@/network/api/protocol'
 
 import {zhCn} from 'element-plus/es/locale/index'
 import Header from '@/components/header/Header.vue'
@@ -21,13 +21,13 @@ const protocolInfoListOk = ref(false)
 const wsOk = ref(false)
 
 // 获取网关列表
-getGateway().then(res => {
+getGatewayList().then(res => {
   gatewayStore.gatewayList = res
   gatewayListOk.value = true
 })
 
 // 获取协议信息列表
-getProtocolInfo().then(res => {
+getProtocolInfoList().then(res => {
   protocolStore.protocolInfoList = res
   protocolInfoListOk.value = true
 })

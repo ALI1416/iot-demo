@@ -169,4 +169,15 @@ public class MongoConstant {
         return gatewaySn + MongoConstant.INTERACT + "_" + DateUtils.getYear(timestamp);
     }
 
+    /**
+     * 获取交互集合名
+     *
+     * @param gatewaySn 网关序号
+     * @param year      年
+     * @return 集合名
+     */
+    public static String getInteractCollectionName(int gatewaySn, int year) {
+        return gatewaySn + MongoConstant.INTERACT + "_" + year;
+    }
+
 }

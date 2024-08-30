@@ -109,7 +109,7 @@ type ReportPageDataResponse = {
   /**
    * 创建时间
    */
-  createTime: Date
+  createTime: string
   /**
    * 报表-月
    */

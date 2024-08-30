@@ -31,11 +31,11 @@ import java.util.List;
 public class ProtocolController extends ControllerBase {
 
     /**
-     * 获取协议信息列表
+     * 获取
      */
-    @GetMapping("getInfo")
-    @Operation(summary = "获取协议信息列表")
-    public static Result<List<ProtocolInfo>> getInfo() {
+    @GetMapping("get")
+    @Operation(summary = "获取")
+    public static Result<List<ProtocolInfo>> get() {
         return Result.o(ProtocolInfo.getTable());
     }
 

@@ -76,7 +76,7 @@ type DeviceType = 0 | 1 | 2
  */
 function get(): Promise<Gateway[]> {
   return http({
-    url: PREFIX + 'getCache'
+    url: PREFIX + 'get'
   })
 }
 
