@@ -55,7 +55,6 @@
   },
   "line": {
     "smooth": true,
-    "symbol": "none",
     "label": {
       "color": "#FFF"
     },
@@ -63,16 +62,9 @@
       "focus": "series"
     },
     "markLine": {
-      "label": {
-        "show": false
-      },
       "lineStyle": {
         "width": 2
-      },
-      "symbol": [
-        "none",
-        "none"
-      ]
+      }
     }
   },
   "gauge": {

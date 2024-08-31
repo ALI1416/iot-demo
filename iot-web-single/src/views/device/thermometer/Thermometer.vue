@@ -7,10 +7,17 @@ import * as echarts from 'echarts/core'
 import Graph from '@/components/graph/Graph.vue'
 import {dateDay1Hour, dateHour1Minute, dateYear1Month, getDateMonth1Day, getDateString} from '@/utils/DataUtil'
 import {subscribe, unsubscribeGroup} from '@/stores/stomp'
-import {round2} from '@/utils/MathUtil'
+import {ceil5, ceil5Upper, floor5, floor5Lower, round2} from '@/utils/MathUtil'
 import {findLast} from '@/network/api/interact'
+import {findReportPage, type ReportPageDataResponse} from '@/network/api/event'
 
 // region 系统
+
+const MAX = 30
+const MIN = 20
+const RANGE_MAX = 35
+const RANGE_MIN = 15
+const RANGE = RANGE_MAX - RANGE_MIN
 
 const props = defineProps<{
   gatewaySn: number,
@@ -24,6 +31,7 @@ const globalStore = useGlobalStore()
  * 10分钟刷新一次
  */
 watch(() => globalStore.refresh10Minute, () => {
+  queryMinute(minute.value)
 })
 
 onMounted(() => {
@@ -45,8 +53,15 @@ watch(props, () => {
   setRange()
   unsubscribeGroup(STOMP_GROUP)
   subscribeData()
-  realtimeChart.clear()
-  updateRealtimeData(undefined)
+  resetRealtime()
+  resetMinute()
+  queryMinute(minute.value)
+  resetHour()
+  queryHour(hour.value)
+  resetDay()
+  queryDay(day.value)
+  resetMonth()
+  queryMonth(month.value)
 })
 
 /**
@@ -66,7 +81,7 @@ onUnmounted(() => {
 
 // endregion
 
-// region 设置界限
+// region HTTP 设置界限
 
 function setRange() {
   findLast({gatewaySn: props.gatewaySn, deviceSn: props.deviceSn, commandCode: 40100}).then(res => {
@@ -76,26 +91,38 @@ function setRange() {
     // 整数
     let max: number = res.response.temperatureMax
     let min: number = res.response.temperatureMin
-    // 最大值为上限+5并且是5的倍数
-    let seriesMax = Math.ceil((max + 0.1) / 5) * 5
-    realtimeOption.series.max = seriesMax
-    // 最小值为上限-5并且是5的倍数
-    let seriesMin = Math.floor((min - 0.1) / 5) * 5
-    realtimeOption.series.min = seriesMin
-    // 分隔符每隔5度一个
-    let seriesTotal = seriesMax - seriesMin
-    realtimeOption.series.splitNumber = seriesTotal / 5
+    /* 实时温度 */
+    // 最大值
+    let rangeMax = ceil5Upper(max)
+    realtimeOption.series.max = rangeMax
+    // 最小值
+    let rangeMin = floor5Lower(min)
+    realtimeOption.series.min = rangeMin
+    // 分隔符
+    let range = rangeMax - rangeMin
+    realtimeOption.series.splitNumber = range / 5
     // 上限
-    realtimeOption.series.axisLine.lineStyle.color[1][0] = 1 - (seriesMax - max) / seriesTotal
+    realtimeOption.series.axisLine.lineStyle.color[1][0] = 1 - (rangeMax - max) / range
     // 下限
-    realtimeOption.series.axisLine.lineStyle.color[0][0] = (min - seriesMin) / seriesTotal
+    realtimeOption.series.axisLine.lineStyle.color[0][0] = (min - rangeMin) / range
     realtimeChart.setOption(realtimeOption)
+    /* 分钟报表 */
+    // 上限
+    historyMinuteOption.visualMap.pieces[2].gt = max
+    historyMinuteOption.series.markLine.data[0].yAxis = max
+    // 中间
+    historyMinuteOption.visualMap.pieces[1].gte = min
+    historyMinuteOption.visualMap.pieces[1].lte = max
+    // 下限
+    historyMinuteOption.visualMap.pieces[0].lt = min
+    historyMinuteOption.series.markLine.data[1].yAxis = min
+    historyMinuteChart.setOption(historyMinuteOption)
   })
 }
 
 // endregion
 
-// region stomp
+// region WS 实时温度
 
 const STOMP_GROUP = 'thermometer'
 
@@ -104,7 +131,7 @@ const EVENT_PREFIX = '/topic/iot/event/'
 function subscribeData() {
   subscribe(STOMP_GROUP, EVENT_PREFIX + props.gatewaySn + '/' + props.deviceSn + '/' + 10100, function (res) {
     let e = JSON.parse(res.body).event
-    updateRealtimeData(e.temperature)
+    updateRealtime(e.temperature)
   })
 }
 
@@ -120,9 +147,9 @@ const realtimeOption: any = {
     type: 'gauge',
     radius: '75%',
     center: ['50%', '55%'],
-    max: 35,
-    min: 15,
-    splitNumber: 4,
+    max: RANGE_MAX,
+    min: RANGE_MIN,
+    splitNumber: RANGE / 5,
     progress: {
       show: true,
       width: 10,
@@ -137,8 +164,8 @@ const realtimeOption: any = {
       lineStyle: {
         width: 20,
         color: [
-          [0.25, '#6CF'],
-          [0.75, '#9C9'],
+          [(MIN - RANGE_MIN) / RANGE, '#6CF'],
+          [1 - (RANGE_MAX - MAX) / RANGE, '#9C9'],
           [1, '#F99']
         ]
       }
@@ -172,15 +199,25 @@ const realtimeOption: any = {
 }
 
 /**
- * 更新实时温度数据
+ * 更新实时温度
  * @param temperature 温度
  */
-function updateRealtimeData(temperature: number | undefined) {
-  if (typeof temperature !== 'undefined') {
-    realtimeOption.series.data = [round2(temperature / 10000)]
-  } else {
-    delete realtimeOption.series.data
-  }
+function updateRealtime(temperature: number) {
+  realtimeOption.series.data = [round2(temperature / 10000)]
+  realtimeChart.setOption(realtimeOption)
+}
+
+/**
+ * 重置实时温度
+ */
+function resetRealtime() {
+  realtimeChart.clear()
+  delete realtimeOption.series.data
+  realtimeOption.series.max = RANGE_MAX
+  realtimeOption.series.min = RANGE_MIN
+  realtimeOption.series.splitNumber = RANGE / 5
+  realtimeOption.series.axisLine.lineStyle.color[0][0] = (MIN - RANGE_MIN) / RANGE
+  realtimeOption.series.axisLine.lineStyle.color[1][0] = 1 - (RANGE_MAX - MAX) / RANGE
   realtimeChart.setOption(realtimeOption)
 }
 
@@ -197,7 +234,7 @@ const historyMinuteOption: any = {
     top: 30,
     bottom: 20,
     left: 30,
-    right: 10
+    right: 20
   },
   tooltip: {
     trigger: 'axis'
@@ -218,8 +255,8 @@ const historyMinuteOption: any = {
   yAxis: {
     name: '℃',
     type: 'value',
-    max: 30,
-    min: 22
+    max: RANGE_MAX,
+    min: RANGE_MIN
   },
   visualMap: {
     type: 'piecewise',
@@ -228,16 +265,16 @@ const historyMinuteOption: any = {
     orient: 'horizontal',
     pieces: [
       {
-        lt: 25,
+        lt: MIN,
         color: '#6CF'
       },
       {
-        gte: 25,
-        lte: 28,
+        gte: MIN,
+        lte: MAX,
         color: '#9C9'
       },
       {
-        gt: 28,
+        gt: MAX,
         color: '#F99'
       }
     ],
@@ -277,31 +314,79 @@ const historyMinuteOption: any = {
             color: '#F99',
           },
           name: '温度上限',
-          yAxis: 28
+          yAxis: MAX
         },
         {
           lineStyle: {
             color: '#6CF',
           },
           name: '温度下限',
-          yAxis: 25
+          yAxis: MIN
         }
       ]
-    },
-    data: [26, 27, 27.5, 28, 27.6, 27.1, 26, 27, 28.88, 28.7, 28.6, 23.33, 25, 26.23, 27.77, 25, 24, 24.5, 24.6, 28.5, 24]
+    }
   }
 }
 
 const minute = ref(new Date())
 const minuteTitle = ref(getDateString(minute.value, 'MINUTE'))
 
-function historyMinuteQuery(date: Date) {
+function queryMinute(date: Date) {
   minute.value = date
   minuteTitle.value = getDateString(date, 'MINUTE')
+  findReportPage({
+    gatewaySn: props.gatewaySn,
+    deviceSn: props.deviceSn,
+    commandCode: 10100,
+    reportType: 'MINUTE',
+    year: date.getFullYear(),
+    month: date.getMonth() + 1,
+    day: date.getDate(),
+    hour: date.getHours(),
+    rows: 60,
+    orderBy: 'minute'
+  }).then(res => {
+    updateMinute(res.list)
+  })
 }
 
-function historyMinuteRefresh() {
-  console.log('historyMinuteRefresh')
+/**
+ * 更新分钟报表
+ */
+function updateMinute(list: ReportPageDataResponse[]) {
+  let temperatureAvg: (number | undefined)[] = []
+  if (list.length) {
+    for (let i = 0; i < 60; i++) {
+      let p = list.filter(p => p.minute === i).pop()
+      if (p) {
+        temperatureAvg.push(round2(p.event.temperatureAvg / 10000))
+      } else {
+        temperatureAvg.push(undefined)
+      }
+    }
+    let temperatureAvgArray = list.map(p => p.event.temperatureAvg as number)
+    let max = Math.max(...temperatureAvgArray) / 10000
+    let min = Math.min(...temperatureAvgArray) / 10000
+    historyMinuteOption.yAxis.max = ceil5(max)
+    historyMinuteOption.yAxis.min = floor5(min)
+  }
+  historyMinuteOption.series.data = temperatureAvg
+  historyMinuteChart.setOption(historyMinuteOption)
+}
+
+/**
+ * 重置分钟报表
+ */
+function resetMinute() {
+  historyMinuteOption.yAxis.max = RANGE_MAX
+  historyMinuteOption.yAxis.min = RANGE_MIN
+  historyMinuteOption.visualMap.pieces[0].lt = MIN
+  historyMinuteOption.visualMap.pieces[1].gte = MIN
+  historyMinuteOption.visualMap.pieces[1].lte = MAX
+  historyMinuteOption.visualMap.pieces[2].gt = MAX
+  historyMinuteOption.series.markLine.data[0].yAxis = MAX
+  historyMinuteOption.series.markLine.data[1].yAxis = MIN
+  historyMinuteChart.setOption(historyMinuteOption)
 }
 
 // endregion
@@ -339,24 +424,21 @@ const historyHourOption: any = {
   yAxis: {
     name: '℃',
     type: 'value',
-    max: 30,
-    min: 22
+    max: RANGE_MAX,
+    min: RANGE_MIN
   },
   series: [
     {
       name: '最高温度',
-      type: 'line',
-      data: [28, 28, 28.5, 28, 27, 28, 29, 28, 28, 28, 28]
+      type: 'line'
     },
     {
       name: '平均温度',
-      type: 'line',
-      data: [26, 27.5, 28, 27.1, 26, 27, 28.88, 24, 25, 26.23, 27.77]
+      type: 'line'
     },
     {
       name: '最低温度',
-      type: 'line',
-      data: [25, 26, 25, 26, 25, 26, 26, 23.5, 25, 25, 26]
+      type: 'line'
     }
   ]
 }
@@ -364,13 +446,62 @@ const historyHourOption: any = {
 const hour = ref(new Date())
 const hourTitle = ref(getDateString(hour.value, 'HOUR'))
 
-function historyHourQuery(date: Date) {
+function queryHour(date: Date) {
   hour.value = date
   hourTitle.value = getDateString(date, 'HOUR')
+  findReportPage({
+    gatewaySn: props.gatewaySn,
+    deviceSn: props.deviceSn,
+    commandCode: 10100,
+    reportType: 'HOUR',
+    year: date.getFullYear(),
+    month: date.getMonth() + 1,
+    day: date.getDate(),
+    rows: 24,
+    orderBy: 'hour'
+  }).then(res => {
+    updateHour(res.list)
+  })
 }
 
-function historyHourRefresh() {
-  console.log('historyHourRefresh')
+/**
+ * 更新小时报表
+ */
+function updateHour(list: ReportPageDataResponse[]) {
+  let temperatureMax: (number | undefined)[] = []
+  let temperatureAvg: (number | undefined)[] = []
+  let temperatureMin: (number | undefined)[] = []
+  if (list.length) {
+    for (let i = 0; i < 24; i++) {
+      let p = list.filter(p => p.hour === i).pop()
+      if (p) {
+        temperatureMax.push(round2(p.event.temperatureMax / 10000))
+        temperatureAvg.push(round2(p.event.temperatureAvg / 10000))
+        temperatureMin.push(round2(p.event.temperatureMin / 10000))
+      } else {
+        temperatureMax.push(undefined)
+        temperatureAvg.push(undefined)
+        temperatureMin.push(undefined)
+      }
+    }
+    let max = Math.max(...list.map(p => p.event.temperatureMax as number)) / 10000
+    let min = Math.min(...list.map(p => p.event.temperatureMin as number)) / 10000
+    historyHourOption.yAxis.max = ceil5(max)
+    historyHourOption.yAxis.min = floor5(min)
+  }
+  historyHourOption.series[0].data = temperatureMax
+  historyHourOption.series[1].data = temperatureAvg
+  historyHourOption.series[2].data = temperatureMin
+  historyHourChart.setOption(historyHourOption)
+}
+
+/**
+ * 重置小时报表
+ */
+function resetHour() {
+  historyHourOption.yAxis.max = RANGE_MAX
+  historyHourOption.yAxis.min = RANGE_MIN
+  historyHourChart.setOption(historyHourOption)
 }
 
 // endregion
@@ -411,35 +542,80 @@ const historyDayOption: any = {
   yAxis: {
     name: '℃',
     type: 'value',
-    max: 30,
-    min: 22
+    max: RANGE_MAX,
+    min: RANGE_MIN
   },
   series: [
     {
       name: '最高温度',
-      type: 'line',
-      data: [28, 28, 28.5, 28, 27, 28, 29, 28, 28, 28, 28]
+      type: 'line'
     },
     {
       name: '平均温度',
-      type: 'line',
-      data: [26, 27.5, 28, 27.1, 26, 27, 28.88, 24, 25, 26.23, 27.77]
+      type: 'line'
     },
     {
       name: '最低温度',
-      type: 'line',
-      data: [25, 26, 25, 26, 25, 26, 26, 23.5, 25, 25, 26]
+      type: 'line'
     }
   ]
 }
 
-function historyDayQuery(date: Date) {
+function queryDay(date: Date) {
   day.value = date
   dayTitle.value = getDateString(date, 'DAY')
+  findReportPage({
+    gatewaySn: props.gatewaySn,
+    deviceSn: props.deviceSn,
+    commandCode: 10100,
+    reportType: 'DAY',
+    year: date.getFullYear(),
+    month: date.getMonth() + 1,
+    rows: historyDayOption.xAxis.data.length,
+    orderBy: 'day'
+  }).then(res => {
+    updateDay(res.list)
+  })
 }
 
-function historyDayRefresh() {
-  console.log('historyDayRefresh')
+/**
+ * 更新日报表
+ */
+function updateDay(list: ReportPageDataResponse[]) {
+  let temperatureMax: (number | undefined)[] = []
+  let temperatureAvg: (number | undefined)[] = []
+  let temperatureMin: (number | undefined)[] = []
+  if (list.length) {
+    for (let i = 0; i < historyDayOption.xAxis.data.length; i++) {
+      let p = list.filter(p => p.day === i).pop()
+      if (p) {
+        temperatureMax.push(round2(p.event.temperatureMax / 10000))
+        temperatureAvg.push(round2(p.event.temperatureAvg / 10000))
+        temperatureMin.push(round2(p.event.temperatureMin / 10000))
+      } else {
+        temperatureMax.push(undefined)
+        temperatureAvg.push(undefined)
+        temperatureMin.push(undefined)
+      }
+    }
+    let max = Math.max(...list.map(p => p.event.temperatureMax as number)) / 10000
+    let min = Math.min(...list.map(p => p.event.temperatureMin as number)) / 10000
+    historyDayOption.yAxis.max = ceil5(max)
+    historyDayOption.yAxis.min = floor5(min)
+  }
+  historyDayOption.series[0].data = temperatureMax
+  historyDayOption.series[1].data = temperatureAvg
+  historyDayOption.series[2].data = temperatureMin
+  historyDayChart.setOption(historyDayOption)
+}
+
+/**
+ * 重置日报表
+ */
+function resetDay() {
+  historyDayOption.yAxis.max = RANGE_MAX
+  historyDayOption.yAxis.min = RANGE_MIN
+  historyDayChart.setOption(historyDayOption)
 }
 
 // endregion
@@ -474,24 +650,21 @@ const historyMonthOption: any = {
   yAxis: {
     name: '℃',
     type: 'value',
-    max: 30,
-    min: 22
+    max: RANGE_MAX,
+    min: RANGE_MIN
   },
   series: [
     {
       name: '最高温度',
-      type: 'line',
-      data: [28, 28, 28.5, 28, 27, 28, 29, 28, 28, 28, 28, 28]
+      type: 'line'
     },
     {
       name: '平均温度',
-      type: 'line',
-      data: [26, 27.5, 28, 27.1, 26, 27, 28.88, 24, 25, 26.23, 27.77, 27]
+      type: 'line'
     },
     {
       name: '最低温度',
-      type: 'line',
-      data: [25, 26, 25, 26, 25, 26, 26, 23.5, 25, 25, 26, 26]
+      type: 'line'
     }
   ]
 }
@@ -499,13 +672,60 @@ const historyMonthOption: any = {
 const month = ref(new Date())
 const monthTitle = ref(getDateString(month.value, 'MONTH'))
 
-function historyMonthQuery(date: Date) {
+function queryMonth(date: Date) {
   month.value = date
   monthTitle.value = getDateString(date, 'MONTH')
+  findReportPage({
+    gatewaySn: props.gatewaySn,
+    deviceSn: props.deviceSn,
+    commandCode: 10100,
+    reportType: 'MONTH',
+    year: date.getFullYear(),
+    rows: 12,
+    orderBy: 'month'
+  }).then(res => {
+    updateMonth(res.list)
+  })
 }
 
-function historyMonthRefresh() {
-  console.log('historyMonthRefresh')
+/**
+ * 更新月报表
+ */
+function updateMonth(list: ReportPageDataResponse[]) {
+  let temperatureMax: (number | undefined)[] = []
+  let temperatureAvg: (number | undefined)[] = []
+  let temperatureMin: (number | undefined)[] = []
+  if (list.length) {
+    for (let i = 0; i < historyMonthOption.xAxis.data.length; i++) {
+      let p = list.filter(p => p.month === i).pop()
+      if (p) {
+        temperatureMax.push(round2(p.event.temperatureMax / 10000))
+        temperatureAvg.push(round2(p.event.temperatureAvg / 10000))
+        temperatureMin.push(round2(p.event.temperatureMin / 10000))
+      } else {
+        temperatureMax.push(undefined)
+        temperatureAvg.push(undefined)
+        temperatureMin.push(undefined)
+      }
+    }
+    let max = Math.max(...list.map(p => p.event.temperatureMax as number)) / 10000
+    let min = Math.min(...list.map(p => p.event.temperatureMin as number)) / 10000
+    historyMonthOption.yAxis.max = ceil5(max)
+    historyMonthOption.yAxis.min = floor5(min)
+  }
+  historyMonthOption.series[0].data = temperatureMax
+  historyMonthOption.series[1].data = temperatureAvg
+  historyMonthOption.series[2].data = temperatureMin
+  historyMonthChart.setOption(historyMonthOption)
+}
+
+/**
+ * 重置月报表
+ */
+function resetMonth() {
+  historyMonthOption.yAxis.max = RANGE_MAX
+  historyMonthOption.yAxis.min = RANGE_MIN
+  historyMonthChart.setOption(historyMonthOption)
 }
 
 // endregion
@@ -521,8 +741,7 @@ function historyMonthRefresh() {
         :title="minuteTitle+' 历史温度'"
         report-type="MINUTE"
         show-refresh
-        @query="historyMinuteQuery"
-        @refresh="historyMinuteRefresh"
+        @query="queryMinute"
     >
       <div ref="historyMinute" class="historyMinute"/>
     </Graph>
@@ -532,8 +751,7 @@ function historyMonthRefresh() {
         :title="hourTitle+' 历史温度'"
         report-type="HOUR"
         show-refresh
-        @query="historyHourQuery"
-        @refresh="historyHourRefresh"
+        @query="queryHour"
     >
       <div ref="historyHour" class="historyHour"/>
     </Graph>
@@ -541,8 +759,7 @@ function historyMonthRefresh() {
         :title="dayTitle+' 历史温度'"
         report-type="DAY"
         show-refresh
-        @query="historyDayQuery"
-        @refresh="historyDayRefresh"
+        @query="queryDay"
     >
       <div ref="historyDay" class="historyDay"/>
     </Graph>
@@ -550,8 +767,7 @@ function historyMonthRefresh() {
         :title="monthTitle+' 历史温度'"
         report-type="MONTH"
         show-refresh
-        @query="historyMonthQuery"
-        @refresh="historyMonthRefresh"
+        @query="queryMonth"
     >
       <div ref="historyMonth" class="historyMonth"/>
     </Graph>

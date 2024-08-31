@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import refreshSvg from '@/assets/images/refresh.svg'
-import {ref} from 'vue'
+import {onMounted, ref} from 'vue'
 import type {ReportType} from '@/types'
+import {CaretLeft, CaretRight} from '@element-plus/icons-vue'
+import dayjs, {type Dayjs} from 'dayjs'
 
 const props = defineProps<{
   title: string
@@ -11,7 +13,6 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   query: [Date]
-  refresh: [void]
 }>()
 
 const date = ref(new Date())
@@ -20,9 +21,49 @@ function disabledDate(date: Date) {
   return date > new Date()
 }
 
-function dateChange() {
+function query() {
   emits('query', date.value)
 }
+
+function left() {
+  leftOrRight(-1)
+}
+
+function right() {
+  leftOrRight(1)
+}
+
+function leftOrRight(value: number) {
+  let d: Dayjs
+  switch (props.reportType) {
+    case 'MONTH': {
+      d = dayjs(date.value).add(value, 'year')
+      break
+    }
+    case 'DAY': {
+      d = dayjs(date.value).add(value, 'month')
+      break
+    }
+    case 'HOUR': {
+      d = dayjs(date.value).add(value, 'day')
+      break
+    }
+    case 'MINUTE':
+    default: {
+      d = dayjs(date.value).add(value, 'hour')
+      break
+    }
+  }
+  let dd = d.toDate()
+  if (!disabledDate(dd)) {
+    date.value = dd
+    query()
+  }
+}
+
+onMounted(() => {
+  query()
+})
 </script>
 
 <template>
@@ -31,6 +72,8 @@ function dateChange() {
       <span>{{ props.title }}</span>
       <div>
         <!-- 月报表 -->
+        <CaretLeft class="arrow" @click="left"/>
+        <CaretRight class="arrow" @click="right"/>
         <el-date-picker
             v-if="props.reportType==='MONTH'"
             v-model="date"
@@ -40,7 +83,7 @@ function dateChange() {
             size="small"
             style="width:80px"
             type="year"
-            @change="dateChange"
+            @change="query"
         />
         <!-- 日报表 -->
         <el-date-picker
@@ -52,7 +95,7 @@ function dateChange() {
             size="small"
             style="width:100px"
             type="month"
-            @change="dateChange"
+            @change="query"
         />
         <!-- 小时报表 -->
         <el-date-picker
@@ -64,7 +107,7 @@ function dateChange() {
             size="small"
             style="width:120px"
             type="date"
-            @change="dateChange"
+            @change="query"
         />
         <!-- 分钟报表 -->
         <el-date-picker
@@ -76,9 +119,9 @@ function dateChange() {
             size="small"
             style="width:150px"
             type="datetime"
-            @change="dateChange"
+            @change="query"
         />
-        <img :src="refreshSvg" alt="刷新" class="refresh" @click="emits('refresh')">
+        <img :src="refreshSvg" alt="刷新" class="refresh" @click="query">
       </div>
     </div>
     <div v-else class="title title2">
@@ -110,6 +153,13 @@ function dateChange() {
 
 .title2 {
   text-align: center;
+}
+
+.arrow {
+  margin-right: 5px;
+  height: 20px;
+  cursor: pointer;
+  color: #666;
 }
 
 .refresh {
