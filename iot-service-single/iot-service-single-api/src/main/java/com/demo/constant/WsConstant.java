@@ -19,7 +19,7 @@ public class WsConstant {
     // /topic/iot
     //   /event/[网关序号]/[设备序号]/[命令代码] 事件
     //   /fault/[网关序号] 故障详情
-    //   /interact/[网关序号]/[设备序号]/[命令代码] 互动
+    //   /interact/[网关序号]/[设备序号]/[命令代码] 交互
 
     /**
      * 前缀{@value}
@@ -38,7 +38,7 @@ public class WsConstant {
      */
     public static final String FAULT_PREFIX = BROADCAST + "fault/";
     /**
-     * 互动前缀(广播模式){@value}
+     * 交互前缀(广播模式){@value}
      */
     public static final String INTERACT_PREFIX = BROADCAST + "interact/";
 

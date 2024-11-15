@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 /**
- * <h1>互动</h1>
+ * <h1>交互</h1>
  *
  * <p>
  * createDate 2023/11/14 11:41:53
@@ -28,7 +28,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("interact")
 @AllArgsConstructor
-@Tag(name = "互动")
+@Tag(name = "交互")
 @Slf4j
 public class InteractController extends ControllerBase {
 
@@ -62,9 +62,9 @@ public class InteractController extends ControllerBase {
         // 插入并发送
         ProtocolVo result = interactService.insertAndSend(protocol);
         if (result != null) {
-            log.info("互动请求发送成功:[{}]", result);
+            log.info("交互请求发送成功:[{}]", result);
         } else {
-            log.warn("互动请求发送失败:[{}]", protocol);
+            log.warn("交互请求发送失败:[{}]", protocol);
         }
         return Result.o(result);
     }

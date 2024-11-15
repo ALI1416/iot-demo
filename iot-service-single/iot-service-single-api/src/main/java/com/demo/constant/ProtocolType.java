@@ -21,7 +21,7 @@ public enum ProtocolType {
      */
     FAULT,
     /**
-     * 互动
+     * 交互
      */
     INTERACT,
 

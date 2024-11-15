@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 /**
- * <h1>互动订阅</h1>
+ * <h1>交互订阅</h1>
  *
  * <p>
  * createDate 2024/04/11 17:42:19
@@ -77,7 +77,7 @@ public class InteractSubscribeService extends ServiceBase {
             log.warn("数据检查未通过 网关序号:[{}] ,设备序号:[{}] ,命令代码:[{}] ,请求序号:[{}] ,错误代码:[{}] ,消息:[{}]", gatewaySn, deviceSn, commandCode, requestSn, errorCode, response);
             return;
         }
-        // 单向互动
+        // 单向交互
         if (requestSn == 0) {
             ProtocolVo protocol = new ProtocolVo();
             protocol.setGatewaySn(gatewaySn);
@@ -88,15 +88,15 @@ public class InteractSubscribeService extends ServiceBase {
             protocol.setResponse(responseData);
             ProtocolVo result = interactDao.insert2(protocol);
             if (result != null) {
-                log.info("单向互动响应接收成功:[{}]", result);
+                log.info("单向交互响应接收成功:[{}]", result);
                 // WebSocket广播模式
                 webSocketTemp.send(WsConstant.getInteractTopic(gatewaySn, deviceSn, commandCode), result.toWebString());
             } else {
-                log.warn("单向互动响应接收失败:[{}]", protocol);
+                log.warn("单向交互响应接收失败:[{}]", protocol);
             }
             return;
         }
-        // 双向互动
+        // 双向交互
         ProtocolVo protocol = interactDao.findById(requestSn, MongoConstant.getInteractCollectionName(gatewaySn, Id.timestamp(requestSn)));
         if (protocol == null) {
             log.warn("网关序号:[{}]不存在请求序号:[{}] ,设备序号:[{}] ,命令代码:[{}] ,错误代码:[{}] ,消息:[{}]", gatewaySn, requestSn, deviceSn, commandCode, errorCode, response);
@@ -120,11 +120,11 @@ public class InteractSubscribeService extends ServiceBase {
         // 更新
         ProtocolVo result = interactDao.save(protocol);
         if (result != null) {
-            log.info("双向互动响应接收成功:[{}]", result);
+            log.info("双向交互响应接收成功:[{}]", result);
             // WebSocket广播模式
             webSocketTemp.send(WsConstant.getInteractTopic(gatewaySn, deviceSn, commandCode), result.toWebString());
         } else {
-            log.info("双向互动响应接收失败:[{}]", protocol);
+            log.info("双向交互响应接收失败:[{}]", protocol);
         }
     }
 

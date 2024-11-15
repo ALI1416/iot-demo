@@ -65,7 +65,7 @@ public class MongoIndexService extends ServiceBase {
                     collectionName.contains(MongoConstant.FAULT) ||
                     collectionName.contains(MongoConstant.FAULT_DETAIL)
             ) {
-                // 互动 故障 故障详情
+                // 交互 故障 故障详情
                 collection.createIndex(COMMAND_CODE);
                 collection.createIndex(DEVICE_SN);
             } else if (collectionName.contains(MongoConstant.EVENT)) {

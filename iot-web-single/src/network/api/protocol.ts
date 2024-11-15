@@ -18,7 +18,7 @@ type ProtocolInfo = {
    */
   name: string
   /**
-   * 协议类型 EVENT事件 FAULT故障 INTERACT互动
+   * 协议类型 EVENT事件 FAULT故障 INTERACT交互
    */
   type: ProtocolType
   /**
@@ -52,7 +52,7 @@ type ProtocolInfo = {
 }
 
 /**
- * 协议类型 EVENT事件 FAULT故障 INTERACT互动
+ * 协议类型 EVENT事件 FAULT故障 INTERACT交互
  */
 type ProtocolType = 'EVENT' | 'FAULT' | 'INTERACT'
 

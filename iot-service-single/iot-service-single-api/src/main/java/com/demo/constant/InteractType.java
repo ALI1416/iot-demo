@@ -16,11 +16,11 @@ import lombok.Getter;
 public enum InteractType {
 
     /**
-     * 默认(双向互动)
+     * 默认(双向交互)
      */
     DEFAULT(0),
     /**
-     * 单向互动
+     * 单向交互
      */
     SINGLE(1),
     ;

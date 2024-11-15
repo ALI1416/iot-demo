@@ -29,7 +29,7 @@ public class MongoConstant {
     //     _month_[yyyy] 月报表(年) 1年12月*每月10条=120条
     //   _fault_[yyyy] 故障(年)
     //   _fault_detail_[yyyy] 故障详情(年)
-    //   _interact_[yyyy] 互动(年)
+    //   _interact_[yyyy] 交互(年)
 
     /**
      * 事件{@value}
@@ -44,7 +44,7 @@ public class MongoConstant {
      */
     public static final String FAULT_DETAIL = "_fault_detail";
     /**
-     * 互动{@value}
+     * 交互{@value}
      */
     public static final String INTERACT = "_interact";
 

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * <h1>互动</h1>
+ * <h1>交互</h1>
  *
  * <p>
  * createDate 2023/11/14 14:59:06
