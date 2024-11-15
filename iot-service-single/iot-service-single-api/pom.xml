@@ -9,7 +9,7 @@
 
   <name>iot-service-single-api</name>
   <description>物联网服务单机版API</description>
-  <url>https://github.com/ALI1416/springboot-demo/tree/master/iot-demo/iot-service-single/iot-service-single-api</url>
+  <url>https://github.com/ALI1416/iot-demo/tree/master/iot-service-single/iot-service-single-api</url>
 
   <parent>
     <groupId>com.demo</groupId>

@@ -11,14 +11,14 @@
 
   <name>iot-service-single</name>
   <description>物联网服务单机版</description>
-  <url>https://github.com/ALI1416/springboot-demo/tree/master/iot-demo/iot-service-single</url>
+  <url>https://github.com/ALI1416/iot-demo/tree/master/iot-service-single</url>
 
   <parent>
     <!--SpringBoot Parent-->
     <!--org.springframework.boot:spring-boot-starter-parent-->
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.3.1</version>
+    <version>3.3.5</version>
   </parent>
 
   <modules>
@@ -82,7 +82,7 @@
     <!--父依赖不含-->
     <!--FastJson-->
     <!--com.alibaba.fastjson2:fastjson2-->
-    <fastjson.version>2.0.52</fastjson.version>
+    <fastjson.version>2.0.53</fastjson.version>
 
     <!--MQTT-->
     <!--org.eclipse.paho:org.eclipse.paho.client.mqttv3-->
@@ -90,7 +90,7 @@
 
     <!--加密算法-->
     <!--org.bouncycastle:bcpkix-jdk18on-->
-    <bcpkix.version>1.78.1</bcpkix.version>
+    <bcpkix.version>1.79</bcpkix.version>
 
     <!--MyBatis-->
     <!--org.mybatis.spring.boot:mybatis-spring-boot-starter-->
