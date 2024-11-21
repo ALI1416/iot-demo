@@ -21,7 +21,7 @@ public enum FieldStatusEnum {
      */
     NULL(new ProtocolInfo.FieldStatus(null, null)),
     /**
-     * 设备类型
+     * 设备类型 0网关 1温度计
      *
      * @see DeviceType
      */

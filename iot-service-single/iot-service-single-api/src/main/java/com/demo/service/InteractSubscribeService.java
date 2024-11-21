@@ -42,7 +42,7 @@ public class InteractSubscribeService extends ServiceBase {
     /**
      * MQTT订阅
      */
-    @Subscribe(MqttConstant.RESPONSE_PREFIX + "+/+/+")
+    @Subscribe(MqttConstant.RESPONSE + "+/+/+")
     public void subscribe(
             @Header(HeaderEnum.TOPIC) String topic,
             @Header(value = HeaderEnum.TOPIC_PART) int gatewaySn,

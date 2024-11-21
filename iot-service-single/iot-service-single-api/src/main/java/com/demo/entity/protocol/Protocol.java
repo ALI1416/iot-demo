@@ -4,7 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.demo.base.MongoEntityBase;
 import com.demo.base.ToStringBase;
-import com.demo.constant.InteractErrorCode;
+import com.demo.constant.ErrorCode;
 import com.demo.constant.InteractType;
 import com.demo.constant.ProtocolType;
 import com.demo.entity.vo.ProtocolVo;
@@ -72,6 +72,21 @@ public class Protocol extends MongoEntityBase {
     @Schema(description = "响应")
     private Data response;
     /**
+     * 广播
+     */
+    @Schema(description = "广播")
+    private Data broadcast;
+    /**
+     * 读取
+     */
+    @Schema(description = "读取")
+    private Data read;
+    /**
+     * 写入
+     */
+    @Schema(description = "写入")
+    private Data write;
+    /**
      * 交互-交互类型
      *
      * @see InteractType
@@ -79,11 +94,11 @@ public class Protocol extends MongoEntityBase {
     @Schema(description = "交互-交互类型")
     private Integer type;
     /**
-     * 交互-错误代码
+     * 错误代码
      *
-     * @see InteractErrorCode
+     * @see ErrorCode
      */
-    @Schema(description = "交互-错误代码")
+    @Schema(description = "错误代码")
     private Integer errorCode;
     /**
      * 故障-故障列表
@@ -315,6 +330,41 @@ public class Protocol extends MongoEntityBase {
     }
 
     /**
+     * 写入处理
+     */
+    @Schema(description = "写入处理", name = "Protocol.WriteHandle")
+    public interface WriteHandle {
+
+        /**
+         * 写入处理
+         *
+         * @param read 读取
+         * @return 写入
+         */
+        Data handle(Data read);
+
+    }
+
+    /**
+     * 默认写入处理
+     */
+    @Schema(description = "默认写入处理", name = "Protocol.DefaultWriteHandle")
+    public static class DefaultWriteHandle implements WriteHandle {
+
+        /**
+         * 写入处理
+         *
+         * @param read 读取
+         * @return 写入
+         */
+        @Override
+        public Data handle(Data read) {
+            return null;
+        }
+
+    }
+
+    /**
      * 事件转换
      *
      * @param commandCode 命令代码
@@ -388,6 +438,87 @@ public class Protocol extends MongoEntityBase {
         if (response != null) {
             try {
                 data = response.to(info.getResponseClass());
+            } catch (Exception ignored) {
+                return null;
+            }
+        }
+        return new AbstractMap.SimpleEntry<>(info.getDeviceType().getCode(), data);
+    }
+
+    /**
+     * 广播转换
+     *
+     * @param commandCode 命令代码
+     * @param broadcast   广播
+     * @return 设备类型, Protocol.Data<br>
+     * 协议格式错误或转换失败返回null
+     */
+    public static Map.Entry<Integer, Data> broadcastConvert(int commandCode, JSONObject broadcast) {
+        ProtocolInfo info = ProtocolInfo.get(commandCode);
+        if (info == null
+                || info.getType() != ProtocolType.BROADCAST
+                || (info.getBroadcast() == null) != (broadcast == null)
+        ) {
+            return null;
+        }
+        Data data = null;
+        if (broadcast != null) {
+            try {
+                data = broadcast.to(info.getBroadcastClass());
+            } catch (Exception ignored) {
+                return null;
+            }
+        }
+        return new AbstractMap.SimpleEntry<>(info.getDeviceType().getCode(), data);
+    }
+
+    /**
+     * 读取转换
+     *
+     * @param commandCode 命令代码
+     * @param read        读取
+     * @return 设备类型, Protocol.Data<br>
+     * 协议格式错误或转换失败返回null
+     */
+    public static Map.Entry<Integer, Data> readConvert(int commandCode, JSONObject read) {
+        ProtocolInfo info = ProtocolInfo.get(commandCode);
+        if (info == null
+                || info.getType() != ProtocolType.COMMUNICATION
+                || (info.getRead() == null) != (read == null)
+        ) {
+            return null;
+        }
+        Data data = null;
+        if (read != null) {
+            try {
+                data = read.to(info.getReadClass());
+            } catch (Exception ignored) {
+                return null;
+            }
+        }
+        return new AbstractMap.SimpleEntry<>(info.getDeviceType().getCode(), data);
+    }
+
+    /**
+     * 写入转换
+     *
+     * @param commandCode 命令代码
+     * @param write       写入
+     * @return 设备类型, Protocol.Data<br>
+     * 协议格式错误或转换失败返回null
+     */
+    public static Map.Entry<Integer, Data> writeConvert(int commandCode, JSONObject write) {
+        ProtocolInfo info = ProtocolInfo.get(commandCode);
+        if (info == null
+                || info.getType() != ProtocolType.COMMUNICATION
+                || (info.getWrite() == null) != (write == null)
+        ) {
+            return null;
+        }
+        Data data = null;
+        if (write != null) {
+            try {
+                data = write.to(info.getWriteClass());
             } catch (Exception ignored) {
                 return null;
             }
@@ -486,6 +617,16 @@ public class Protocol extends MongoEntityBase {
      */
     public static ProtocolVo getEventReportMonth(List<ProtocolVo> list) {
         return ProtocolInfo.get(list.get(0).getCommandCode()).getEventReportMonthFunction().apply(list);
+    }
+
+    /**
+     * 获取交流写入
+     *
+     * @param read 读取
+     * @return 写入
+     */
+    public static Data getCommunicationWrite(int commandCode, Data read) {
+        return ProtocolInfo.get(commandCode).getCommunicationWriteFunction().apply(read);
     }
 
 }

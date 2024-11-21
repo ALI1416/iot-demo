@@ -34,6 +34,16 @@
   <textarea id="faultMsg" readonly cols="50" rows="5"></textarea>
 </div>
 <div>
+  <h3>广播</h3>
+  <h4>校时广播</h4>
+  <textarea id="timeSynMsg" readonly cols="50" rows="5"></textarea>
+</div>
+<div>
+  <h3>交流</h3>
+  <h4>获取时间戳</h4>
+  <textarea id="getTimeMsg" readonly cols="50" rows="5"></textarea>
+</div>
+<div>
   <h3>交互</h3>
   <h4>设置通信地址</h4>
   <textarea id="setCommunicationAddressSendText" cols="50" rows="5">{
@@ -77,6 +87,8 @@
   const msg = document.getElementById('msg')
   const thermometerMsg = document.getElementById('thermometerMsg')
   const faultMsg = document.getElementById('faultMsg')
+  const timeSynMsg = document.getElementById('timeSynMsg')
+  const getTimeMsg = document.getElementById('getTimeMsg')
   const setCommunicationAddressSendText = document.getElementById('setCommunicationAddressSendText')
   const setCommunicationAddressSendBtn = document.getElementById('setCommunicationAddressSendBtn')
   const setCommunicationAddressMsg = document.getElementById('setCommunicationAddressMsg')
@@ -218,6 +230,16 @@
     /* 故障详情 */
     stomp.subscribe('/topic/iot/fault/' + gatewaySnText.value, function (res) {
       faultMsg.value = res.body + '\n' + faultMsg.value
+    })
+    /* 广播 */
+    // 校时广播
+    stomp.subscribe('/topic/iot/broadcast/50000', function (res) {
+      timeSynMsg.value = res.body + '\n' + timeSynMsg.value
+    })
+    /* 交流 */
+    // 获取时间戳
+    stomp.subscribe('/topic/iot/communication/' + gatewaySnText.value + '/0/60000', function (res) {
+      getTimeMsg.value = res.body + '\n' + getTimeMsg.value
     })
     /* 交互 */
     // 设置通信地址

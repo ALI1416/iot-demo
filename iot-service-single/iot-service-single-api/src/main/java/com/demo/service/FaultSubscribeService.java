@@ -44,7 +44,7 @@ public class FaultSubscribeService extends ServiceBase {
     /**
      * MQTT订阅
      */
-    @Subscribe(MqttConstant.FAULT_PREFIX + "+/+/+")
+    @Subscribe(MqttConstant.FAULT + "+/+/+")
     public void subscribe(
             @Header(HeaderEnum.TOPIC) String topic,
             @Header(value = HeaderEnum.TOPIC_PART) int gatewaySn,

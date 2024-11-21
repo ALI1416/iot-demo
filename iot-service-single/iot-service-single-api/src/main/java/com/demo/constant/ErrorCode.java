@@ -3,7 +3,7 @@ package com.demo.constant;
 import lombok.Getter;
 
 /**
- * <h1>交互-错误代码</h1>
+ * <h1>错误代码</h1>
  *
  * <p>
  * createDate 2024/08/30 10:43:13
@@ -13,7 +13,7 @@ import lombok.Getter;
  * @since 1.0.0
  **/
 @Getter
-public enum InteractErrorCode {
+public enum ErrorCode {
 
     /**
      * 没有错误
@@ -74,7 +74,7 @@ public enum InteractErrorCode {
      */
     private final int code;
 
-    InteractErrorCode(int code) {
+    ErrorCode(int code) {
         this.code = code;
     }
 

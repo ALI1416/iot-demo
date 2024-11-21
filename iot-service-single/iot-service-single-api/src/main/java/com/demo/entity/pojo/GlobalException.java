@@ -48,6 +48,17 @@ public class GlobalException extends RuntimeException {
     /**
      * 构造函数
      *
+     * @param msg 错误信息
+     */
+    public GlobalException(String msg, Throwable cause) {
+        super(msg, cause);
+        this.resultEnum = ResultEnum.ERROR;
+        this.msg = msg;
+    }
+
+    /**
+     * 构造函数
+     *
      * @param resultEnum 统一返回状态枚举
      */
     public GlobalException(ResultEnum resultEnum) {

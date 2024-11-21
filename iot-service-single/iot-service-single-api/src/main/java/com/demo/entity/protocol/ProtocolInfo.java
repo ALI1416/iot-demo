@@ -108,6 +108,21 @@ public class ProtocolInfo extends ToStringBase {
      */
     @Schema(description = "响应字段信息列表")
     private List<FieldInfo> response;
+    /**
+     * 广播字段信息列表
+     */
+    @Schema(description = "广播字段信息列表")
+    private List<FieldInfo> broadcast;
+    /**
+     * 读取字段信息列表
+     */
+    @Schema(description = "读取字段信息列表")
+    private List<FieldInfo> read;
+    /**
+     * 写入字段信息列表
+     */
+    @Schema(description = "写入字段信息列表")
+    private List<FieldInfo> write;
 
     /**
      * 事件类
@@ -140,6 +155,12 @@ public class ProtocolInfo extends ToStringBase {
     @JSONField(serialize = false, deserialize = false)
     private Function<List<ProtocolVo>, ProtocolVo> eventReportMonthFunction;
     /**
+     * 交流写入方法
+     */
+    @Schema(description = "交流写入方法")
+    @JSONField(serialize = false, deserialize = false)
+    private Function<Protocol.Data, Protocol.Data> communicationWriteFunction;
+    /**
      * 请求类
      */
     @Schema(description = "请求类")
@@ -151,6 +172,24 @@ public class ProtocolInfo extends ToStringBase {
     @Schema(description = "响应类")
     @JSONField(serialize = false, deserialize = false)
     private Class<? extends Protocol.Data> responseClass;
+    /**
+     * 广播类
+     */
+    @Schema(description = "广播类")
+    @JSONField(serialize = false, deserialize = false)
+    private Class<? extends Protocol.Data> broadcastClass;
+    /**
+     * 读取类
+     */
+    @Schema(description = "读取类")
+    @JSONField(serialize = false, deserialize = false)
+    private Class<? extends Protocol.Data> readClass;
+    /**
+     * 写入类
+     */
+    @Schema(description = "写入类")
+    @JSONField(serialize = false, deserialize = false)
+    private Class<? extends Protocol.Data> writeClass;
 
     /**
      * 字段信息
@@ -187,15 +226,11 @@ public class ProtocolInfo extends ToStringBase {
         private FieldSpecialDataType specialDataType;
         /**
          * 字段单位
-         *
-         * @see FieldUnit
          */
         @Schema(description = "字段单位")
         private FieldUnit unit;
         /**
          * 推荐字段单位
-         *
-         * @see FieldUnit
          */
         @Schema(description = "推荐字段单位")
         private FieldUnit recommend;
@@ -211,8 +246,6 @@ public class ProtocolInfo extends ToStringBase {
         private Integer divide;
         /**
          * 字段状态
-         *
-         * @see FieldStatus
          */
         @Schema(description = "字段状态")
         private FieldStatus[] status;
@@ -395,7 +428,7 @@ public class ProtocolInfo extends ToStringBase {
             ) {
                 // 协议类型
                 protocolInfo.setType(ProtocolType.EVENT);
-                // 全部数据类
+                // 事件类
                 Class<? extends Protocol.Data> eventClass = eventAnno.event();
                 protocolInfo.setEvent(getFieldInfo(eventClass));
                 protocolInfo.setEventClass(eventClass);
@@ -420,7 +453,7 @@ public class ProtocolInfo extends ToStringBase {
                     protocolInfo.setEventReportDayFunction(handle::day);
                     protocolInfo.setEventReportMonthFunction(handle::month);
                 } catch (Exception e) {
-                    throw new RuntimeException(clazz.getName() + " 的注解 " + ProtocolAnno.Event.class.getName() + " 解析异常", e);
+                    throw new GlobalException(clazz.getName() + " 的注解 " + ProtocolAnno.Event.class.getName() + " 解析异常", e);
                 }
             }
             // 故障
@@ -433,7 +466,7 @@ public class ProtocolInfo extends ToStringBase {
                 try {
                     protocolInfo.setFault(faultClass.getConstructor().newInstance().fault());
                 } catch (Exception e) {
-                    throw new RuntimeException(clazz.getName() + " 的注解 " + ProtocolAnno.Fault.class.getName() + " 解析异常", e);
+                    throw new GlobalException(clazz.getName() + " 的注解 " + ProtocolAnno.Fault.class.getName() + " 解析异常", e);
                 }
             }
             // 交互
@@ -456,11 +489,51 @@ public class ProtocolInfo extends ToStringBase {
                     protocolInfo.setResponseClass(responseClass);
                 }
             }
+            // 广播
+            ProtocolAnno.Broadcast broadcastAnno = protocolAnno.broadcast();
+            if (broadcastAnno.broadcast() != Protocol.DefaultData.class) {
+                // 协议类型
+                protocolInfo.setType(ProtocolType.BROADCAST);
+                // 广播类
+                Class<? extends Protocol.Data> broadcastClass = broadcastAnno.broadcast();
+                protocolInfo.setBroadcast(getFieldInfo(broadcastClass));
+                protocolInfo.setBroadcastClass(broadcastClass);
+            }
+            // 交流
+            ProtocolAnno.Communication communicationAnno = protocolAnno.communication();
+            if (communicationAnno.read() != Protocol.DefaultData.class
+                    || communicationAnno.write() != Protocol.DefaultData.class
+            ) {
+                // 协议类型
+                protocolInfo.setType(ProtocolType.COMMUNICATION);
+                // 读取类
+                Class<? extends Protocol.Data> readClass = communicationAnno.read();
+                if (readClass != Protocol.DefaultData.class) {
+                    protocolInfo.setRead(getFieldInfo(readClass));
+                    protocolInfo.setReadClass(readClass);
+                }
+                // 写入类
+                Class<? extends Protocol.Data> writeClass = communicationAnno.write();
+                if (writeClass != Protocol.DefaultData.class) {
+                    protocolInfo.setWrite(getFieldInfo(writeClass));
+                    protocolInfo.setWriteClass(writeClass);
+                }
+                // 故障类
+                Class<? extends Protocol.WriteHandle> writeHandleClass = communicationAnno.writeHandle();
+                try {
+                    Protocol.WriteHandle handle = writeHandleClass.getConstructor().newInstance();
+                    protocolInfo.setCommunicationWriteFunction(handle::handle);
+                } catch (Exception e) {
+                    throw new GlobalException(clazz.getName() + " 的注解 " + ProtocolAnno.Fault.class.getName() + " 解析异常", e);
+                }
+            }
             if (protocolInfo.getType() == null) {
-                throw new RuntimeException(clazz.getName() + " 的注解 " + ProtocolAnno.class.getName()
+                throw new GlobalException(clazz.getName() + " 的注解 " + ProtocolAnno.class.getName()
                         + " 必须指定 " + ProtocolAnno.Event.class.getName()
                         + " 或 " + ProtocolAnno.Fault.class.getName()
                         + " 或 " + ProtocolAnno.Interact.class.getName()
+                        + " 或 " + ProtocolAnno.Broadcast.class.getName()
+                        + " 或 " + ProtocolAnno.Communication.class.getName()
                 );
             }
             list.add(protocolInfo);

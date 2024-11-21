@@ -67,6 +67,16 @@ public @interface ProtocolAnno {
     Interact interact() default @Interact();
 
     /**
+     * 广播
+     */
+    Broadcast broadcast() default @Broadcast(broadcast = Protocol.DefaultData.class);
+
+    /**
+     * 交流
+     */
+    Communication communication() default @Communication();
+
+    /**
      * 事件
      */
     @Target({ElementType.ANNOTATION_TYPE})
@@ -75,7 +85,7 @@ public @interface ProtocolAnno {
     @interface Event {
 
         /**
-         * 全部数据类
+         * 事件类
          */
         Class<? extends Protocol.Data> event();
 
@@ -138,6 +148,46 @@ public @interface ProtocolAnno {
          * 响应类
          */
         Class<? extends Protocol.Data> response() default Protocol.DefaultData.class;
+
+    }
+
+    /**
+     * 广播
+     */
+    @Target({ElementType.ANNOTATION_TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    @Documented
+    @interface Broadcast {
+
+        /**
+         * 广播类
+         */
+        Class<? extends Protocol.Data> broadcast();
+
+    }
+
+    /**
+     * 交流
+     */
+    @Target({ElementType.ANNOTATION_TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    @Documented
+    @interface Communication {
+
+        /**
+         * 读取类
+         */
+        Class<? extends Protocol.Data> read() default Protocol.DefaultData.class;
+
+        /**
+         * 写入类
+         */
+        Class<? extends Protocol.Data> write() default Protocol.DefaultData.class;
+
+        /**
+         * 写入处理类
+         */
+        Class<? extends Protocol.WriteHandle> writeHandle() default Protocol.DefaultWriteHandle.class;
 
     }
 

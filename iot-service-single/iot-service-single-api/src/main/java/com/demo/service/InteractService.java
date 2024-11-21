@@ -5,7 +5,7 @@ import cn.z.mongo.entity.Pageable;
 import cn.z.mqtt.MqttTemp;
 import com.alibaba.fastjson2.JSON;
 import com.demo.base.ServiceBase;
-import com.demo.constant.InteractErrorCode;
+import com.demo.constant.ErrorCode;
 import com.demo.constant.MqttConstant;
 import com.demo.dao.mongo.InteractDao;
 import com.demo.entity.protocol.Frame;
@@ -110,7 +110,7 @@ public class InteractService extends ServiceBase {
         protocol.setGatewaySn(gatewaySn);
         protocol.setDeviceSn(deviceSn);
         protocol.setCommandCode(commandCode);
-        protocol.setErrorCode(InteractErrorCode.NO_ERROR.getCode());
+        protocol.setErrorCode(ErrorCode.NO_ERROR.getCode());
         protocol.setYear(DateUtils.getYear());
         List<ProtocolVo> list = findPage(protocol).getList();
         if (list.isEmpty()) {

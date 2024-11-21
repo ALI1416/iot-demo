@@ -30,6 +30,8 @@ public class MongoConstant {
     //   _fault_[yyyy] 故障(年)
     //   _fault_detail_[yyyy] 故障详情(年)
     //   _interact_[yyyy] 交互(年)
+    //   _communication_[yyyy] 交流(年)
+    // broadcast_[yyyy] 广播(年)
 
     /**
      * 事件{@value}
@@ -38,32 +40,40 @@ public class MongoConstant {
     /**
      * 故障{@value}
      */
-    public static final String FAULT = "_fault";
+    public static final String FAULT = "_fault_";
     /**
      * 故障详情{@value}
      */
-    public static final String FAULT_DETAIL = "_fault_detail";
+    public static final String FAULT_DETAIL = "_fault_detail_";
     /**
      * 交互{@value}
      */
-    public static final String INTERACT = "_interact";
+    public static final String INTERACT = "_interact_";
+    /**
+     * 广播{@value}
+     */
+    public static final String BROADCAST = "broadcast_";
+    /**
+     * 交流{@value}
+     */
+    public static final String COMMUNICATION = "_communication_";
 
     /**
      * 报表-分钟{@value}
      */
-    public static final String MINUTE = "_minute";
+    public static final String MINUTE = "_minute_";
     /**
      * 报表-小时{@value}
      */
-    public static final String HOUR = "_hour";
+    public static final String HOUR = "_hour_";
     /**
      * 报表-日{@value}
      */
-    public static final String DAY = "_day";
+    public static final String DAY = "_day_";
     /**
      * 报表-月{@value}
      */
-    public static final String MONTH = "_month";
+    public static final String MONTH = "_month_";
 
     /**
      * 获取事件集合名
@@ -99,16 +109,16 @@ public class MongoConstant {
     public static String getEventReportCollectionName(int gatewaySn, int year, ReportType reportType) {
         switch (reportType) {
             case MINUTE -> {
-                return gatewaySn + MongoConstant.EVENT + MongoConstant.MINUTE + "_" + year;
+                return gatewaySn + MongoConstant.EVENT + MongoConstant.MINUTE + year;
             }
             case HOUR -> {
-                return gatewaySn + MongoConstant.EVENT + MongoConstant.HOUR + "_" + year;
+                return gatewaySn + MongoConstant.EVENT + MongoConstant.HOUR + year;
             }
             case DAY -> {
-                return gatewaySn + MongoConstant.EVENT + MongoConstant.DAY + "_" + year;
+                return gatewaySn + MongoConstant.EVENT + MongoConstant.DAY + year;
             }
             case MONTH -> {
-                return gatewaySn + MongoConstant.EVENT + MongoConstant.MONTH + "_" + year;
+                return gatewaySn + MongoConstant.EVENT + MongoConstant.MONTH + year;
             }
             default -> throw new GlobalException("报表类型错误！");
         }
@@ -122,7 +132,7 @@ public class MongoConstant {
      * @return 集合名
      */
     public static String getFaultCollectionName(int gatewaySn, Timestamp timestamp) {
-        return gatewaySn + MongoConstant.FAULT + "_" + DateUtils.getYear(timestamp);
+        return gatewaySn + MongoConstant.FAULT + DateUtils.getYear(timestamp);
     }
 
     /**
@@ -133,7 +143,7 @@ public class MongoConstant {
      * @return 集合名
      */
     public static String getFaultDetailCollectionName(int gatewaySn, Timestamp timestamp) {
-        return gatewaySn + MongoConstant.FAULT_DETAIL + "_" + DateUtils.getYear(timestamp);
+        return gatewaySn + MongoConstant.FAULT_DETAIL + DateUtils.getYear(timestamp);
     }
 
     /**
@@ -144,7 +154,7 @@ public class MongoConstant {
      * @return 集合名
      */
     public static String getFaultDetailCollectionName(int gatewaySn, int year) {
-        return gatewaySn + MongoConstant.FAULT_DETAIL + "_" + year;
+        return gatewaySn + MongoConstant.FAULT_DETAIL + year;
     }
 
     /**
@@ -155,7 +165,7 @@ public class MongoConstant {
      * @return 集合名
      */
     public static String getInteractCollectionName(int gatewaySn, Timestamp timestamp) {
-        return gatewaySn + MongoConstant.INTERACT + "_" + DateUtils.getYear(timestamp);
+        return gatewaySn + MongoConstant.INTERACT + DateUtils.getYear(timestamp);
     }
 
     /**
@@ -166,7 +176,7 @@ public class MongoConstant {
      * @return 集合名
      */
     public static String getInteractCollectionName(int gatewaySn, long timestamp) {
-        return gatewaySn + MongoConstant.INTERACT + "_" + DateUtils.getYear(timestamp);
+        return gatewaySn + MongoConstant.INTERACT + DateUtils.getYear(timestamp);
     }
 
     /**
@@ -177,7 +187,28 @@ public class MongoConstant {
      * @return 集合名
      */
     public static String getInteractCollectionName(int gatewaySn, int year) {
-        return gatewaySn + MongoConstant.INTERACT + "_" + year;
+        return gatewaySn + MongoConstant.INTERACT + year;
+    }
+
+    /**
+     * 获取广播集合名
+     *
+     * @param timestamp 时间戳
+     * @return 集合名
+     */
+    public static String getBroadcastCollectionName(Timestamp timestamp) {
+        return MongoConstant.BROADCAST + DateUtils.getYear(timestamp);
+    }
+
+    /**
+     * 获取交流集合名
+     *
+     * @param gatewaySn 网关序号
+     * @param timestamp 时间戳
+     * @return 集合名
+     */
+    public static String getCommunicationCollectionName(int gatewaySn, Timestamp timestamp) {
+        return gatewaySn + MongoConstant.COMMUNICATION + DateUtils.getYear(timestamp);
     }
 
 }

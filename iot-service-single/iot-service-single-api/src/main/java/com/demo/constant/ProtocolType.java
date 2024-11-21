@@ -24,5 +24,13 @@ public enum ProtocolType {
      * 交互
      */
     INTERACT,
+    /**
+     * 广播
+     */
+    BROADCAST,
+    /**
+     * 交流
+     */
+    COMMUNICATION,
 
 }

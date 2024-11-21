@@ -39,7 +39,7 @@ public class EventSubscribeService extends ServiceBase {
     /**
      * MQTT订阅
      */
-    @Subscribe(MqttConstant.EVENT_PREFIX + "+/+/+")
+    @Subscribe(MqttConstant.EVENT + "+/+/+")
     public void subscribe(
             @Header(HeaderEnum.TOPIC) String topic,
             @Header(value = HeaderEnum.TOPIC_PART) int gatewaySn,
