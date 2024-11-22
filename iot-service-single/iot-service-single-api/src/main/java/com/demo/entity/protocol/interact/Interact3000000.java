@@ -21,12 +21,12 @@ import lombok.Setter;
  * @since 1.0.0
  **/
 @Schema(description = "设置通信地址")
-@ProtocolAnno(code = 30000, name = "设置通信地址", deviceType = DeviceType.GATEWAY,
-        interact = @ProtocolAnno.Interact(request = Interact30000.Request.class)
+@ProtocolAnno(code = 3000000, name = "设置通信地址", deviceType = DeviceType.GATEWAY,
+        interact = @ProtocolAnno.Interact(request = Interact3000000.Request.class)
 )
-public class Interact30000 {
+public class Interact3000000 {
 
-    private Interact30000() {
+    private Interact3000000() {
     }
 
     /**
@@ -34,7 +34,7 @@ public class Interact30000 {
      */
     @Getter
     @Setter
-    @Schema(description = "请求", name = "Interact30000.Request")
+    @Schema(description = "请求", name = "Interact3000000.Request")
     public static class Request extends ToStringBase implements Protocol.Data {
 
         /**

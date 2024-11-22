@@ -124,7 +124,7 @@
     const data = {
       gatewaySn: gatewaySnText.value,
       deviceSn: 0,
-      commandCode: 30000,
+      commandCode: 3000000,
       requestJson: JSON.parse(setCommunicationAddressSendText.value)
     }
     interact(data).then(res => {
@@ -139,7 +139,7 @@
     const data = {
       gatewaySn: gatewaySnText.value,
       deviceSn: deviceSnText.value,
-      commandCode: 30100,
+      commandCode: 3000100,
       requestJson: JSON.parse(setThermometerSendText.value)
     }
     interact(data).then(res => {
@@ -154,7 +154,7 @@
     const data = {
       gatewaySn: gatewaySnText.value,
       deviceSn: 0,
-      commandCode: 40000
+      commandCode: 4000000
     }
     interact(data).then(res => {
       alert(JSON.stringify(res))
@@ -168,7 +168,7 @@
     const data = {
       gatewaySn: gatewaySnText.value,
       deviceSn: 0,
-      commandCode: 40001
+      commandCode: 4000001
     }
     interact(data).then(res => {
       alert(JSON.stringify(res))
@@ -182,7 +182,7 @@
     const data = {
       gatewaySn: gatewaySnText.value,
       deviceSn: deviceSnText.value,
-      commandCode: 40100
+      commandCode: 4000100
     }
     interact(data).then(res => {
       alert(JSON.stringify(res))
@@ -224,7 +224,7 @@
     msg.innerText = 'WebSocket连接成功'
     /* 事件 */
     // 温度计事件
-    stomp.subscribe('/topic/iot/event/' + gatewaySnText.value + '/' + deviceSnText.value + '/10100', function (res) {
+    stomp.subscribe('/topic/iot/event/' + gatewaySnText.value + '/' + deviceSnText.value + '/1000100', function (res) {
       thermometerMsg.value = res.body + '\n' + thermometerMsg.value
     })
     /* 故障详情 */
@@ -233,33 +233,33 @@
     })
     /* 广播 */
     // 校时广播
-    stomp.subscribe('/topic/iot/broadcast/50000', function (res) {
+    stomp.subscribe('/topic/iot/broadcast/5000000', function (res) {
       timeSynMsg.value = res.body + '\n' + timeSynMsg.value
     })
     /* 交流 */
     // 获取时间戳
-    stomp.subscribe('/topic/iot/communication/' + gatewaySnText.value + '/0/60000', function (res) {
+    stomp.subscribe('/topic/iot/communication/' + gatewaySnText.value + '/0/6000000', function (res) {
       getTimeMsg.value = res.body + '\n' + getTimeMsg.value
     })
     /* 交互 */
     // 设置通信地址
-    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/0/30000', function (res) {
+    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/0/3000000', function (res) {
       setCommunicationAddressMsg.value = res.body + '\n' + setCommunicationAddressMsg.value
     })
     // 获取通信地址
-    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/0/40000', function (res) {
+    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/0/4000000', function (res) {
       getCommunicationAddressMsg.value = res.body + '\n' + getCommunicationAddressMsg.value
     })
     // 获取网关配置
-    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/0/40001', function (res) {
+    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/0/4000001', function (res) {
       getGatewayInfoMsg.value = res.body + '\n' + getGatewayInfoMsg.value
     })
     // 设置温度计配置
-    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/' + deviceSnText.value + '/30100', function (res) {
+    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/' + deviceSnText.value + '/3000100', function (res) {
       setThermometerMsg.value = res.body + '\n' + setThermometerMsg.value
     })
     // 获取温度计配置
-    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/' + deviceSnText.value + '/40100', function (res) {
+    stomp.subscribe('/topic/iot/interact/' + gatewaySnText.value + '/' + deviceSnText.value + '/4000100', function (res) {
       getThermometerMsg.value = res.body + '\n' + getThermometerMsg.value
     })
   }

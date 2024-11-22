@@ -17,12 +17,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @since 1.0.0
  **/
 @Schema(description = "温度计故障")
-@ProtocolAnno(code = 20100, name = "温度计故障", deviceType = DeviceType.THERMOMETER,
-        fault = @ProtocolAnno.Fault(fault = Fault20100.Fault.class)
+@ProtocolAnno(code = 2000100, name = "温度计故障", deviceType = DeviceType.THERMOMETER,
+        fault = @ProtocolAnno.Fault(fault = Fault2000100.Fault.class)
 )
-public class Fault20100 {
+public class Fault2000100 {
 
-    private Fault20100() {
+    private Fault2000100() {
     }
 
     /**

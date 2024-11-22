@@ -16,19 +16,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @since 1.0.0
  **/
 @Schema(description = "获取通信地址")
-@ProtocolAnno(code = 40000, name = "获取通信地址", deviceType = DeviceType.GATEWAY,
-        interact = @ProtocolAnno.Interact(response = Interact40000.Response.class)
+@ProtocolAnno(code = 4000000, name = "获取通信地址", deviceType = DeviceType.GATEWAY,
+        interact = @ProtocolAnno.Interact(response = Interact4000000.Response.class)
 )
-public class Interact40000 {
+public class Interact4000000 {
 
-    private Interact40000() {
+    private Interact4000000() {
     }
 
     /**
      * 响应
      */
-    @Schema(description = "响应", name = "Interact40000.Response")
-    public static class Response extends Interact30000.Request implements Protocol.Data {
+    @Schema(description = "响应", name = "Interact4000000.Response")
+    public static class Response extends Interact3000000.Request implements Protocol.Data {
     }
 
 }

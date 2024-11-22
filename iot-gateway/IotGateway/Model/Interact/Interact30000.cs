@@ -4,7 +4,7 @@ namespace IotGateway.Model.Interact
     /// <summary>
     /// 设置通信地址
     /// </summary>
-    public class Interact30000
+    public class Interact3000000
     {
 
         /// <summary>

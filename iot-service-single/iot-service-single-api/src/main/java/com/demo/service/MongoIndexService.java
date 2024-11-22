@@ -37,9 +37,8 @@ public class MongoIndexService extends ServiceBase {
 
     private final MongoTemplate mongoTemplate;
 
-    private static final Bson COMMAND_CODE = Indexes.ascending("commandCode");
     private static final Bson DEVICE_SN = Indexes.ascending("deviceSn");
-    private static final Bson TYPE = Indexes.ascending("type");
+    private static final Bson COMMAND_CODE = Indexes.ascending("commandCode");
     private static final Bson MONTH = Indexes.ascending("month");
     private static final Bson DAY = Indexes.ascending("day");
     private static final Bson HOUR = Indexes.ascending("hour");
@@ -49,6 +48,19 @@ public class MongoIndexService extends ServiceBase {
     private static final Bson REPORT_EVENT_DAY = Indexes.compoundIndex(COMMAND_CODE, DEVICE_SN, MONTH, DAY);
     private static final Bson REPORT_EVENT_HOUR = Indexes.compoundIndex(COMMAND_CODE, DEVICE_SN, MONTH, DAY, HOUR);
     private static final Bson REPORT_EVENT_MINUTE = Indexes.compoundIndex(COMMAND_CODE, DEVICE_SN, MONTH, DAY, HOUR, MINUTE);
+
+    // [网关序号]
+    //   _event 事件
+    //     _[yyyyMM] 全部数据(月) deviceSn commandCode
+    //     _minute_[yyyy] 分钟报表(年) deviceSn commandCode month day hour minute
+    //     _hour_[yyyy] 小时报表(年) deviceSn commandCode month day hour
+    //     _day_[yyyy] 日报表(年) deviceSn commandCode month day
+    //     _month_[yyyy] 月报表(年) deviceSn commandCode month
+    //   _fault_[yyyy] 故障(年) deviceSn commandCode
+    //   _fault_detail_[yyyy] 故障详情(年) deviceSn commandCode
+    //   _interact_[yyyy] 交互(年) deviceSn commandCode
+    //   _communication_[yyyy] 交流(年) deviceSn commandCode
+    // broadcast_[yyyy] 广播(年) commandCode
 
     /**
      * 更新索引(每天的0时1分2秒)
@@ -61,13 +73,17 @@ public class MongoIndexService extends ServiceBase {
         Set<String> collectionNameSet = mongoTemplate.getCollectionNames();
         for (String collectionName : collectionNameSet) {
             MongoCollection<Document> collection = mongoTemplate.getCollection(collectionName);
-            if (collectionName.contains(MongoConstant.INTERACT) ||
-                    collectionName.contains(MongoConstant.FAULT) ||
-                    collectionName.contains(MongoConstant.FAULT_DETAIL)
+            if (collectionName.contains(MongoConstant.FAULT)
+                    || collectionName.contains(MongoConstant.FAULT_DETAIL)
+                    || collectionName.contains(MongoConstant.INTERACT)
+                    || collectionName.contains(MongoConstant.COMMUNICATION)
             ) {
-                // 交互 故障 故障详情
+                // 故障 故障详情 交互 交流
                 collection.createIndex(COMMAND_CODE);
                 collection.createIndex(DEVICE_SN);
+            } else if (collectionName.contains(MongoConstant.BROADCAST)) {
+                // 广播
+                collection.createIndex(COMMAND_CODE);
             } else if (collectionName.contains(MongoConstant.EVENT)) {
                 // 事件
                 collection.createIndex(COMMAND_CODE);

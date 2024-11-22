@@ -22,12 +22,12 @@ import lombok.Setter;
  * @since 1.0.0
  **/
 @Schema(description = "设置温度计配置")
-@ProtocolAnno(code = 30100, name = "设置温度计配置", deviceType = DeviceType.THERMOMETER, special = true,
-        interact = @ProtocolAnno.Interact(request = Interact30100.Request.class)
+@ProtocolAnno(code = 3000100, name = "设置温度计配置", deviceType = DeviceType.THERMOMETER, special = true,
+        interact = @ProtocolAnno.Interact(request = Interact3000100.Request.class)
 )
-public class Interact30100 {
+public class Interact3000100 {
 
-    private Interact30100() {
+    private Interact3000100() {
     }
 
     /**
@@ -35,7 +35,7 @@ public class Interact30100 {
      */
     @Getter
     @Setter
-    @Schema(description = "请求", name = "Interact30100.Request")
+    @Schema(description = "请求", name = "Interact3000100.Request")
     public static class Request extends ToStringBase implements Protocol.Data {
 
         /**

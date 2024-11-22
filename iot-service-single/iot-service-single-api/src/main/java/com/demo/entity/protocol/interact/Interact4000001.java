@@ -24,12 +24,12 @@ import java.util.List;
  * @since 1.0.0
  **/
 @Schema(description = "获取网关配置")
-@ProtocolAnno(code = 40001, name = "获取网关配置", deviceType = DeviceType.GATEWAY,
-        interact = @ProtocolAnno.Interact(response = Interact40001.Response.class)
+@ProtocolAnno(code = 4000001, name = "获取网关配置", deviceType = DeviceType.GATEWAY,
+        interact = @ProtocolAnno.Interact(response = Interact4000001.Response.class)
 )
-public class Interact40001 {
+public class Interact4000001 {
 
-    private Interact40001() {
+    private Interact4000001() {
     }
 
     /**
@@ -37,7 +37,7 @@ public class Interact40001 {
      */
     @Getter
     @Setter
-    @Schema(description = "响应", name = "Interact40001.Response")
+    @Schema(description = "响应", name = "Interact4000001.Response")
     public static class Response extends ToStringBase implements Protocol.Data {
 
         /**

@@ -84,7 +84,7 @@ onUnmounted(() => {
 // region HTTP 设置界限
 
 function setRange() {
-  findLast({gatewaySn: props.gatewaySn, deviceSn: props.deviceSn, commandCode: 40100}).then(res => {
+  findLast({gatewaySn: props.gatewaySn, deviceSn: props.deviceSn, commandCode: 4000100}).then(res => {
     if (!res) {
       return
     }
@@ -129,7 +129,7 @@ const STOMP_GROUP = 'thermometer'
 const EVENT_PREFIX = '/topic/iot/event/'
 
 function subscribeData() {
-  subscribe(STOMP_GROUP, EVENT_PREFIX + props.gatewaySn + '/' + props.deviceSn + '/' + 10100, function (res) {
+  subscribe(STOMP_GROUP, EVENT_PREFIX + props.gatewaySn + '/' + props.deviceSn + '/' + 1000100, function (res) {
     let e = JSON.parse(res.body).event
     updateRealtime(e.temperature)
   })
@@ -337,7 +337,7 @@ function queryMinute(date: Date) {
   findReportPage({
     gatewaySn: props.gatewaySn,
     deviceSn: props.deviceSn,
-    commandCode: 10100,
+    commandCode: 1000100,
     reportType: 'MINUTE',
     year: date.getFullYear(),
     month: date.getMonth() + 1,
@@ -452,7 +452,7 @@ function queryHour(date: Date) {
   findReportPage({
     gatewaySn: props.gatewaySn,
     deviceSn: props.deviceSn,
-    commandCode: 10100,
+    commandCode: 1000100,
     reportType: 'HOUR',
     year: date.getFullYear(),
     month: date.getMonth() + 1,
@@ -567,7 +567,7 @@ function queryDay(date: Date) {
   findReportPage({
     gatewaySn: props.gatewaySn,
     deviceSn: props.deviceSn,
-    commandCode: 10100,
+    commandCode: 1000100,
     reportType: 'DAY',
     year: date.getFullYear(),
     month: date.getMonth() + 1,
@@ -678,7 +678,7 @@ function queryMonth(date: Date) {
   findReportPage({
     gatewaySn: props.gatewaySn,
     deviceSn: props.deviceSn,
-    commandCode: 10100,
+    commandCode: 1000100,
     reportType: 'MONTH',
     year: date.getFullYear(),
     rows: 12,

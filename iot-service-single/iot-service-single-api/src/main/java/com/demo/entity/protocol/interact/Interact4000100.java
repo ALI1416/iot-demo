@@ -16,19 +16,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @since 1.0.0
  **/
 @Schema(description = "获取温度计配置")
-@ProtocolAnno(code = 40100, name = "获取温度计配置", deviceType = DeviceType.THERMOMETER,
-        interact = @ProtocolAnno.Interact(response = Interact40100.Response.class)
+@ProtocolAnno(code = 4000100, name = "获取温度计配置", deviceType = DeviceType.THERMOMETER,
+        interact = @ProtocolAnno.Interact(response = Interact4000100.Response.class)
 )
-public class Interact40100 {
+public class Interact4000100 {
 
-    private Interact40100() {
+    private Interact4000100() {
     }
 
     /**
      * 响应
      */
-    @Schema(description = "响应", name = "Interact40100.Response")
-    public static class Response extends Interact30100.Request implements Protocol.Data {
+    @Schema(description = "响应", name = "Interact4000100.Response")
+    public static class Response extends Interact3000100.Request implements Protocol.Data {
     }
 
 }

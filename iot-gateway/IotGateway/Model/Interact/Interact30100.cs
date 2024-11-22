@@ -4,7 +4,7 @@ namespace IotGateway.Model.Interact
     /// <summary>
     /// 设置温度计配置
     /// </summary>
-    public class Interact30100
+    public class Interact3000100
     {
 
         /// <summary>

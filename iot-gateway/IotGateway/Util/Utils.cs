@@ -66,7 +66,7 @@ namespace IotGateway.Util
         /// <summary>
         /// 获取通信地址 响应
         /// </summary>
-        public static readonly Interact40000.Response Interact40000Response = new Interact40000.Response()
+        public static readonly Interact4000000.Response Interact4000000Response = new Interact4000000.Response()
         {
             Uri = "mqtt://127.0.0.1:1883",
             Username = "account",
@@ -76,16 +76,16 @@ namespace IotGateway.Util
         /// <summary>
         /// 获取网关配置 响应
         /// </summary>
-        public static readonly Interact40001.Response Interact40001Response = new Interact40001.Response()
+        public static readonly Interact4000001.Response Interact4000001Response = new Interact4000001.Response()
         {
-            DeviceList = new List<Interact40001.Device>()
+            DeviceList = new List<Interact4000001.Device>()
             {
-                new Interact40001.Device()
+                new Interact4000001.Device()
                 {
                     Sn = 0,
                     Type = 0
                 },
-                new Interact40001.Device()
+                new Interact4000001.Device()
                 {
                     Sn = 1,
                     Type = 1

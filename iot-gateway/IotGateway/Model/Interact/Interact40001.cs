@@ -6,7 +6,7 @@ namespace IotGateway.Model.Interact
     /// <summary>
     /// 获取网关配置
     /// </summary>
-    public class Interact40001
+    public class Interact4000001
     {
 
         /// <summary>

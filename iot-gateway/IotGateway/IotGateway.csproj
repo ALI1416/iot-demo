@@ -44,13 +44,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Model\ErrorCode.cs" />
-    <Compile Include="Model\Event\Event10100.cs" />
+    <Compile Include="Model\Event\Event1000100.cs" />
     <Compile Include="Model\Frame.cs" />
-    <Compile Include="Model\Interact\Interact30000.cs" />
-    <Compile Include="Model\Interact\Interact30100.cs" />
-    <Compile Include="Model\Interact\Interact40100.cs" />
-    <Compile Include="Model\Interact\Interact40001.cs" />
-    <Compile Include="Model\Interact\Interact40000.cs" />
+    <Compile Include="Model\Interact\Interact3000000.cs" />
+    <Compile Include="Model\Interact\Interact3000100.cs" />
+    <Compile Include="Model\Interact\Interact4000100.cs" />
+    <Compile Include="Model\Interact\Interact4000001.cs" />
+    <Compile Include="Model\Interact\Interact4000000.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\MqttService.cs" />

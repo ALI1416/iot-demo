@@ -9,7 +9,7 @@ import com.demo.constant.MqttConstant;
 import com.demo.constant.WsConstant;
 import com.demo.dao.mongo.BroadcastDao;
 import com.demo.entity.protocol.Frame;
-import com.demo.entity.protocol.broadcast.Broadcast50000;
+import com.demo.entity.protocol.broadcast.Broadcast5000000;
 import com.demo.entity.vo.ProtocolVo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,15 +62,15 @@ public class BroadcastService extends ServiceBase {
     /**
      * 校时广播(每隔12小时的10分20秒)
      *
-     * @see Broadcast50000
+     * @see Broadcast5000000
      */
     @Async
     // @Scheduled(cron = "3 * * * * *")
     @Scheduled(cron = "20 10 0/12 * * *")
     public void automaticTiming() {
         ProtocolVo protocol = new ProtocolVo();
-        protocol.setCommandCode(50000);
-        Broadcast50000.Broadcast broadcast = new Broadcast50000.Broadcast();
+        protocol.setCommandCode(5000000);
+        Broadcast5000000.Broadcast broadcast = new Broadcast5000000.Broadcast();
         broadcast.setTimestamp(Clock.now());
         protocol.setBroadcast(broadcast);
         ProtocolVo result = insertAndSend(protocol);

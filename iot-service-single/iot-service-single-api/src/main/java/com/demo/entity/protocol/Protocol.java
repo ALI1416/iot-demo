@@ -57,6 +57,20 @@ public class Protocol extends MongoEntityBase {
     @Schema(description = "命令代码")
     private Integer commandCode;
     /**
+     * 交互-交互类型
+     *
+     * @see InteractType
+     */
+    @Schema(description = "交互-交互类型")
+    private Integer type;
+    /**
+     * 错误代码
+     *
+     * @see ErrorCode
+     */
+    @Schema(description = "错误代码")
+    private Integer errorCode;
+    /**
      * 事件
      */
     @Schema(description = "事件")
@@ -86,20 +100,6 @@ public class Protocol extends MongoEntityBase {
      */
     @Schema(description = "写入")
     private Data write;
-    /**
-     * 交互-交互类型
-     *
-     * @see InteractType
-     */
-    @Schema(description = "交互-交互类型")
-    private Integer type;
-    /**
-     * 错误代码
-     *
-     * @see ErrorCode
-     */
-    @Schema(description = "错误代码")
-    private Integer errorCode;
     /**
      * 故障-故障列表
      */

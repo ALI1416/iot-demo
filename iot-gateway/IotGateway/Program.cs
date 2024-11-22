@@ -56,8 +56,8 @@ namespace IotGateway
         /// </summary>
         private static readonly Dictionary<int, Queue<Tuple<long, DateTime>>> map = new Dictionary<int, Queue<Tuple<long, DateTime>>>()
         {
-            { 30100, new Queue<Tuple<long, DateTime>>() },
-            { 40100, new Queue<Tuple<long, DateTime>>() }
+            { 3000100, new Queue<Tuple<long, DateTime>>() },
+            { 4000100, new Queue<Tuple<long, DateTime>>() }
         };
 
         /// <summary>
@@ -76,8 +76,8 @@ namespace IotGateway
                     {
                         if (data.Length == 5)
                         {
-                            topic = "$iot/event/" + gatewaySn + "/" + deviceSn + "/10100";
-                            frame.Event = new Event10100.Event
+                            topic = "$iot/event/" + gatewaySn + "/" + deviceSn + "/1000100";
+                            frame.Event = new Event1000100.Event
                             {
                                 Temperature = Utils.Byte4ToInt(data.Skip(1).Take(4).ToArray())
                             };
@@ -89,7 +89,7 @@ namespace IotGateway
                     {
                         if (data.Length == 2)
                         {
-                            topic = "$iot/fault/" + gatewaySn + "/" + deviceSn + "/20100";
+                            topic = "$iot/fault/" + gatewaySn + "/" + deviceSn + "/2000100";
                             frame.Fault = Utils.GetFaultList(data);
                         }
                         break;
@@ -99,8 +99,8 @@ namespace IotGateway
                     {
                         if (data.Length == 2)
                         {
-                            topic = "$iot/response/" + gatewaySn + "/" + deviceSn + "/30100";
-                            frame.RequestSn = GetRequestSn(30100);
+                            topic = "$iot/response/" + gatewaySn + "/" + deviceSn + "/3000100";
+                            frame.RequestSn = GetRequestSn(3000100);
                             frame.ErrorCode = Utils.GetResponseErrorCode(data);
                         }
                         break;
@@ -110,10 +110,10 @@ namespace IotGateway
                     {
                         if (data.Length == 5)
                         {
-                            topic = "$iot/response/" + gatewaySn + "/" + deviceSn + "/40100";
-                            frame.RequestSn = GetRequestSn(40100);
+                            topic = "$iot/response/" + gatewaySn + "/" + deviceSn + "/4000100";
+                            frame.RequestSn = GetRequestSn(4000100);
                             frame.ErrorCode = (int)ErrorCode.NoError;
-                            frame.Response = new Interact40100.Response()
+                            frame.Response = new Interact4000100.Response()
                             {
                                 IntervalRefresh = (sbyte)data[1],
                                 IntervalPush = (sbyte)data[2],
@@ -189,11 +189,11 @@ namespace IotGateway
                             break;
                         }
                     // 设置通信地址
-                    case 30000:
+                    case 3000000:
                         {
                             if (request != null)
                             {
-                                Interact30000.Request r = request.ToObject<Interact30000.Request>();
+                                Interact3000000.Request r = request.ToObject<Interact3000000.Request>();
                                 if (r != null
                                     && r.Uri != null && r.Username != null && r.Password != null)
                                 {
@@ -203,27 +203,27 @@ namespace IotGateway
                             break;
                         }
                     // 获取通信地址
-                    case 40000:
+                    case 4000000:
                         {
                             mqttFrame.ErrorCode = (int)ErrorCode.NoError;
-                            mqttFrame.Response = Utils.Interact40000Response;
+                            mqttFrame.Response = Utils.Interact4000000Response;
                             break;
                         }
                     // 获取网关配置
-                    case 40001:
+                    case 4000001:
                         {
                             mqttFrame.ErrorCode = (int)ErrorCode.NoError;
-                            mqttFrame.Response = Utils.Interact40001Response;
+                            mqttFrame.Response = Utils.Interact4000001Response;
                             break;
                         }
                     // 设置温度计配置
-                    case 30100:
+                    case 3000100:
                         {
                             if (serialPortService.IsOpen())
                             {
                                 if (request != null)
                                 {
-                                    Interact30100.Request r = request.ToObject<Interact30100.Request>();
+                                    Interact3000100.Request r = request.ToObject<Interact3000100.Request>();
                                     if (r != null
                                         && r.IntervalRefresh != null && r.IntervalPush != null
                                         && r.TemperatureMax != null && r.TemperatureMin != null
@@ -234,7 +234,7 @@ namespace IotGateway
                                         && r.TemperatureMin >= -55 && r.TemperatureMin <= 99
                                         && r.TemperatureMax > r.TemperatureMin)
                                     {
-                                        AddRequestSn(30100, requestSn);
+                                        AddRequestSn(3000100, requestSn);
                                         mqttFrame.ErrorCode = (int)ErrorCode.NoError;
                                         byte[] msg = new byte[] {
                                             0x80,
@@ -255,11 +255,11 @@ namespace IotGateway
                             break;
                         }
                     // 获取温度计配置
-                    case 40100:
+                    case 4000100:
                         {
                             if (serialPortService.IsOpen())
                             {
-                                AddRequestSn(40100, requestSn);
+                                AddRequestSn(4000100, requestSn);
                                 mqttFrame.ErrorCode = (int)ErrorCode.NoError;
                                 byte[] msg = new byte[] {
                                             0x81
@@ -340,27 +340,27 @@ namespace IotGateway
             while (true)
             {
                 DateTime now = DateTime.Now;
-                Queue<Tuple<long, DateTime>> map30100 = map[30100];
-                Queue<Tuple<long, DateTime>> map40100 = map[40100];
-                for (int i = 0; i < map30100.Count; i++)
+                Queue<Tuple<long, DateTime>> map3000100 = map[3000100];
+                Queue<Tuple<long, DateTime>> map4000100 = map[4000100];
+                for (int i = 0; i < map3000100.Count; i++)
                 {
-                    Tuple<long, DateTime> tuple = map30100.Peek();
+                    Tuple<long, DateTime> tuple = map3000100.Peek();
                     if (now.Subtract(tuple.Item2).TotalSeconds < timeout)
                     {
                         break;
                     }
-                    map30100.Dequeue();
-                    SendTimeoutMessage("$iot/response/" + gatewaySn + "/" + deviceSn + "/30100/", tuple.Item1);
+                    map3000100.Dequeue();
+                    SendTimeoutMessage("$iot/response/" + gatewaySn + "/" + deviceSn + "/3000100/", tuple.Item1);
                 }
-                for (int i = 0; i < map40100.Count; i++)
+                for (int i = 0; i < map4000100.Count; i++)
                 {
-                    Tuple<long, DateTime> tuple = map40100.Peek();
+                    Tuple<long, DateTime> tuple = map4000100.Peek();
                     if (now.Subtract(tuple.Item2).TotalSeconds < timeout)
                     {
                         break;
                     }
-                    map40100.Dequeue();
-                    SendTimeoutMessage("$iot/response/" + gatewaySn + "/" + deviceSn + "/40100/", tuple.Item1);
+                    map4000100.Dequeue();
+                    SendTimeoutMessage("$iot/response/" + gatewaySn + "/" + deviceSn + "/4000100/", tuple.Item1);
                 }
                 Thread.Sleep(10000);
             }

@@ -4,7 +4,7 @@ namespace IotGateway.Model
     /// <summary>
     /// 温度计事件
     /// </summary>
-    public class Event10100
+    public class Event1000100
     {
 
         /// <summary>

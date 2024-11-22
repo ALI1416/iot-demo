@@ -21,12 +21,12 @@ import lombok.Setter;
  * @since 1.0.0
  **/
 @Schema(description = "校时广播")
-@ProtocolAnno(code = 50000, name = "校时广播", deviceType = DeviceType.GATEWAY,
-        broadcast = @ProtocolAnno.Broadcast(broadcast = Broadcast50000.Broadcast.class)
+@ProtocolAnno(code = 5000000, name = "校时广播", deviceType = DeviceType.GATEWAY,
+        broadcast = @ProtocolAnno.Broadcast(broadcast = Broadcast5000000.Broadcast.class)
 )
-public class Broadcast50000 {
+public class Broadcast5000000 {
 
-    private Broadcast50000() {
+    private Broadcast5000000() {
     }
 
     /**
@@ -34,7 +34,7 @@ public class Broadcast50000 {
      */
     @Getter
     @Setter
-    @Schema(description = "校时广播", name = "Broadcast50000.Broadcast")
+    @Schema(description = "校时广播", name = "Broadcast5000000.Broadcast")
     public static class Broadcast extends ToStringBase implements Protocol.Data {
 
         /**

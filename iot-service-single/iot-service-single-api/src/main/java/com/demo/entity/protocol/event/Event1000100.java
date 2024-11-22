@@ -23,14 +23,14 @@ import java.util.stream.IntStream;
  * @since 1.0.0
  **/
 @Schema(description = "温度计事件")
-@ProtocolAnno(code = 10100, name = "温度计事件", deviceType = DeviceType.THERMOMETER,
-        event = @ProtocolAnno.Event(event = Event10100.Event.class, reportMinute = Event10100.ReportMinute.class,
-                reportHour = Event10100.ReportHourDayMonth.class, reportDay = Event10100.ReportHourDayMonth.class,
-                reportMonth = Event10100.ReportHourDayMonth.class, reportHandle = Event10100.ReportHandle.class)
+@ProtocolAnno(code = 1000100, name = "温度计事件", deviceType = DeviceType.THERMOMETER,
+        event = @ProtocolAnno.Event(event = Event1000100.Event.class, reportMinute = Event1000100.ReportMinute.class,
+                reportHour = Event1000100.ReportHourDayMonth.class, reportDay = Event1000100.ReportHourDayMonth.class,
+                reportMonth = Event1000100.ReportHourDayMonth.class, reportHandle = Event1000100.ReportHandle.class)
 )
-public class Event10100 {
+public class Event1000100 {
 
-    private Event10100() {
+    private Event1000100() {
     }
 
     /**
@@ -38,7 +38,7 @@ public class Event10100 {
      */
     @Getter
     @Setter
-    @Schema(description = "温度计事件", name = "Event10100.Event")
+    @Schema(description = "温度计事件", name = "Event1000100.Event")
     public static class Event extends ToStringBase implements Protocol.Data {
 
         /**
@@ -65,7 +65,7 @@ public class Event10100 {
      */
     @Getter
     @Setter
-    @Schema(description = "温度计事件分钟报表", name = "Event10100.ReportMinute")
+    @Schema(description = "温度计事件分钟报表", name = "Event1000100.ReportMinute")
     public static class ReportMinute extends Protocol.DefaultData {
 
         /**
@@ -82,7 +82,7 @@ public class Event10100 {
      */
     @Getter
     @Setter
-    @Schema(description = "温度计事件小时/日/月报表", name = "Event10100.ReportHourDayMonth")
+    @Schema(description = "温度计事件小时/日/月报表", name = "Event1000100.ReportHourDayMonth")
     public static class ReportHourDayMonth extends ReportMinute {
 
         /**

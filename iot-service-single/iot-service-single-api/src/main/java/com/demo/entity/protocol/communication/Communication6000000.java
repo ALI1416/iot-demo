@@ -23,14 +23,14 @@ import lombok.Setter;
  * @since 1.0.0
  **/
 @Schema(description = "获取时间戳")
-@ProtocolAnno(code = 60000, name = "获取时间戳", deviceType = DeviceType.GATEWAY,
+@ProtocolAnno(code = 6000000, name = "获取时间戳", deviceType = DeviceType.GATEWAY,
         communication = @ProtocolAnno.Communication(
-                write = Communication60000.Write.class,
-                writeHandle = Communication60000.WriteHandle.class)
+                write = Communication6000000.Write.class,
+                writeHandle = Communication6000000.WriteHandle.class)
 )
-public class Communication60000 {
+public class Communication6000000 {
 
-    private Communication60000() {
+    private Communication6000000() {
     }
 
     /**
@@ -38,7 +38,7 @@ public class Communication60000 {
      */
     @Getter
     @Setter
-    @Schema(description = "写入", name = "Communication60000.Write")
+    @Schema(description = "写入", name = "Communication6000000.Write")
     public static class Write extends ToStringBase implements Protocol.Data {
 
         /**
@@ -65,7 +65,7 @@ public class Communication60000 {
     /**
      * 写入处理
      */
-    @Schema(description = "写入处理", name = "Communication60000.WriteHandle")
+    @Schema(description = "写入处理", name = "Communication6000000.WriteHandle")
     public static class WriteHandle implements Protocol.WriteHandle {
 
         /**

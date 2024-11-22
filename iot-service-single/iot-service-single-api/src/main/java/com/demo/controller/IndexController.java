@@ -4,7 +4,7 @@ import com.demo.entity.pojo.Result;
 import com.demo.entity.protocol.Frame;
 import com.demo.entity.protocol.Protocol;
 import com.demo.entity.protocol.ProtocolInfo;
-import com.demo.entity.protocol.event.Event10100;
+import com.demo.entity.protocol.event.Event1000100;
 import com.demo.entity.protocol.interact.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,12 +41,12 @@ public class IndexController {
     @Operation(summary = "协议实体")
     public Result protocol(
             Frame frame, Protocol protocol, ProtocolInfo protocolInfo,
-            Event10100.Event event10100Event, Event10100.ReportMinute event10100ReportMinute, Event10100.ReportHourDayMonth event10100EventHourDayMonth,
-            Interact30000.Request interact30000Request,
-            Interact30100.Request interact30100Request,
-            Interact40000.Response interact40000Response,
-            Interact40001.Response interact40001Response,
-            Interact40100.Response interact40100Response
+            Event1000100.Event event1000100Event, Event1000100.ReportMinute event1000100ReportMinute, Event1000100.ReportHourDayMonth event1000100EventHourDayMonth,
+            Interact3000000.Request interact3000000Request,
+            Interact3000100.Request interact3000100Request,
+            Interact4000000.Response interact4000000Response,
+            Interact4000001.Response interact4000001Response,
+            Interact4000100.Response interact4000100Response
     ) {
         return Result.o();
     }

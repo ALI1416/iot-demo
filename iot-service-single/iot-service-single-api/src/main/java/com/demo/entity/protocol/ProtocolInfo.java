@@ -1,7 +1,6 @@
 package com.demo.entity.protocol;
 
 import cn.z.tool.ClassScanner;
-import com.alibaba.fastjson2.annotation.JSONField;
 import com.demo.announce.*;
 import com.demo.base.ToStringBase;
 import com.demo.constant.ProtocolType;
@@ -128,68 +127,57 @@ public class ProtocolInfo extends ToStringBase {
      * 事件类
      */
     @Schema(description = "事件类")
-    @JSONField(serialize = false, deserialize = false)
-    private Class<? extends Protocol.Data> eventClass;
+    private transient Class<? extends Protocol.Data> eventClass;
     /**
      * 事件分钟报表方法
      */
     @Schema(description = "事件分钟报表方法")
-    @JSONField(serialize = false, deserialize = false)
-    private Function<List<ProtocolVo>, ProtocolVo> eventReportMinuteFunction;
+    private transient Function<List<ProtocolVo>, ProtocolVo> eventReportMinuteFunction;
     /**
      * 事件小时报表方法
      */
     @Schema(description = "事件小时报表方法")
-    @JSONField(serialize = false, deserialize = false)
-    private Function<List<ProtocolVo>, ProtocolVo> eventReportHourFunction;
+    private transient Function<List<ProtocolVo>, ProtocolVo> eventReportHourFunction;
     /**
      * 事件日报表方法
      */
     @Schema(description = "事件日报表方法")
-    @JSONField(serialize = false, deserialize = false)
-    private Function<List<ProtocolVo>, ProtocolVo> eventReportDayFunction;
+    private transient Function<List<ProtocolVo>, ProtocolVo> eventReportDayFunction;
     /**
      * 事件月报表方法
      */
     @Schema(description = "事件月报表方法")
-    @JSONField(serialize = false, deserialize = false)
-    private Function<List<ProtocolVo>, ProtocolVo> eventReportMonthFunction;
+    private transient Function<List<ProtocolVo>, ProtocolVo> eventReportMonthFunction;
     /**
      * 交流写入方法
      */
     @Schema(description = "交流写入方法")
-    @JSONField(serialize = false, deserialize = false)
-    private Function<Protocol.Data, Protocol.Data> communicationWriteFunction;
+    private transient Function<Protocol.Data, Protocol.Data> communicationWriteFunction;
     /**
      * 请求类
      */
     @Schema(description = "请求类")
-    @JSONField(serialize = false, deserialize = false)
-    private Class<? extends Protocol.Data> requestClass;
+    private transient Class<? extends Protocol.Data> requestClass;
     /**
      * 响应类
      */
     @Schema(description = "响应类")
-    @JSONField(serialize = false, deserialize = false)
-    private Class<? extends Protocol.Data> responseClass;
+    private transient Class<? extends Protocol.Data> responseClass;
     /**
      * 广播类
      */
     @Schema(description = "广播类")
-    @JSONField(serialize = false, deserialize = false)
-    private Class<? extends Protocol.Data> broadcastClass;
+    private transient Class<? extends Protocol.Data> broadcastClass;
     /**
      * 读取类
      */
     @Schema(description = "读取类")
-    @JSONField(serialize = false, deserialize = false)
-    private Class<? extends Protocol.Data> readClass;
+    private transient Class<? extends Protocol.Data> readClass;
     /**
      * 写入类
      */
     @Schema(description = "写入类")
-    @JSONField(serialize = false, deserialize = false)
-    private Class<? extends Protocol.Data> writeClass;
+    private transient Class<? extends Protocol.Data> writeClass;
 
     /**
      * 字段信息
