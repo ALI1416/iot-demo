@@ -108,7 +108,7 @@ public class CommunicationSubscribeService extends ServiceBase {
             write.setWrite(protocol.getWrite());
             // 不能在同一个线程内使用
             ThreadPool.execute(() -> mqttTemp.send(
-                    MqttConstant.getWriteTopic(result.getGatewaySn(), result.getDeviceSn(), result.getCommandCode()),
+                    MqttConstant.getWriteTopic(protocol.getGatewaySn(), protocol.getDeviceSn(), protocol.getCommandCode()),
                     JSON.toJSONBytes(write)
             ));
             // WebSocket广播模式

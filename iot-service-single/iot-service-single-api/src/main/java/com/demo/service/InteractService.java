@@ -52,7 +52,7 @@ public class InteractService extends ServiceBase {
             request.setRequestSn(result.getId());
             request.setRequest(protocol.getRequest());
             mqttTemp.send(
-                    MqttConstant.getRequestTopic(result.getGatewaySn(), result.getDeviceSn(), result.getCommandCode()),
+                    MqttConstant.getRequestTopic(protocol.getGatewaySn(), protocol.getDeviceSn(), protocol.getCommandCode()),
                     JSON.toJSONBytes(request)
             );
         }

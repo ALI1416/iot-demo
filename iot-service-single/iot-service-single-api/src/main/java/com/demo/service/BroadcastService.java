@@ -50,7 +50,7 @@ public class BroadcastService extends ServiceBase {
             Frame.Broadcast request = new Frame.Broadcast();
             request.setBroadcast(protocol.getBroadcast());
             mqttTemp.send(
-                    MqttConstant.getBroadcastTopic(result.getCommandCode()),
+                    MqttConstant.getBroadcastTopic(protocol.getCommandCode()),
                     JSON.toJSONBytes(request)
             );
             // WebSocket广播模式
