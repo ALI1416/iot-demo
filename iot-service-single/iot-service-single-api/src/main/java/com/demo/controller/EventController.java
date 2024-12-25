@@ -40,7 +40,7 @@ public class EventController extends ControllerBase {
     @Operation(summary = "分页查询报表", description = "需要gatewaySn,year,reportType")
     public Result<Page<ProtocolVo>> findReportPage(@RequestBody ProtocolVo protocol) {
         if (existNull(protocol.getGatewaySn(), protocol.getYear(), protocol.getReportType())) {
-            return paramIsError();
+            return paramError();
         }
         return Result.o(eventService.findReportPage(protocol));
     }

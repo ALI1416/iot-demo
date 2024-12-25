@@ -18,7 +18,7 @@
     <!--org.springframework.boot:spring-boot-starter-parent-->
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.3.5</version>
+    <version>3.4.1</version>
   </parent>
 
   <modules>
@@ -94,7 +94,7 @@
 
     <!--MyBatis-->
     <!--org.mybatis.spring.boot:mybatis-spring-boot-starter-->
-    <mybatis.version>3.0.3</mybatis.version>
+    <mybatis.version>3.0.4</mybatis.version>
 
     <!--PageHelper分页排序查询-->
     <!--com.github.pagehelper:pagehelper-spring-boot-starter-->
@@ -102,7 +102,7 @@
 
     <!--雪花ID生成器-->
     <!--cn.404z:id-spring-boot-autoconfigure-->
-    <id.version>3.2.0.single</id.version>
+    <id.version>3.3.0.single</id.version>
 
     <!--Knife4j-->
     <!--com.github.xiaoymin:knife4j-openapi3-jakarta-spring-boot-starter-->

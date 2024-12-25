@@ -16,7 +16,7 @@ function create() {
     if (res.data.code !== 0) {
       ElNotification({
         title: '接口调用异常',
-        message: res.data.msg,
+        message: res.data.message,
         type: 'error'
       })
       return Promise.reject(res)

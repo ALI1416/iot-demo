@@ -7,10 +7,7 @@ import cn.z.mqtt.annotation.Subscribe;
 import cn.z.websocket.WebSocketTemp;
 import com.alibaba.fastjson2.JSONObject;
 import com.demo.base.ServiceBase;
-import com.demo.constant.InteractType;
-import com.demo.constant.MongoConstant;
-import com.demo.constant.MqttConstant;
-import com.demo.constant.WsConstant;
+import com.demo.constant.*;
 import com.demo.dao.mongo.InteractDao;
 import com.demo.entity.protocol.Frame;
 import com.demo.entity.protocol.Protocol;
@@ -64,18 +61,22 @@ public class InteractSubscribeService extends ServiceBase {
             log.warn("协议帧错误 请求序号:[{}] ,错误代码:[{}] ,网关序号:[{}] ,设备序号:[{}] ,命令代码:[{}] ,消息:[{}]", requestSn, errorCode, gatewaySn, deviceSn, commandCode, response);
             return;
         }
-        // 响应转换
-        Map.Entry<Integer, Protocol.Data> responseMap = Protocol.responseConvert(commandCode, response);
-        // 协议格式错误或转换失败
-        if (responseMap == null) {
-            log.warn("协议格式错误或转换失败 网关序号:[{}] ,设备序号:[{}] ,命令代码:[{}] ,请求序号:[{}] ,错误代码:[{}] ,消息:[{}]", gatewaySn, deviceSn, commandCode, requestSn, errorCode, response);
-            return;
-        }
-        // 数据检查未通过
-        Protocol.Data responseData = responseMap.getValue();
-        if (responseData != null && responseData.dataCheckNotPass()) {
-            log.warn("数据检查未通过 网关序号:[{}] ,设备序号:[{}] ,命令代码:[{}] ,请求序号:[{}] ,错误代码:[{}] ,消息:[{}]", gatewaySn, deviceSn, commandCode, requestSn, errorCode, response);
-            return;
+        Protocol.Data responseData = null;
+        // 没有错误
+        if (errorCode == ErrorCode.NO_ERROR.getCode()) {
+            // 响应转换
+            Map.Entry<Integer, Protocol.Data> responseMap = Protocol.responseConvert(commandCode, response);
+            // 协议格式错误或转换失败
+            if (responseMap == null) {
+                log.warn("协议格式错误或转换失败 网关序号:[{}] ,设备序号:[{}] ,命令代码:[{}] ,请求序号:[{}] ,错误代码:[{}] ,消息:[{}]", gatewaySn, deviceSn, commandCode, requestSn, errorCode, response);
+                return;
+            }
+            // 数据检查未通过
+            responseData = responseMap.getValue();
+            if (responseData != null && responseData.dataCheckNotPass()) {
+                log.warn("数据检查未通过 网关序号:[{}] ,设备序号:[{}] ,命令代码:[{}] ,请求序号:[{}] ,错误代码:[{}] ,消息:[{}]", gatewaySn, deviceSn, commandCode, requestSn, errorCode, response);
+                return;
+            }
         }
         // 单向交互
         if (requestSn == 0) {

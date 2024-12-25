@@ -44,13 +44,13 @@ public class InteractController extends ControllerBase {
         Integer deviceSn = protocol.getDeviceSn();
         Integer commandCode = protocol.getCommandCode();
         if (existNull(gatewaySn, deviceSn, commandCode)) {
-            return paramIsError();
+            return paramError();
         }
         // 请求转换
         Map.Entry<Integer, Protocol.Data> requestMap = Protocol.requestConvert(commandCode, protocol.getRequestJson());
         // 协议格式错误或转换失败或数据检查未通过
         if (requestMap == null || (requestMap.getValue() != null && requestMap.getValue().dataCheckNotPass())) {
-            return paramIsError();
+            return paramError();
         }
         // 网关序号、设备序号、设备类型不匹配
         // if (GatewayService.notValid(gatewaySn, deviceSn, requestMap.getKey())) {

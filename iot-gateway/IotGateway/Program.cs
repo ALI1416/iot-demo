@@ -71,7 +71,7 @@ namespace IotGateway
             Frame frame = new Frame();
             switch (data[0])
             {
-                // 温度事件
+                // 温度计事件
                 case 0x00:
                     {
                         if (data.Length == 5)
@@ -84,7 +84,7 @@ namespace IotGateway
                         }
                         break;
                     }
-                // 温度警报
+                // 温度计警报
                 case 0x40:
                     {
                         if (data.Length == 2)
@@ -94,7 +94,7 @@ namespace IotGateway
                         }
                         break;
                     }
-                // 设置温度参数：
+                // 设置温度计配置
                 case 0xC0:
                     {
                         if (data.Length == 2)
@@ -105,7 +105,7 @@ namespace IotGateway
                         }
                         break;
                     }
-                // 读取温度参数
+                // 获取温度计配置
                 case 0xC1:
                     {
                         if (data.Length == 5)
@@ -133,7 +133,7 @@ namespace IotGateway
             // 无法解析
             else
             {
-                log.Warn(logger + " 无法解析！");
+                log.Warn(logger + "无法解析！");
             }
         }
 
@@ -147,7 +147,7 @@ namespace IotGateway
             bool mqttSend = true;
             string message = Encoding.UTF8.GetString(data);
             Frame frame = JsonConvert.DeserializeObject<Frame>(message);
-            string logger = "MQTT接收到主题 " + topic + "  消息 " + message;
+            string logger = "MQTT收到主题 " + topic + "  消息 " + message;
             int deviceSn;
             int commandCode;
             long requestSn;
@@ -350,7 +350,7 @@ namespace IotGateway
                         break;
                     }
                     map3000100.Dequeue();
-                    SendTimeoutMessage("$iot/response/" + gatewaySn + "/" + deviceSn + "/3000100/", tuple.Item1);
+                    SendTimeoutMessage("$iot/response/" + gatewaySn + "/" + deviceSn + "/3000100", tuple.Item1);
                 }
                 for (int i = 0; i < map4000100.Count; i++)
                 {
@@ -360,7 +360,7 @@ namespace IotGateway
                         break;
                     }
                     map4000100.Dequeue();
-                    SendTimeoutMessage("$iot/response/" + gatewaySn + "/" + deviceSn + "/4000100/", tuple.Item1);
+                    SendTimeoutMessage("$iot/response/" + gatewaySn + "/" + deviceSn + "/4000100", tuple.Item1);
                 }
                 Thread.Sleep(10000);
             }

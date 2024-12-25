@@ -39,7 +39,7 @@ public class GatewayController extends ControllerBase {
     @Operation(summary = "插入", description = "需要sn,name<br>响应：成功id,失败0")
     public Result<Long> send(@RequestBody GatewayVo gateway) {
         if (existNull(gateway.getSn(), gateway.getName())) {
-            return paramIsError();
+            return paramError();
         }
         return Result.o(gatewayService.insert(gateway));
     }
