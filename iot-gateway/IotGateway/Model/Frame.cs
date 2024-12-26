@@ -31,6 +31,18 @@ namespace IotGateway.Model
         /// 响应
         /// </summary>
         public object Response { get; set; }
+        /// <summary>
+        /// 广播
+        /// </summary>
+        public object Broadcast { get; set; }
+        /// <summary>
+        /// 读取
+        /// </summary>
+        public object Read { get; set; }
+        /// <summary>
+        /// 写入
+        /// </summary>
+        public object Write { get; set; }
 
     }
 }

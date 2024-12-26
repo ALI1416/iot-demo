@@ -1,17 +1,21 @@
+using System;
 using System.Text;
 using System.Threading;
-using System;
 using System.Threading.Tasks;
 using System.Linq;
-using IotGateway.Model;
-using Newtonsoft.Json;
 using System.Collections.Generic;
-using IotGateway.Model.Interact;
-using Newtonsoft.Json.Serialization;
-using IotGateway.Service;
 using log4net;
-using IotGateway.Util;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
+using IotGateway.Model;
+using IotGateway.Model.Event;
+using IotGateway.Model.Interact;
+using IotGateway.Service;
+using IotGateway.Util;
+using log4net.Repository.Hierarchy;
+using IotGateway.Model.Communication;
+using IotGateway.Model.Broadcast;
 
 namespace IotGateway
 {
@@ -36,6 +40,12 @@ namespace IotGateway
         private static readonly string username = null;
         private static readonly string password = null;
 
+        private static readonly string[] subscribeTopicArray = new string[] {
+            "$iot/request/" + gatewaySn + "/+/+",
+            "$iot/write/" + gatewaySn + "/+/+",
+            "$iot/broadcast/+",
+        };
+
         /// <summary>
         /// 网关序号
         /// </summary>
@@ -48,8 +58,6 @@ namespace IotGateway
         /// 请求超时时间(秒)[1分钟]
         /// </summary>
         private static readonly int timeout = 60;
-
-        private static readonly string[] subscribeTopicArray = new string[] { "$iot/request/" + gatewaySn + "/+/+" };
 
         /// <summary>
         /// 请求序号Map 命令代码,请求序号,请求时间
@@ -144,14 +152,45 @@ namespace IotGateway
         /// <param name="data">消息</param>
         private static void MqttReceiveCallback(string topic, byte[] data)
         {
-            bool mqttSend = true;
             string message = Encoding.UTF8.GetString(data);
             Frame frame = JsonConvert.DeserializeObject<Frame>(message);
             string logger = "MQTT收到主题 " + topic + "  消息 " + message;
+            string[] topicPart = topic.Split('/');
+            switch (topicPart[1])
+            {
+                // 交互
+                case "request":
+                    {
+                        MqttInteractHandle(topicPart, frame, logger);
+                        break;
+                    }
+                // 交流
+                case "write":
+                    {
+                        MqttCommunicationHandle(topicPart, frame, logger);
+                        break;
+                    }
+                // 广播
+                case "broadcast":
+                    {
+                        MqttBroadcastHandle(topicPart, frame, logger);
+                        break;
+                    }
+            }
+        }
+
+        /// <summary>
+        /// MQTT交互消息处理
+        /// <param name="topicPart">主题片段</param>
+        /// <param name="frame">协议帧</param>
+        /// <param name="logger">日志</param>
+        /// </summary>
+        private static void MqttInteractHandle(string[] topicPart, Frame frame, string logger)
+        {
+            bool mqttSend = true;
             int deviceSn;
             int commandCode;
             long requestSn;
-            string[] topicPart = topic.Split('/');
             try
             {
                 deviceSn = int.Parse(topicPart[3]);
@@ -234,8 +273,6 @@ namespace IotGateway
                                         && r.TemperatureMin >= -55 && r.TemperatureMin <= 99
                                         && r.TemperatureMax > r.TemperatureMin)
                                     {
-                                        AddRequestSn(3000100, requestSn);
-                                        mqttFrame.ErrorCode = (int)ErrorCode.NoError;
                                         byte[] msg = new byte[] {
                                             0x80,
                                             (byte) r.IntervalRefresh,
@@ -243,8 +280,16 @@ namespace IotGateway
                                             (byte) r.TemperatureMax,
                                             (byte) r.TemperatureMin
                                         };
-                                        serialPortService.Send(msg);
-                                        mqttSend = false;
+                                        if (serialPortService.Send(msg))
+                                        {
+                                            mqttSend = false;
+                                            mqttFrame.ErrorCode = (int)ErrorCode.NoError;
+                                            AddRequestSn(3000100, requestSn);
+                                        }
+                                        else
+                                        {
+                                            mqttFrame.ErrorCode = (int)ErrorCode.DeviceOffline;
+                                        }
                                     }
                                 }
                             }
@@ -259,13 +304,19 @@ namespace IotGateway
                         {
                             if (serialPortService.IsOpen())
                             {
-                                AddRequestSn(4000100, requestSn);
-                                mqttFrame.ErrorCode = (int)ErrorCode.NoError;
                                 byte[] msg = new byte[] {
                                             0x81
                                         };
-                                serialPortService.Send(msg);
-                                mqttSend = false;
+                                if (serialPortService.Send(msg))
+                                {
+                                    mqttSend = false;
+                                    mqttFrame.ErrorCode = (int)ErrorCode.NoError;
+                                    AddRequestSn(4000100, requestSn);
+                                }
+                                else
+                                {
+                                    mqttFrame.ErrorCode = (int)ErrorCode.DeviceOffline;
+                                }
                             }
                             else
                             {
@@ -300,6 +351,131 @@ namespace IotGateway
             else
             {
                 log.Warn(logger);
+            }
+        }
+
+        /// <summary>
+        /// MQTT交流消息处理
+        /// <param name="topicPart">主题片段</param>
+        /// <param name="frame">协议帧</param>
+        /// <param name="logger">日志</param>
+        /// </summary>
+        private static void MqttCommunicationHandle(string[] topicPart, Frame frame, string logger)
+        {
+            bool messageError = true;
+            int deviceSn;
+            int commandCode;
+            try
+            {
+                deviceSn = int.Parse(topicPart[3]);
+                commandCode = int.Parse(topicPart[4]);
+            }
+            // 主题错误
+            catch
+            {
+                log.Warn(logger + " 主题错误！");
+                return;
+            }
+            // 错误代码错误
+            if (frame.ErrorCode != (int)ErrorCode.NoError)
+            {
+                log.Warn(logger + " 错误代码错误！");
+                return;
+            }
+            if ((deviceSn == 0) || (deviceSn == Program.deviceSn))
+            {
+                JObject write = (JObject)frame.Write;
+                switch (commandCode)
+                {
+                    // 命令代码错误
+                    default:
+                        {
+                            log.Warn(logger + " 命令代码错误！");
+                            return;
+                        }
+                    // 获取时间戳
+                    case 6000000:
+                        {
+                            if (write != null)
+                            {
+                                Communication6000000.Write w = write.ToObject<Communication6000000.Write>();
+                                if (w != null && w.Timestamp != null)
+                                {
+                                    messageError = false;
+                                    logger += " 获取时间戳 " + DateTimeOffset.FromUnixTimeMilliseconds((long)w.Timestamp);
+                                }
+                            }
+                            break;
+                        }
+                }
+            }
+            // 设备不存在
+            else
+            {
+                log.Warn(logger + " 设备不存在！");
+                return;
+            }
+            if (messageError)
+            {
+                log.Warn(logger + " 消息错误！");
+            }
+            else
+            {
+                log.Info(logger);
+            }
+        }
+
+        /// <summary>
+        /// MQTT广播消息处理
+        /// <param name="topicPart">主题片段</param>
+        /// <param name="frame">协议帧</param>
+        /// <param name="logger">日志</param>
+        /// </summary>
+        private static void MqttBroadcastHandle(string[] topicPart, Frame frame, string logger)
+        {
+            bool messageError = true;
+            int commandCode;
+            try
+            {
+                commandCode = int.Parse(topicPart[2]);
+            }
+            // 主题错误
+            catch
+            {
+                log.Warn(logger + " 主题错误！");
+                return;
+            }
+            JObject broadcast = (JObject)frame.Broadcast;
+            switch (commandCode)
+            {
+                // 命令代码错误
+                default:
+                    {
+                        log.Warn(logger + " 命令代码错误！");
+                        return;
+                    }
+                // 校时广播
+                case 5000000:
+                    {
+                        if (broadcast != null)
+                        {
+                            Broadcast5000000.Broadcast b = broadcast.ToObject<Broadcast5000000.Broadcast>();
+                            if (b != null && b.Timestamp != null)
+                            {
+                                messageError = false;
+                                logger += " 校时广播 " + DateTimeOffset.FromUnixTimeMilliseconds((long)b.Timestamp);
+                            }
+                        }
+                        break;
+                    }
+            }
+            if (messageError)
+            {
+                log.Warn(logger + " 消息错误！");
+            }
+            else
+            {
+                log.Info(logger);
             }
         }
 
@@ -379,8 +555,24 @@ namespace IotGateway
                 ErrorCode = (int)ErrorCode.DeviceRequestTimeout
             };
             string message = JsonConvert.SerializeObject(frame);
-            log.Warn("设备执行超时！\n  MQTT发送主题 " + topic + " 消息 " + message);
             mqttService.Send(topic, Encoding.UTF8.GetBytes(message));
+            log.Warn("设备执行超时！\n  MQTT发送主题 " + topic + " 消息 " + message);
+        }
+
+        /// <summary>
+        /// 获取时间戳处理
+        /// </summary>
+        private static void GetTimestampHandle()
+        {
+            // 60秒轮询一次
+            while (true)
+            {
+                string topic = "$iot/read/" + gatewaySn + "/0/6000000";
+                string message = "{}";
+                mqttService.Send(topic, Encoding.UTF8.GetBytes(message));
+                log.Info("获取时间戳\n  MQTT发送主题 " + topic + " 消息 " + message);
+                Thread.Sleep(60000);
+            }
         }
 
         public static void Main(string[] args)
@@ -402,9 +594,13 @@ namespace IotGateway
             // 请求超时处理
             Task requestTimeoutHandle = new Task(() => RequestTimeoutHandle());
             requestTimeoutHandle.Start();
+            // 获取时间戳处理
+            Task getTimestampHandle = new Task(() => GetTimestampHandle());
+            getTimestampHandle.Start();
             Task.WaitAll(serialPortInit);
             Task.WaitAll(mqttInit);
             Task.WaitAll(requestTimeoutHandle);
+            Task.WaitAll(getTimestampHandle);
         }
 
     }

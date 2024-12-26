@@ -1,4 +1,4 @@
-namespace IotGateway.Model
+namespace IotGateway.Model.Event
 {
 
     /// <summary>
@@ -8,7 +8,7 @@ namespace IotGateway.Model
     {
 
         /// <summary>
-        /// 事件
+        /// 温度计事件
         /// </summary>
         public class Event
         {
@@ -16,7 +16,7 @@ namespace IotGateway.Model
             /// <summary>
             /// 温度(0.0001℃ 0.0001摄氏度)
             /// </summary>
-            public int Temperature { get; set; }
+            public int? Temperature { get; set; }
 
         }
 

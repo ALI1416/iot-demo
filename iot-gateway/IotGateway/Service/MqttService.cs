@@ -103,12 +103,11 @@ namespace IotGateway.Service
                 try
                 {
                     // 订阅主题
-                    client.SubscribeAsync(subscribeTopicArray[i]).Wait();
+                  client.SubscribeAsync(subscribeTopicArray[i]).Wait();
                 }
                 catch (Exception e)
                 {
                     log.Error("MQTT主题 " + subscribeTopicArray[i] + " 监听失败！", e);
-
                 }
             }
             return true;

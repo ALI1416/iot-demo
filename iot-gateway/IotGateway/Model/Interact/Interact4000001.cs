@@ -31,11 +31,11 @@ namespace IotGateway.Model.Interact
             /// <summary>
             /// 设备序号
             /// </summary>
-            public int Sn { get; set; }
+            public int? Sn { get; set; }
             /// <summary>
             /// 设备类型 0网关 1温度计
             /// </summary>
-            public int Type { get; set; }
+            public int? Type { get; set; }
 
         }
 

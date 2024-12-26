@@ -44,6 +44,10 @@ namespace IotGateway.Service
             try
             {
                 serialPort = new SerialPort(portName, baudRate);
+                // 写超时(1秒)
+                serialPort.WriteTimeout = 1000;
+                // 读超时(1秒)
+                serialPort.ReadTimeout = 1000;
                 // 开启串口
                 serialPort.Open();
                 isOpen = true;

@@ -65,8 +65,8 @@ public class BroadcastService extends ServiceBase {
      * @see Broadcast5000000
      */
     @Async
-    // @Scheduled(cron = "3 * * * * *")
-    @Scheduled(cron = "20 10 0/12 * * *")
+    @Scheduled(cron = "3 * * * * *")
+    // @Scheduled(cron = "20 10 0/12 * * *")
     public void automaticTiming() {
         ProtocolVo protocol = new ProtocolVo();
         protocol.setCommandCode(5000000);

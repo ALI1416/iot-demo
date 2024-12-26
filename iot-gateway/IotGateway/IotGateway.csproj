@@ -43,6 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\Broadcast\Broadcast5000000.cs" />
+    <Compile Include="Model\Communication\Communication6000000.cs" />
     <Compile Include="Model\ErrorCode.cs" />
     <Compile Include="Model\Event\Event1000100.cs" />
     <Compile Include="Model\Frame.cs" />
@@ -74,5 +76,6 @@
       <Version>13.0.3</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
