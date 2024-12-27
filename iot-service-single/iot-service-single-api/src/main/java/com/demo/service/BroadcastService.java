@@ -37,29 +37,6 @@ public class BroadcastService extends ServiceBase {
     private final WebSocketTemp webSocketTemp;
 
     /**
-     * 插入并发送
-     *
-     * @param protocol ProtocolVo
-     * @return ok:T,e:null
-     */
-    public ProtocolVo insertAndSend(ProtocolVo protocol) {
-        // 插入
-        ProtocolVo result = broadcastDao.insert(protocol);
-        if (result != null) {
-            // 发送到嵌入式
-            Frame.Broadcast request = new Frame.Broadcast();
-            request.setBroadcast(protocol.getBroadcast());
-            mqttTemp.send(
-                    MqttConstant.getBroadcastTopic(protocol.getCommandCode()),
-                    JSON.toJSONBytes(request)
-            );
-            // WebSocket广播模式
-            webSocketTemp.send(WsConstant.getBroadcastTopic(protocol.getCommandCode()), result.toWebString());
-        }
-        return result;
-    }
-
-    /**
      * 校时广播(每隔12小时的10分20秒)
      *
      * @see Broadcast5000000
@@ -79,6 +56,28 @@ public class BroadcastService extends ServiceBase {
         } else {
             log.warn("校时广播发送失败:[{}]", protocol);
         }
+    }
+
+    /**
+     * 插入并发送
+     *
+     * @param protocol ProtocolVo
+     * @return ok:T,e:null
+     */
+    public ProtocolVo insertAndSend(ProtocolVo protocol) {
+        // 插入
+        ProtocolVo result = broadcastDao.insert(protocol);
+        if (result != null) {
+            // 发送到嵌入式
+            Frame.Broadcast broadcast = new Frame.Broadcast();
+            broadcast.setBroadcast(protocol.getBroadcast());
+            String topic = MqttConstant.getBroadcastTopic(protocol.getCommandCode());
+            mqttTemp.send(topic, JSON.toJSONBytes(broadcast));
+            log.info("发送广播主题:[{}] ,消息:[{}]", topic, broadcast);
+            // WebSocket广播模式
+            webSocketTemp.send(WsConstant.getBroadcastTopic(protocol.getCommandCode()), result.toWebString());
+        }
+        return result;
     }
 
 }

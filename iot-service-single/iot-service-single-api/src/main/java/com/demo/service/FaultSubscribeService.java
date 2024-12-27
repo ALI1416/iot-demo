@@ -53,7 +53,7 @@ public class FaultSubscribeService extends ServiceBase {
             @Header(HeaderEnum.MSG) String msg,
             @Header(HeaderEnum.MSG) Frame frame
     ) {
-        log.info("主题:[{}] ,消息:[{}]", topic, msg);
+        log.info("收到故障主题:[{}] ,消息:[{}]", topic, msg);
         // 故障数组处理
         faultArrayHandle(gatewaySn, deviceSn, commandCode, frame.getFault());
     }

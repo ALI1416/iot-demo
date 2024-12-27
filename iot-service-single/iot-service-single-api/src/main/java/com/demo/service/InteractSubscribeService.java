@@ -1,10 +1,12 @@
 package com.demo.service;
 
 import cn.z.id.Id;
+import cn.z.mqtt.MqttTemp;
 import cn.z.mqtt.annotation.Header;
 import cn.z.mqtt.annotation.HeaderEnum;
 import cn.z.mqtt.annotation.Subscribe;
 import cn.z.websocket.WebSocketTemp;
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.demo.base.ServiceBase;
 import com.demo.constant.*;
@@ -34,6 +36,7 @@ import java.util.Map;
 public class InteractSubscribeService extends ServiceBase {
 
     private final InteractDao interactDao;
+    private final MqttTemp mqttTemp;
     private final WebSocketTemp webSocketTemp;
 
     /**
@@ -48,7 +51,7 @@ public class InteractSubscribeService extends ServiceBase {
             @Header(HeaderEnum.MSG) String msg,
             @Header(HeaderEnum.MSG) Frame frame
     ) {
-        log.info("主题:[{}] ,消息:[{}]", topic, msg);
+        log.info("收到交互主题:[{}] ,消息:[{}]", topic, msg);
         // 响应JSON处理
         responseJsonHandle(gatewaySn, deviceSn, commandCode, frame.getRequestSn(), frame.getErrorCode(), frame.getResponse());
     }
@@ -127,6 +130,28 @@ public class InteractSubscribeService extends ServiceBase {
         } else {
             log.info("双向交互响应接收失败:[{}]", protocol);
         }
+    }
+
+
+    /**
+     * 插入并发送
+     *
+     * @param protocol ProtocolVo
+     * @return ok:T,e:null
+     */
+    public ProtocolVo insertAndSend(ProtocolVo protocol) {
+        // 插入
+        ProtocolVo result = interactDao.insert(protocol);
+        if (result != null) {
+            // 发送到嵌入式
+            Frame.Request request = new Frame.Request();
+            request.setRequestSn(result.getId());
+            request.setRequest(protocol.getRequest());
+            String topic = MqttConstant.getRequestTopic(protocol.getGatewaySn(), protocol.getDeviceSn(), protocol.getCommandCode());
+            mqttTemp.send(topic, JSON.toJSONBytes(request));
+            log.info("发送交互主题:[{}] ,消息:[{}]", topic, request);
+        }
+        return result;
     }
 
 }

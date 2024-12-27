@@ -53,7 +53,7 @@ public class CommunicationSubscribeService extends ServiceBase {
             @Header(HeaderEnum.MSG) String msg,
             @Header(HeaderEnum.MSG) Frame frame
     ) {
-        log.info("主题:[{}] ,消息:[{}]", topic, msg);
+        log.info("收到交流主题:[{}] ,消息:[{}]", topic, msg);
         // 读取JSON处理
         readJsonHandle(gatewaySn, deviceSn, commandCode, frame.getRead());
     }
@@ -106,11 +106,10 @@ public class CommunicationSubscribeService extends ServiceBase {
             Frame.Write write = new Frame.Write();
             write.setErrorCode(protocol.getErrorCode());
             write.setWrite(protocol.getWrite());
+            String topic = MqttConstant.getWriteTopic(protocol.getGatewaySn(), protocol.getDeviceSn(), protocol.getCommandCode());
             // 不能在同一个线程内使用
-            ThreadPool.execute(() -> mqttTemp.send(
-                    MqttConstant.getWriteTopic(protocol.getGatewaySn(), protocol.getDeviceSn(), protocol.getCommandCode()),
-                    JSON.toJSONBytes(write)
-            ));
+            ThreadPool.execute(() -> mqttTemp.send(topic, JSON.toJSONBytes(write)));
+            log.info("发送交流主题:[{}] ,消息:[{}]", topic, write);
             // WebSocket广播模式
             webSocketTemp.send(WsConstant.getCommunicationTopic(protocol.getGatewaySn(), protocol.getDeviceSn(), protocol.getCommandCode()), result.toWebString());
         }

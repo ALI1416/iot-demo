@@ -48,7 +48,7 @@ public class EventSubscribeService extends ServiceBase {
             @Header(HeaderEnum.MSG) String msg,
             @Header(HeaderEnum.MSG) Frame frame
     ) {
-        log.info("主题:[{}] ,消息:[{}]", topic, msg);
+        log.info("收到事件主题:[{}] ,消息:[{}]", topic, msg);
         // 事件JSON处理
         eventJsonHandle(gatewaySn, deviceSn, commandCode, frame.getEvent());
     }

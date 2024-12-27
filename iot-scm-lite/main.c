@@ -12,11 +12,11 @@
 unsigned char UartReceiveData[UART_RECEIVE_SIZE];
 // 串口下一个接收数据存放下标
 unsigned char UartReceiveIndex = 0;
-// 串口接收状态：
-// 0未接收；
-// 1接收中；
-// 2被定时器中断函数打断；
-// 3接收完成(数据要在UART_RECEIVE_SIZE毫秒内发送完成，否则无效)
+// 串口接收状态
+// 0 未接收
+// 1 接收中
+// 2 被定时器中断函数打断
+// 3 接收完成(数据要在UART_RECEIVE_SIZE毫秒内发送完成，否则无效)
 unsigned char UartReceiveStatus = 0;
 
 // 温度转换最大值(秒)
@@ -25,7 +25,9 @@ unsigned char TEMP_CONVERT_MAX = 60;
 unsigned char TEMP_CONVERT_MIN = 1;
 // 温度转换间隔(秒)
 unsigned char TempConvertTime = 1;
-// 温度转换状态：0不可转换；1可转换
+// 温度转换状态
+// 0 不可转换
+// 1 可转换
 unsigned char TempConvertStatus = 1;
 
 // 串口发送最大值(秒)
@@ -34,7 +36,9 @@ unsigned char UART_SEND_MAX = 60;
 unsigned char UART_SEND_MIN = 1;
 // 串口发送间隔(秒)
 unsigned char UartSendTime = 10;
-// 串口发送状态：0不可发送；1可发送
+// 串口发送状态
+// 0 不可发送
+// 1 可发送
 unsigned char UartSendStatus = 0;
 
 // 温度最大值(℃)(实际为125)
@@ -50,7 +54,10 @@ char TempInt;
 char TempAlertHigh = 30;
 // 低温警报(℃)
 char TempAlertLow = 20;
-// 温度警报状态：0无警报；bit0(0x01)温度过高；bit1(0x02)温度过低
+// 温度警报状态
+// 0 无警报
+// bit0(0x01) 温度过高
+// bit1(0x02) 温度过低
 unsigned char TempAlertStatus = 0;
 
 void main()
@@ -94,31 +101,31 @@ void main()
   delayMs(500);
   while (1)
   {
-    // 数据交互格式：
-    // 事件(单片机 --> 网关)：0x00 - 0x3F
-    //   温度事件：0x00
+    // 数据交互格式
+    // 事件(单片机 --> 网关):0x00 ~ 0x3F
+    //   温度计事件:0x00
     //     温度x10000(32bit)
-    // 故障(单片机 --> 网关)：0x40 - 0x7F
-    //   温度警报：0x40
+    // 故障(单片机 --> 网关):0x40 ~ 0x7F
+    //   温度计故障:0x40
     //     温度警报状态(8bit)
-    // 交互(网关 --> 单片机)：请求：0x80 - 0xBF 响应：0xC0 - 0xFF
-    //   设置温度参数：
-    //     请求：0x80
+    // 交互(网关 --> 单片机):请求:0x80 ~ 0xBF 响应:0xC0 ~ 0xFF
+    //   设置温度计配置
+    //     请求:0x80
     //       T温度转换间隔 U串口发送间隔 H高温警报 L低温警报(32bit)
-    //     响应：0xC0
+    //     响应:0xC0
     //       是否成功(8bit)
     //         0x00 成功
     //         0x01 失败
-    //   读取温度参数：
-    //     请求：0x81
-    //     响应：0xC1
+    //   获取温度计配置
+    //     请求:0x81
+    //     响应:0xC1
     //       T温度转换间隔 U串口发送间隔 H高温警报 L低温警报(32bit)
     /* 数据接收完成 */
     if (UartReceiveStatus == 3)
     {
       // 数据头
       unsigned char header = UartReceiveData[0];
-      // 设置温度参数请求：0x80
+      // 设置温度计配置请求:0x80
       if (header == 0x80)
       {
         // T温度转换间隔
@@ -155,7 +162,7 @@ void main()
           delayMs(5);
           AT24C02_WriteByte(3, TempAlertLow);
           delayMs(5);
-          // 设置温度参数响应：0xC0
+          // 设置温度计配置响应:0xC0
           UartSendByte(0xC0);
           // 0x00 成功
           UartSendByte(0x00);
@@ -163,16 +170,16 @@ void main()
         // 数据错误
         else
         {
-          // 设置温度参数响应：0xC0
+          // 设置温度计配置响应:0xC0
           UartSendByte(0xC0);
           // 0x01 失败
           UartSendByte(0x01);
         }
       }
-      // 读取温度参数请求：0x81
+      // 获取温度计配置请求:0x81
       if (header == 0x81)
       {
-        // 读取温度参数响应：0xC1
+        // 获取温度计配置响应:0xC1
         UartSendByte(0xC1);
         // 温度转换间隔
         UartSendByte(TempConvertTime);
@@ -219,7 +226,7 @@ void main()
       unsigned char t1 = (Temp & 0x00FF0000) >> 16;
       unsigned char t2 = (Temp & 0x0000FF00) >> 8;
       unsigned char t3 = Temp & 0x000000FF;
-      // 温度事件：0x00
+      // 温度计事件:0x00
       UartSendByte(0x00);
       // 温度x10000
       UartSendByte(t0);
@@ -229,7 +236,7 @@ void main()
       if (TempAlertStatus != 0)
       {
         delayMs(10);
-        // 温度警报：0x40
+        // 温度计故障:0x40
         UartSendByte(0x40);
         // 温度警报状态
         UartSendByte(TempAlertStatus);

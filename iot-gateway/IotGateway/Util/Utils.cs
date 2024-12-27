@@ -60,6 +60,7 @@ namespace IotGateway.Util
                 sb.Append(bytes[i].ToString("X2"));
                 sb.Append(" ");
             }
+            sb.Remove(sb.Length - 1, 1);
             return sb.ToString();
         }
 

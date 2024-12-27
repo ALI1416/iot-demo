@@ -13,7 +13,6 @@ using IotGateway.Model.Event;
 using IotGateway.Model.Interact;
 using IotGateway.Service;
 using IotGateway.Util;
-using log4net.Repository.Hierarchy;
 using IotGateway.Model.Communication;
 using IotGateway.Model.Broadcast;
 
@@ -40,12 +39,6 @@ namespace IotGateway
         private static readonly string username = null;
         private static readonly string password = null;
 
-        private static readonly string[] subscribeTopicArray = new string[] {
-            "$iot/request/" + gatewaySn + "/+/+",
-            "$iot/write/" + gatewaySn + "/+/+",
-            "$iot/broadcast/+",
-        };
-
         /// <summary>
         /// 网关序号
         /// </summary>
@@ -58,6 +51,12 @@ namespace IotGateway
         /// 请求超时时间(秒)[1分钟]
         /// </summary>
         private static readonly int timeout = 60;
+
+        private static readonly string[] subscribeTopicArray = new string[] {
+            $"$iot/request/{gatewaySn}/+/+",
+            $"$iot/write/{gatewaySn}/+/+",
+            "$iot/broadcast/+",
+        };
 
         /// <summary>
         /// 请求序号Map 命令代码,请求序号,请求时间
@@ -74,9 +73,10 @@ namespace IotGateway
         /// <param name="data">消息</param>
         private static void SerialPortReceiveCallback(byte[] data)
         {
-            string logger = "串口收到消息 " + Utils.Bytes2Hex(data);
+            string logger = $"串口收到消息:[{Utils.Bytes2Hex(data)}]";
             string topic = null;
             Frame frame = new Frame();
+            string type = "";
             switch (data[0])
             {
                 // 温度计事件
@@ -84,11 +84,12 @@ namespace IotGateway
                     {
                         if (data.Length == 5)
                         {
-                            topic = "$iot/event/" + gatewaySn + "/" + deviceSn + "/1000100";
+                            topic = $"$iot/event/{gatewaySn}/{deviceSn}/1000100";
                             frame.Event = new Event1000100.Event
                             {
                                 Temperature = Utils.Byte4ToInt(data.Skip(1).Take(4).ToArray())
                             };
+                            type = "事件";
                         }
                         break;
                     }
@@ -97,8 +98,9 @@ namespace IotGateway
                     {
                         if (data.Length == 2)
                         {
-                            topic = "$iot/fault/" + gatewaySn + "/" + deviceSn + "/2000100";
+                            topic = $"$iot/fault/{gatewaySn}/{deviceSn}/2000100";
                             frame.Fault = Utils.GetFaultList(data);
+                            type = "故障";
                         }
                         break;
                     }
@@ -107,9 +109,10 @@ namespace IotGateway
                     {
                         if (data.Length == 2)
                         {
-                            topic = "$iot/response/" + gatewaySn + "/" + deviceSn + "/3000100";
+                            topic = $"$iot/response/{gatewaySn}/{deviceSn}/3000100";
                             frame.RequestSn = GetRequestSn(3000100);
                             frame.ErrorCode = Utils.GetResponseErrorCode(data);
+                            type = "交互";
                         }
                         break;
                     }
@@ -118,7 +121,7 @@ namespace IotGateway
                     {
                         if (data.Length == 5)
                         {
-                            topic = "$iot/response/" + gatewaySn + "/" + deviceSn + "/4000100";
+                            topic = $"$iot/response/{gatewaySn}/{deviceSn}/4000100";
                             frame.RequestSn = GetRequestSn(4000100);
                             frame.ErrorCode = (int)ErrorCode.NoError;
                             frame.Response = new Interact4000100.Response()
@@ -128,6 +131,7 @@ namespace IotGateway
                                 TemperatureMax = (sbyte)data[3],
                                 TemperatureMin = (sbyte)data[4]
                             };
+                            type = "交互";
                         }
                         break;
                     }
@@ -136,12 +140,12 @@ namespace IotGateway
             {
                 string message = JsonConvert.SerializeObject(frame);
                 mqttService.Send(topic, Encoding.UTF8.GetBytes(message));
-                log.Info(logger + "\n  MQTT发送主题 " + topic + " 消息 " + message);
+                log.Info(logger + $"\n  MQTT发送{type}主题:[{topic}], 消息:[{message}]");
             }
             // 无法解析
             else
             {
-                log.Warn(logger + "无法解析！");
+                log.Warn(logger + "\n  无法解析！");
             }
         }
 
@@ -154,25 +158,28 @@ namespace IotGateway
         {
             string message = Encoding.UTF8.GetString(data);
             Frame frame = JsonConvert.DeserializeObject<Frame>(message);
-            string logger = "MQTT收到主题 " + topic + "  消息 " + message;
             string[] topicPart = topic.Split('/');
+            string logger = "MQTT收到";
             switch (topicPart[1])
             {
                 // 交互
                 case "request":
                     {
+                        logger += $"交互主题:[{topic}], 消息:[{message}]";
                         MqttInteractHandle(topicPart, frame, logger);
                         break;
                     }
                 // 交流
                 case "write":
                     {
+                        logger += $"交流主题:[{topic}], 消息:[{message}]";
                         MqttCommunicationHandle(topicPart, frame, logger);
                         break;
                     }
                 // 广播
                 case "broadcast":
                     {
+                        logger += $"广播主题:[{topic}], 消息:[{message}]";
                         MqttBroadcastHandle(topicPart, frame, logger);
                         break;
                     }
@@ -199,18 +206,18 @@ namespace IotGateway
             // 主题错误
             catch
             {
-                log.Warn(logger + " 主题错误！");
+                log.Warn(logger + "\n  主题错误！");
                 return;
             }
             long? requestSnN = frame.RequestSn;
             // 请求序号错误
             if (requestSnN == null || requestSnN <= 0)
             {
-                log.Warn(logger + " 请求序号错误！");
+                log.Warn(logger + "\n  请求序号错误！");
                 return;
             }
             requestSn = (long)requestSnN;
-            string mqttTopic = "$iot/response/" + gatewaySn + "/" + deviceSn + "/" + commandCode;
+            string mqttTopic = $"$iot/response/{gatewaySn}/{deviceSn}/{commandCode}";
             Frame mqttFrame = new Frame
             {
                 RequestSn = requestSn
@@ -224,7 +231,7 @@ namespace IotGateway
                     default:
                         {
                             mqttFrame.ErrorCode = (int)ErrorCode.CommandCodeError;
-                            logger += " 命令代码错误！";
+                            logger += "\n  命令代码错误！";
                             break;
                         }
                     // 设置通信地址
@@ -330,19 +337,19 @@ namespace IotGateway
             else
             {
                 mqttFrame.ErrorCode = (int)ErrorCode.DeviceNotFound;
-                logger += " 设备不存在！";
+                logger += "\n  设备不存在！";
             }
             // MQTT消息错误
             if (mqttFrame.ErrorCode == null)
             {
                 mqttFrame.ErrorCode = (int)ErrorCode.MqttMessageError;
-                logger += " MQTT消息错误！";
+                logger += "\n  MQTT消息错误！";
             }
             if (mqttSend)
             {
                 string mqttMessage = JsonConvert.SerializeObject(mqttFrame);
                 mqttService.Send(mqttTopic, Encoding.UTF8.GetBytes(mqttMessage));
-                logger += "\n  MQTT发送主题 " + mqttTopic + " 消息 " + mqttMessage;
+                logger += $"\n  MQTT发送交互主题:[{mqttTopic}], 消息:[{mqttMessage}]";
             }
             if (mqttFrame.ErrorCode == (int)ErrorCode.NoError)
             {
@@ -373,13 +380,13 @@ namespace IotGateway
             // 主题错误
             catch
             {
-                log.Warn(logger + " 主题错误！");
+                log.Warn(logger + "\n  主题错误！");
                 return;
             }
             // 错误代码错误
             if (frame.ErrorCode != (int)ErrorCode.NoError)
             {
-                log.Warn(logger + " 错误代码错误！");
+                log.Warn(logger + "\n  错误代码错误！");
                 return;
             }
             if ((deviceSn == 0) || (deviceSn == Program.deviceSn))
@@ -390,7 +397,7 @@ namespace IotGateway
                     // 命令代码错误
                     default:
                         {
-                            log.Warn(logger + " 命令代码错误！");
+                            log.Warn(logger + "\n  命令代码错误！");
                             return;
                         }
                     // 获取时间戳
@@ -402,7 +409,7 @@ namespace IotGateway
                                 if (w != null && w.Timestamp != null)
                                 {
                                     messageError = false;
-                                    logger += " 获取时间戳 " + DateTimeOffset.FromUnixTimeMilliseconds((long)w.Timestamp);
+                                    logger += "\n  获取时间戳 " + DateTimeOffset.FromUnixTimeMilliseconds((long)w.Timestamp);
                                 }
                             }
                             break;
@@ -412,12 +419,12 @@ namespace IotGateway
             // 设备不存在
             else
             {
-                log.Warn(logger + " 设备不存在！");
+                log.Warn(logger + "\n  设备不存在！");
                 return;
             }
             if (messageError)
             {
-                log.Warn(logger + " 消息错误！");
+                log.Warn(logger + "\n  消息错误！");
             }
             else
             {
@@ -442,7 +449,7 @@ namespace IotGateway
             // 主题错误
             catch
             {
-                log.Warn(logger + " 主题错误！");
+                log.Warn(logger + "\n  主题错误！");
                 return;
             }
             JObject broadcast = (JObject)frame.Broadcast;
@@ -451,7 +458,7 @@ namespace IotGateway
                 // 命令代码错误
                 default:
                     {
-                        log.Warn(logger + " 命令代码错误！");
+                        log.Warn(logger + "\n  命令代码错误！");
                         return;
                     }
                 // 校时广播
@@ -463,7 +470,7 @@ namespace IotGateway
                             if (b != null && b.Timestamp != null)
                             {
                                 messageError = false;
-                                logger += " 校时广播 " + DateTimeOffset.FromUnixTimeMilliseconds((long)b.Timestamp);
+                                logger += "\n  校时广播 " + DateTimeOffset.FromUnixTimeMilliseconds((long)b.Timestamp);
                             }
                         }
                         break;
@@ -471,7 +478,7 @@ namespace IotGateway
             }
             if (messageError)
             {
-                log.Warn(logger + " 消息错误！");
+                log.Warn(logger + "\n  消息错误！");
             }
             else
             {
@@ -526,7 +533,7 @@ namespace IotGateway
                         break;
                     }
                     map3000100.Dequeue();
-                    SendTimeoutMessage("$iot/response/" + gatewaySn + "/" + deviceSn + "/3000100", tuple.Item1);
+                    SendTimeoutMessage($"$iot/response/{gatewaySn}/{deviceSn}/3000100", tuple.Item1);
                 }
                 for (int i = 0; i < map4000100.Count; i++)
                 {
@@ -536,7 +543,7 @@ namespace IotGateway
                         break;
                     }
                     map4000100.Dequeue();
-                    SendTimeoutMessage("$iot/response/" + gatewaySn + "/" + deviceSn + "/4000100", tuple.Item1);
+                    SendTimeoutMessage($"$iot/response/{gatewaySn}/{deviceSn}/4000100", tuple.Item1);
                 }
                 Thread.Sleep(10000);
             }
@@ -556,7 +563,7 @@ namespace IotGateway
             };
             string message = JsonConvert.SerializeObject(frame);
             mqttService.Send(topic, Encoding.UTF8.GetBytes(message));
-            log.Warn("设备执行超时！\n  MQTT发送主题 " + topic + " 消息 " + message);
+            log.Warn($"设备执行超时！\n  MQTT发送交互主题:[{topic}], 消息:[{message}]");
         }
 
         /// <summary>
@@ -564,13 +571,14 @@ namespace IotGateway
         /// </summary>
         private static void GetTimestampHandle()
         {
+            Thread.Sleep(10000);
             // 60秒轮询一次
             while (true)
             {
-                string topic = "$iot/read/" + gatewaySn + "/0/6000000";
+                string topic = $"$iot/read/{gatewaySn}/0/6000000";
                 string message = "{}";
                 mqttService.Send(topic, Encoding.UTF8.GetBytes(message));
-                log.Info("获取时间戳\n  MQTT发送主题 " + topic + " 消息 " + message);
+                log.Info($"获取时间戳\n  MQTT发送交流主题:[{topic}], 消息:[{message}]");
                 Thread.Sleep(60000);
             }
         }

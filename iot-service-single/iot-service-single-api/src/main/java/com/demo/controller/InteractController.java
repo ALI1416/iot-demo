@@ -6,6 +6,7 @@ import com.demo.entity.pojo.Result;
 import com.demo.entity.protocol.Protocol;
 import com.demo.entity.vo.ProtocolVo;
 import com.demo.service.InteractService;
+import com.demo.service.InteractSubscribeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +34,7 @@ import java.util.Map;
 public class InteractController extends ControllerBase {
 
     private final InteractService interactService;
+    private final InteractSubscribeService interactSubscribeService;
 
     /**
      * 发送
@@ -60,7 +62,7 @@ public class InteractController extends ControllerBase {
         protocol.setRequest(requestMap.getValue());
         protocol.setRequestJson(null);
         // 插入并发送
-        ProtocolVo result = interactService.insertAndSend(protocol);
+        ProtocolVo result = interactSubscribeService.insertAndSend(protocol);
         if (result != null) {
             log.info("交互请求发送成功:[{}]", result);
         } else {
