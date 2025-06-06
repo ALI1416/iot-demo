@@ -31,8 +31,8 @@
 
 ### TypeScript
 
-- `@tsconfig/node20` : `@tsconfig/node20`  
-  [![NPM](https://img.shields.io/npm/v/@tsconfig/node20?label=NPM)](https://npmmirror.com/package/@tsconfig/node20)
+- `@tsconfig/node22` : `@tsconfig/node22`  
+  [![NPM](https://img.shields.io/npm/v/@tsconfig/node22?label=NPM)](https://npmmirror.com/package/@tsconfig/node22)
 - `@types/node` : `@types/node`  
   [![NPM](https://img.shields.io/npm/v/@types/node?label=NPM)](https://npmmirror.com/package/@types/node)
 - `@vue/tsconfig` : `@vue/tsconfig`  

@@ -10,8 +10,6 @@ spring:
       max-request-size: 4GB
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      max-lifetime: 60000
   data:
     mongodb:
       auto-index-creation: true
