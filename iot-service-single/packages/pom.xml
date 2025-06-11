@@ -33,7 +33,7 @@
     <!--继承父依赖不可修改版本号-->
     <!--SpringBoot-->
     <!--org.springframework.boot:spring-boot-starter-->
-    <springboot.version>3.4.1</springboot.version>
+    <springboot.version>3.5.0</springboot.version>
 
     <!--SpringBoot Web-->
     <!--org.springframework.boot:spring-boot-starter-web-->

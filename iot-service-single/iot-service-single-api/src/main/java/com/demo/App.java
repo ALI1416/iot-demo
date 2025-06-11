@@ -34,10 +34,10 @@ import java.util.TimeZone;
  * @author ALI[ali-k@foxmail.com]
  * @since 1.0.0
  **/
-@MapperScan("com.demo.mapper")
 @SpringBootApplication
 @EnableScheduling
 @EnableAsync
+@MapperScan("com.demo.mapper")
 public class App {
 
     public static void main(String[] args) {

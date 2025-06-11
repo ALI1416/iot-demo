@@ -7,17 +7,13 @@ interface ImportMeta {
 
 interface ImportMetaEnv {
   /**
-   * APP标题
-   */
-  readonly VITE_APP_TITLE: string
-  /**
    * 网站标题
    */
   readonly VITE_WEB_TITLE: string
   /**
-   * Web URL
+   * API URL
    */
-  readonly VITE_WEB_URL: string
+  readonly VITE_API_URL: string
   /**
    * WebSocket URL
    */
